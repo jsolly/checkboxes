@@ -1,36 +1,43 @@
 ---
+import { Code } from "astro:components";
+
 interface Props {
 	code: string;
-	language?: string;
+	lang?: "astro" | "typescript" | "javascript" | "html";
 }
 
-const { code, language = "html" } = Astro.props;
+const { code = "", lang = "html" } = Astro.props;
 ---
 
 <div class="mt-4 rounded-lg overflow-hidden border border-slate-200" x-data="{ expanded: false }">
-  <button 
-    class="w-full bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between hover:bg-slate-100 transition-colors"
-    @click="expanded = !expanded"
-  >
-    <div class="font-mono text-sm text-slate-600">Code</div>
-    <div class="text-slate-400">
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        class="h-5 w-5 transition-transform"
-        :class="expanded ? 'rotate-180' : ''"
-        fill="none" 
-        viewBox="0 0 24 24" 
-        stroke="currentColor"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-      </svg>
-    </div>
-  </button>
-  <div 
-    class="overflow-hidden transition-[max-height] duration-300 ease-in-out"
-    x-ref="code"
-    :style="expanded ? { maxHeight: $refs.code.scrollHeight + 'px' } : { maxHeight: '0px' }"
-  >
-    <pre class="p-4 overflow-x-auto bg-white"><code class="text-sm">{code.trim()}</code></pre>
-  </div>
+	<button 
+		class="w-full bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between hover:bg-slate-100 transition-colors"
+		@click="expanded = !expanded"
+	>
+		<div class="flex items-center space-x-3">
+			<div class="font-mono text-sm text-slate-600">Code</div>
+			<div class="text-xs px-2 py-0.5 rounded bg-slate-200 text-slate-600">{lang}</div>
+		</div>
+		<div class="text-slate-400">
+			<svg 
+				xmlns="http://www.w3.org/2000/svg" 
+				class="h-5 w-5 transition-transform"
+				:class="expanded ? 'rotate-180' : ''"
+				fill="none" 
+				viewBox="0 0 24 24" 
+				stroke="currentColor"
+			>
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+			</svg>
+		</div>
+	</button>
+	<div 
+		class="overflow-hidden transition-[max-height] duration-300 ease-in-out"
+		x-ref="code"
+		:style="expanded ? { maxHeight: $refs.code.scrollHeight + 'px' } : { maxHeight: '0px' }"
+	>
+		<div class="p-4 overflow-x-auto bg-white">
+			<Code code={code} lang={lang} theme="github-light" wrap />
+		</div>
+	</div>
 </div> 
