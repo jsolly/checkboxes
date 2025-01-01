@@ -1,4 +1,6 @@
 ---
+import GithubIcon from "../assets/github.svg?raw";
+
 interface Props {
 	title?: string;
 }
@@ -16,6 +18,17 @@ const { title = "checkboxes.xyz" } = Astro.props;
 	</head>
 	<body>
 		<slot />
+		<footer class="group flex justify-center mt-5 mb-16">
+			<a
+				href="https://github.com/jsolly/checkboxes"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="flex items-center justify-center content-center text-xs text-slate-500 hover:text-slate-700 transition-colors"
+			>
+				<Fragment set:html={GithubIcon} class="w-5 h-5 mr-2" />
+				View Source
+			</a>
+		</footer>
 	</body>
 </html>
 
