@@ -23,31 +23,9 @@ let childStates: Record<string, boolean> = childCheckboxItems.reduce(
 	{} as Record<string, boolean>,
 );
 
-let parentChecked = false;
-let isIndeterminate = false;
-
-$: {
-	const allChecked = Object.values(childStates).every(Boolean);
-	const someChecked = Object.values(childStates).some(Boolean);
-	parentChecked = allChecked;
-	isIndeterminate = someChecked && !allChecked;
-}
-
-function handleParentChange(e: Event) {
-	const newValue = (e.target as HTMLInputElement).checked;
-	const newStates: Record<string, boolean> = {};
-	for (const key of Object.keys(childStates)) {
-		newStates[key] = newValue;
-	}
-	childStates = newStates;
-}
-
-function handleChildChange(id: string, e: Event) {
-	const newValue = (e.target as HTMLInputElement).checked;
-	const newStates = { ...Object.assign({}, childStates) };
-	newStates[id] = newValue;
-	childStates = newStates;
-}
+$: allChecked = Object.values(childStates).every(Boolean);
+$: someChecked = Object.values(childStates).some(Boolean);
+$: isIndeterminate = someChecked && !allChecked;
 </script>
 
 <div class="bg-white rounded-lg p-3 border border-slate-200">
@@ -60,8 +38,12 @@ function handleChildChange(id: string, e: Event) {
           type="checkbox"
           id={parentCheckbox.id}
           class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-          bind:checked={parentChecked}
-          on:change={handleParentChange}
+          bind:checked={allChecked}
+          on:change={() => {
+            childStates = Object.fromEntries(
+              Object.keys(childStates).map(key => [key, allChecked])
+            );
+          }}
           use:setIndeterminate={isIndeterminate}
         />
         <label
@@ -82,8 +64,7 @@ function handleChildChange(id: string, e: Event) {
               type="checkbox"
               id={item.id}
               class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-              checked={childStates[item.id]}
-              on:change={(e) => handleChildChange(item.id, e)}
+              bind:checked={childStates[item.id]}
             />
             <label
               for={item.id}
@@ -99,16 +80,15 @@ function handleChildChange(id: string, e: Event) {
 </div>
 
 <script lang="ts" context="module">
-  // Custom action to handle indeterminate state
-  export function setIndeterminate(node: HTMLInputElement, indeterminate: boolean) {
-    function update(indeterminate: boolean) {
-      node.indeterminate = indeterminate;
-    }
+function setIndeterminate(node: HTMLInputElement, indeterminate: boolean) {
+	function update(indeterminate: boolean) {
+		node.indeterminate = indeterminate;
+	}
 
-    update(indeterminate);
-    return {
-      update,
-      destroy() {}
-    };
-  }
+	update(indeterminate);
+	return {
+		update,
+		destroy() {}
+	};
+}
 </script> 
