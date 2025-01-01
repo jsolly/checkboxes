@@ -30,13 +30,13 @@ pnpm build
 ```
 src/
 ├── components/
-│   ├── alpine/         # Alpine.js implementation
-│   ├── vanilla/        # Pure JavaScript implementation
-│   └── CodeBlock.astro # Shared code display component
+│   ├── alpine/
+│   │   ├── alpine.astro        # Implementation
+│   │   └── alpineContainer     # Display wrapper
+│   ├── vanilla/
+│   │   ├── vanilla.astro       # Implementation
+│   │   └── vanillaContainer    # Display wrapper
+│   └── CodeBlock.astro        # Code display
 └── pages/
-    └── index.astro     # Main page
+    └── index.astro           # Main page
 ```
-
-## License
-
-MIT
