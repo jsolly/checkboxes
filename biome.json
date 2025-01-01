@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": true,
-		"ignore": ["src/components/alpine/alpineContainer.astro"]
+		"ignore": ["src/**/*Container.astro"]
 	},
 	"formatter": {
 		"enabled": true,

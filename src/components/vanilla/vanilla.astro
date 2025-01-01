@@ -1,6 +1,4 @@
 ---
-import CodeBlock from "./CodeBlock.astro";
-
 const parentCheckbox = {
 	id: "parent-vanilla",
 	label: "Parent Checkbox",
@@ -97,38 +95,31 @@ document.querySelectorAll('[data-checkbox-container]')
       </div>
     </div>
   </div>
-
-  <!-- Code Display -->
-  <CodeBlock code={code} lang="javascript" />
 </div>
 
 <script>
-  function initializeCheckboxes(container: HTMLElement) {
-    const parentCheckbox = container.querySelector('[data-parent-checkbox]') as HTMLInputElement;
-    const childCheckboxes = container.querySelectorAll('[data-child-checkbox]') as NodeListOf<HTMLInputElement>;
+	function initializeCheckboxes(container: HTMLElement) {
+		const parentCheckbox = container.querySelector('[data-parent-checkbox]') as HTMLInputElement;
+		const childCheckboxes = container.querySelectorAll('[data-child-checkbox]') as NodeListOf<HTMLInputElement>;
 
-    // Update parent checkbox based on children
-    function updateParentState() {
-      const allChecked = Array.from(childCheckboxes).every(checkbox => checkbox.checked);
-      parentCheckbox.checked = allChecked;
-    }
+		function updateParentState() {
+			const allChecked = Array.from(childCheckboxes).every(checkbox => checkbox.checked);
+			parentCheckbox.checked = allChecked;
+		}
 
-    // Update children based on parent
-    function updateChildrenState() {
-      childCheckboxes.forEach(checkbox => {
-        checkbox.checked = parentCheckbox.checked;
-      });
-    }
+		function updateChildrenState() {
+			childCheckboxes.forEach(checkbox => {
+				checkbox.checked = parentCheckbox.checked;
+			});
+		}
 
-    // Add event listeners
-    parentCheckbox.addEventListener('change', updateChildrenState);
-    childCheckboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', updateParentState);
-    });
-  }
+		parentCheckbox.addEventListener('change', updateChildrenState);
+		childCheckboxes.forEach(checkbox => {
+			checkbox.addEventListener('change', updateParentState);
+		});
+	}
 
-  // Initialize all checkbox containers on the page
-  document.querySelectorAll('[data-checkbox-container]').forEach(container => {
-    initializeCheckboxes(container as HTMLElement);
-  });
+	document.querySelectorAll('[data-checkbox-container]').forEach(container => {
+		initializeCheckboxes(container as HTMLElement);
+	});
 </script> 

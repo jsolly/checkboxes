@@ -3,10 +3,10 @@ import { Code } from "astro:components";
 
 interface Props {
 	code: string;
-	lang?: "astro" | "typescript" | "javascript" | "html";
+	displayName: string;
 }
 
-const { code = "", lang = "html" } = Astro.props;
+const { code = "", displayName } = Astro.props;
 ---
 
 <div class="mt-4 rounded-lg overflow-hidden border border-slate-200" x-data="{ expanded: false }">
@@ -15,8 +15,8 @@ const { code = "", lang = "html" } = Astro.props;
 		@click="expanded = !expanded"
 	>
 		<div class="flex items-center space-x-3">
-			<div class="font-mono text-sm text-slate-600">Code</div>
-			<div class="text-xs px-2 py-0.5 rounded bg-slate-200 text-slate-600">{lang}</div>
+			<div class="text-xs px-2 py-0.5 rounded bg-slate-200 text-slate-600">{displayName}</div>
+			<div class="text-sm text-slate-500" x-text="expanded ? 'Hide Code' : 'View Code'"></div>
 		</div>
 		<div class="text-slate-400">
 			<svg 
@@ -37,7 +37,7 @@ const { code = "", lang = "html" } = Astro.props;
 		:style="expanded ? { maxHeight: $refs.code.scrollHeight + 'px' } : { maxHeight: '0px' }"
 	>
 		<div class="p-4 overflow-x-auto bg-white">
-			<Code code={code} lang={lang} theme="github-light" wrap />
+			<Code code={code} lang="javascript" theme="github-light" wrap />
 		</div>
 	</div>
 </div> 

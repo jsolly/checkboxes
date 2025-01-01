@@ -1,0 +1,71 @@
+---
+import Vanilla from "./vanilla.astro";
+import CodeBlock from "../CodeBlock.astro";
+
+const code = `---
+const parentCheckbox = {
+  id: "parent-vanilla",
+  label: "Parent Checkbox"
+};
+
+const childCheckboxItems = [
+  {
+    id: "child1-vanilla",
+    label: "Child 1"
+  },
+  {
+    id: "child2-vanilla",
+    label: "Child 2"
+  },
+  {
+    id: "child3-vanilla",
+    label: "Child 3"
+  }
+];
+---
+
+<!-- Component Demo -->
+<div class="bg-white rounded-lg p-3 border border-slate-200" data-checkbox-container>
+  <h2 class="text-lg font-semibold text-slate-800 mb-2">Vanilla JS</h2>
+  <div class="space-y-1">
+    <!-- Parent checkbox -->
+    <div class="p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
+      <div class="flex items-center space-x-3">
+        <input 
+          type="checkbox" 
+          id={parentCheckbox.id}
+          name="notifications" 
+          value="parent"
+          class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+          data-parent-checkbox
+        >
+        <label for={parentCheckbox.id} class="text-slate-700 cursor-pointer text-sm font-medium">{parentCheckbox.label}</label>
+      </div>
+    </div>
+
+    <!-- Child checkboxes -->
+    <div class="ml-6 space-y-1">
+      {childCheckboxItems.map(item => (
+        <div class="p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
+          <div class="flex items-center space-x-3">
+            <input 
+              type="checkbox" 
+              id={item.id}
+              name="notifications" 
+              value={item.id}
+              class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+              data-child-checkbox
+            >
+            <label for={item.id} class="text-slate-700 cursor-pointer text-sm font-medium">{item.label}</label>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>`;
+---
+
+<div class="max-w-2xl w-full">
+  <Vanilla />
+  <CodeBlock code={code} displayName="Pure JavaScript" />
+</div> 
