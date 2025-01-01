@@ -2,60 +2,75 @@
 import Hyperscript from "./hyperscript.astro";
 import CodeBlock from "../CodeBlock.astro";
 
-const code = `<div class="bg-white rounded-lg p-3 border border-slate-200">
-  <h2 class="text-lg font-semibold text-slate-800 mb-3">Hyperscript</h2>
-  <div class="space-y-1">
-    <!-- Parent Checkbox -->
-    <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
-      <div class="flex items-center space-x-3">
-        <input
-          type="checkbox"
-          id="parent-hyperscript"
-          class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-          _="on click
-              set the checked of <input[type=checkbox]/> in the next <div/> to my checked
-            on click from the next <div/>
-              set checked to <input[type=checkbox]:checked/> in the next <div/>
-              set unchecked to <input[type=checkbox]:not(:checked)/> in the next <div/>
-              set my indeterminate to false
-              if unchecked is empty
-                set my checked to true
-              else if checked is empty
-                set my checked to false
-              else
-                set my indeterminate to true"
-        />
-        <label
-          for="parent-hyperscript"
-          class="text-slate-700 cursor-pointer text-sm font-medium"
-        >
-          Parent Checkbox
-        </label>
+const code = `---
+const parentCheckbox = {
+	id: "parent-hyperscript",
+	label: "Parent Checkbox",
+};
+
+const childCheckboxItems = [
+	{ id: "child1-hyperscript", label: "Child 1" },
+	{ id: "child2-hyperscript", label: "Child 2" },
+	{ id: "child3-hyperscript", label: "Child 3" },
+];
+---
+
+<div class="max-w-2xl w-full">
+  <div class="bg-white rounded-lg p-3 border border-slate-200">
+    <h2 class="text-lg font-semibold text-slate-800 mb-3">Hyperscript</h2>
+    <div class="space-y-1">
+      <!-- Parent Checkbox -->
+      <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+        <div class="flex items-center space-x-3">
+          <input
+            type="checkbox"
+            id={parentCheckbox.id}
+            class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+            _="on click
+                set the checked of <input[type=checkbox]/> in the next <div/> to my checked
+              on click from the next <div/>
+                set checked to <input[type=checkbox]:checked/> in the next <div/>
+                set unchecked to <input[type=checkbox]:not(:checked)/> in the next <div/>
+                set my indeterminate to false
+                if unchecked is empty
+                  set my checked to true
+                else if checked is empty
+                  set my checked to false
+                else
+                  set my indeterminate to true"
+          />
+          <label
+            for={parentCheckbox.id}
+            class="text-slate-700 cursor-pointer text-sm font-medium"
+          >
+            {parentCheckbox.label}
+          </label>
+        </div>
+      </div>
+
+      <!-- Child Checkboxes -->
+      <div class="ml-8 space-y-1">
+        {childCheckboxItems.map(item => (
+          <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+            <div class="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id={item.id}
+                class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+              />
+              <label
+                for={item.id}
+                class="text-slate-700 cursor-pointer text-sm font-medium"
+              >
+                {item.label}
+              </label>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
-
-    <!-- Child Checkboxes -->
-    <div class="ml-8 space-y-1">
-      {childCheckboxItems.map(item => (
-        <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
-          <div class="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id={item.id}
-              class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-            />
-            <label
-              for={item.id}
-              class="text-slate-700 cursor-pointer text-sm font-medium"
-            >
-              {item.label}
-            </label>
-          </div>
-        </div>
-      ))}
-    </div>
   </div>
-</div>`;
+</div> `;
 ---
 
 <div class="max-w-2xl w-full">

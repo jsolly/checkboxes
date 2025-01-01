@@ -18,44 +18,6 @@ const childCheckboxItems = [
 		label: "Child 3",
 	},
 ];
-
-const code = `// HTML
-<div data-checkbox-container>
-  <input type="checkbox" data-parent-checkbox>
-  
-  <input type="checkbox" data-child-checkbox>
-  <input type="checkbox" data-child-checkbox>
-  <input type="checkbox" data-child-checkbox>
-</div>
-
-// JavaScript
-function initializeCheckboxes(container) {
-  const parentCheckbox = container.querySelector('[data-parent-checkbox]');
-  const childCheckboxes = container.querySelectorAll('[data-child-checkbox]');
-
-  function updateParentState() {
-    const allChecked = Array.from(childCheckboxes).every(checkbox => checkbox.checked);
-    const someChecked = Array.from(childCheckboxes).some(checkbox => checkbox.checked);
-    parentCheckbox.checked = allChecked;
-    parentCheckbox.indeterminate = someChecked && !allChecked;
-  }
-
-  function updateChildrenState() {
-    childCheckboxes.forEach(checkbox => {
-      checkbox.checked = parentCheckbox.checked;
-    });
-    parentCheckbox.indeterminate = false;
-  }
-
-  parentCheckbox.addEventListener('change', updateChildrenState);
-  childCheckboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', updateParentState);
-  });
-}
-
-// Initialize
-document.querySelectorAll('[data-checkbox-container]')
-  .forEach(container => initializeCheckboxes(container));`;
 ---
 
 <div class="max-w-2xl w-full">
@@ -99,10 +61,10 @@ document.querySelectorAll('[data-checkbox-container]')
   </div>
 </div>
 
-<script>
-	function initializeCheckboxes(container: HTMLElement) {
-		const parentCheckbox = container.querySelector('[data-parent-checkbox]') as HTMLInputElement;
-		const childCheckboxes = container.querySelectorAll('[data-child-checkbox]') as NodeListOf<HTMLInputElement>;
+<script lang="js">
+	function initializeCheckboxes(container) {
+		const parentCheckbox = container.querySelector('[data-parent-checkbox]');
+		const childCheckboxes = container.querySelectorAll('[data-child-checkbox]');
 
 		function updateParentState() {
 			const allChecked = Array.from(childCheckboxes).every(checkbox => checkbox.checked);
@@ -125,6 +87,6 @@ document.querySelectorAll('[data-checkbox-container]')
 	}
 
 	document.querySelectorAll('[data-checkbox-container]').forEach(container => {
-			initializeCheckboxes(container as HTMLElement);
+			initializeCheckboxes(container);
 	});
 </script> 

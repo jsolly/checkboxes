@@ -1,33 +1,3 @@
-<script lang="ts">
-interface CheckboxItem {
-	id: string;
-	label: string;
-}
-
-const parentCheckbox: CheckboxItem = {
-	id: "parent-svelte",
-	label: "Parent Checkbox",
-};
-
-const childCheckboxItems: CheckboxItem[] = [
-	{ id: "child1-svelte", label: "Child 1" },
-	{ id: "child2-svelte", label: "Child 2" },
-	{ id: "child3-svelte", label: "Child 3" },
-];
-
-let childStates: Record<string, boolean> = childCheckboxItems.reduce(
-	(acc, item) => {
-		acc[item.id] = false;
-		return acc;
-	},
-	{} as Record<string, boolean>,
-);
-
-$: allChecked = Object.values(childStates).every(Boolean);
-$: someChecked = Object.values(childStates).some(Boolean);
-$: isIndeterminate = someChecked && !allChecked;
-</script>
-
 <div class="bg-white rounded-lg p-3 border border-slate-200">
   <h2 class="text-lg font-semibold text-slate-800 mb-3">Svelte</h2>
   <div class="space-y-1">
@@ -77,9 +47,33 @@ $: isIndeterminate = someChecked && !allChecked;
       {/each}
     </div>
   </div>
-</div>
+</div> 
 
-<script lang="ts" context="module">
+<script lang="ts">
+interface CheckboxItem {
+	id: string;
+	label: string;
+}
+
+const parentCheckbox: CheckboxItem = {
+	id: "parent-svelte",
+	label: "Parent Checkbox",
+};
+
+const childCheckboxItems: CheckboxItem[] = [
+	{ id: "child1-svelte", label: "Child 1" },
+	{ id: "child2-svelte", label: "Child 2" },
+	{ id: "child3-svelte", label: "Child 3" },
+];
+
+let childStates: Record<string, boolean> = childCheckboxItems.reduce(
+	(acc, item) => {
+		acc[item.id] = false;
+		return acc;
+	},
+	{} as Record<string, boolean>,
+);
+
 function setIndeterminate(node: HTMLInputElement, indeterminate: boolean) {
 	function update(indeterminate: boolean) {
 		node.indeterminate = indeterminate;
@@ -88,7 +82,11 @@ function setIndeterminate(node: HTMLInputElement, indeterminate: boolean) {
 	update(indeterminate);
 	return {
 		update,
-		destroy() {}
+		destroy() {},
 	};
 }
-</script> 
+
+$: allChecked = Object.values(childStates).every(Boolean);
+$: someChecked = Object.values(childStates).some(Boolean);
+$: isIndeterminate = someChecked && !allChecked;
+</script>
