@@ -1,0 +1,86 @@
+---
+import Alpine from "./alpine.astro";
+import CodeBlock from "../CodeBlock.astro";
+
+const code = `---
+const parentCheckbox = {
+  id: "parent",
+  label: "Parent Checkbox"
+};
+
+const childCheckboxItems = [
+  {
+    id: "child1",
+    label: "Child 1"
+  },
+  {
+    id: "child2",
+    label: "Child 2"
+  },
+  {
+    id: "child3",
+    label: "Child 3"
+  }
+];
+---
+
+<div class="bg-white rounded-lg p-3 border border-slate-200" 
+  x-data="{ 
+    parentChecked: false,
+    childStates: {
+      child1: false,
+      child2: false,
+      child3: false
+    },
+    toggleParent() {
+      for (let key in this.childStates) {
+        this.childStates[key] = this.parentChecked;
+      }
+    }
+  }"
+  x-effect="parentChecked = Object.values(childStates).every(v => v)"
+>
+  <h2 class="text-lg font-semibold text-slate-800 mb-3">Alpine.js</h2>
+  <div class="space-y-1">
+    <!-- Parent checkbox -->
+    <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+      <div class="flex items-center space-x-3">
+        <input 
+          type="checkbox" 
+          id="parent" 
+          name="notifications" 
+          value="parent"
+          class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+          x-model="parentChecked"
+          @change="toggleParent"
+        >
+        <label for={parentCheckbox.id} class="text-slate-700 cursor-pointer text-sm font-medium">{parentCheckbox.label}</label>
+      </div>
+    </div>
+
+    <!-- Child checkboxes -->
+    <div class="ml-8 space-y-1">
+      {childCheckboxItems.map(item => (
+        <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+          <div class="flex items-center space-x-3">
+            <input 
+              type="checkbox" 
+              id={item.id}
+              name="notifications" 
+              value={item.id}
+              class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+              x-model={\`childStates.\${item.id}\`}
+            >
+            <label for={item.id} class="text-slate-700 cursor-pointer text-sm font-medium">{item.label}</label>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>`;
+---
+
+<div class="max-w-2xl w-full">
+  <Alpine />
+  <CodeBlock code={code} language="astro" />
+</div>
