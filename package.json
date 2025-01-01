@@ -20,12 +20,17 @@
 	"dependencies": {
 		"@astrojs/alpinejs": "^0.4.1",
 		"@astrojs/prism": "^3.2.0",
+		"@astrojs/react": "^4.1.2",
 		"@astrojs/sitemap": "^3.2.1",
 		"@astrojs/tailwind": "^5.1.4",
 		"@astrojs/vue": "^5.0.3",
 		"@types/alpinejs": "^3.13.11",
+		"@types/react": "^19.0.2",
+		"@types/react-dom": "^19.0.2",
 		"alpinejs": "^3.14.8",
 		"astro": "^5.1.1",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
 		"shiki": "^1.24.4",
 		"tailwindcss": "^3.4.17",
 		"vue": "^3.5.13"
