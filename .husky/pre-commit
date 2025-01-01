@@ -1,7 +1,4 @@
 echo "🚀 Running pre-commit hook..."
-echo "Files to be processed:"
-git diff --cached --name-only
-echo "---"
 pnpm lint-staged
 lint_status=$?
 
