@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface CheckboxItem {
 	id: string;
@@ -16,20 +16,100 @@ const childCheckboxItems: CheckboxItem[] = [
 	{ id: "child3-react", label: "Child 3" },
 ];
 
+// Parent Checkbox Component
+function ParentCheckbox({
+	id,
+	label,
+	checked,
+	indeterminate,
+	onChange,
+}: {
+	id: string;
+	label: string;
+	checked: boolean;
+	indeterminate: boolean;
+	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
+	const checkboxRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (checkboxRef.current) {
+			checkboxRef.current.indeterminate = indeterminate;
+		}
+	}, [indeterminate]);
+
+	return (
+		<div className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+			<div className="flex items-center space-x-3">
+				<input
+					ref={checkboxRef}
+					type="checkbox"
+					id={id}
+					className="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+					checked={checked}
+					onChange={onChange}
+				/>
+				<label
+					htmlFor={id}
+					className="text-slate-700 cursor-pointer text-sm font-medium"
+				>
+					{label}
+				</label>
+			</div>
+		</div>
+	);
+}
+
+// Child Checkbox Component
+function ChildCheckbox({
+	id,
+	label,
+	checked,
+	onChange,
+}: {
+	id: string;
+	label: string;
+	checked: boolean;
+	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
+	return (
+		<div className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+			<div className="flex items-center space-x-3">
+				<input
+					type="checkbox"
+					id={id}
+					className="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+					checked={checked}
+					onChange={onChange}
+				/>
+				<label
+					htmlFor={id}
+					className="text-slate-700 cursor-pointer text-sm font-medium"
+				>
+					{label}
+				</label>
+			</div>
+		</div>
+	);
+}
+
+// Main Component
 export default function NestedCheckboxes() {
-	const [childStates, setChildStates] = useState<Record<string, boolean>>(
-		() => {
-			const initial: Record<string, boolean> = {};
-			for (const item of childCheckboxItems) {
-				initial[item.id] = false;
-			}
-			return initial;
-		},
+	const initialChildStates = useMemo(
+		() =>
+			childCheckboxItems.reduce(
+				(acc, item) => {
+					acc[item.id] = false;
+					return acc;
+				},
+				{} as Record<string, boolean>,
+			),
+		[],
 	);
 
+	const [childStates, setChildStates] = useState(initialChildStates);
 	const [parentChecked, setParentChecked] = useState(false);
 	const [isIndeterminate, setIsIndeterminate] = useState(false);
-	const parentRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		const allChecked = Object.values(childStates).every(Boolean);
@@ -39,20 +119,18 @@ export default function NestedCheckboxes() {
 		setIsIndeterminate(someChecked && !allChecked);
 	}, [childStates]);
 
-	useEffect(() => {
-		if (parentRef.current) {
-			parentRef.current.indeterminate = isIndeterminate;
-		}
-	}, [isIndeterminate]);
-
 	const handleParentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newValue = e.target.checked;
+		const updatedStates = Object.keys(childStates).reduce(
+			(acc, key) => {
+				acc[key] = newValue;
+				return acc;
+			},
+			{} as Record<string, boolean>,
+		);
+
 		setParentChecked(newValue);
-		const newStates: Record<string, boolean> = {};
-		for (const key of Object.keys(childStates)) {
-			newStates[key] = newValue;
-		}
-		setChildStates(newStates);
+		setChildStates(updatedStates);
 	};
 
 	const handleChildChange =
@@ -68,48 +146,24 @@ export default function NestedCheckboxes() {
 			<h2 className="text-lg font-semibold text-slate-800 mb-3">React</h2>
 			<div className="space-y-1">
 				{/* Parent Checkbox */}
-				<div className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
-					<div className="flex items-center space-x-3">
-						<input
-							ref={parentRef}
-							type="checkbox"
-							id={parentCheckbox.id}
-							className="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-							checked={parentChecked}
-							onChange={handleParentChange}
-						/>
-						<label
-							htmlFor={parentCheckbox.id}
-							className="text-slate-700 cursor-pointer text-sm font-medium"
-						>
-							{parentCheckbox.label}
-						</label>
-					</div>
-				</div>
+				<ParentCheckbox
+					id={parentCheckbox.id}
+					label={parentCheckbox.label}
+					checked={parentChecked}
+					indeterminate={isIndeterminate}
+					onChange={handleParentChange}
+				/>
 
 				{/* Child Checkboxes */}
 				<div className="ml-8 space-y-1">
 					{childCheckboxItems.map((item) => (
-						<div
+						<ChildCheckbox
 							key={item.id}
-							className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
-						>
-							<div className="flex items-center space-x-3">
-								<input
-									type="checkbox"
-									id={item.id}
-									className="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-									checked={childStates[item.id]}
-									onChange={handleChildChange(item.id)}
-								/>
-								<label
-									htmlFor={item.id}
-									className="text-slate-700 cursor-pointer text-sm font-medium"
-								>
-									{item.label}
-								</label>
-							</div>
-						</div>
+							id={item.id}
+							label={item.label}
+							checked={childStates[item.id]}
+							onChange={handleChildChange(item.id)}
+						/>
 					))}
 				</div>
 			</div>
