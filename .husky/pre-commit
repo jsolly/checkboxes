@@ -1,0 +1,13 @@
+echo "🚀 Running pre-commit hook..."
+echo "Files to be processed:"
+git diff --cached --name-only
+echo "---"
+pnpm lint-staged
+lint_status=$?
+
+if [ $lint_status -ne 0 ]; then
+  echo "❌ Lint-staged failed! Please fix the errors and try committing again."
+  exit $lint_status
+fi
+
+echo "✅ Pre-commit hook completed successfully"
