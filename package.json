@@ -22,11 +22,13 @@
 		"@astrojs/prism": "^3.2.0",
 		"@astrojs/sitemap": "^3.2.1",
 		"@astrojs/tailwind": "^5.1.4",
+		"@astrojs/vue": "^5.0.3",
 		"@types/alpinejs": "^3.13.11",
 		"alpinejs": "^3.14.8",
 		"astro": "^5.1.1",
 		"shiki": "^1.24.4",
-		"tailwindcss": "^3.4.17"
+		"tailwindcss": "^3.4.17",
+		"vue": "^3.5.13"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",

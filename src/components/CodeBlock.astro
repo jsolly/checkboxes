@@ -4,9 +4,10 @@ import { Code } from "astro:components";
 interface Props {
 	code: string;
 	displayName: string;
+	lang?: "javascript" | "typescript" | "vue" | "html" | "css";
 }
 
-const { code = "", displayName } = Astro.props;
+const { code = "", displayName, lang = "javascript" } = Astro.props;
 ---
 
 <div class="mt-4 rounded-lg overflow-hidden border border-slate-200" x-data="{ expanded: false }">
@@ -37,7 +38,7 @@ const { code = "", displayName } = Astro.props;
 		:style="expanded ? { maxHeight: $refs.code.scrollHeight + 'px' } : { maxHeight: '0px' }"
 	>
 		<div class="p-4 overflow-x-auto bg-white">
-			<Code code={code} lang="javascript" theme="github-light" wrap />
+			<Code code={code} lang={lang} theme="github-light" wrap />
 		</div>
 	</div>
 </div> 

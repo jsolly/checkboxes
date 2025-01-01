@@ -34,6 +34,9 @@ const childCheckboxItems = [
 				for (let key in this.childStates) {
 					this.childStates[key] = this.parentChecked;
 				}
+			},
+			areSomeChildrenChecked() {
+				return Object.values(this.childStates).some(v => v) && !this.parentChecked;
 			}
 		}"
 		x-effect="parentChecked = Object.values(childStates).every(v => v)"
@@ -51,6 +54,7 @@ const childCheckboxItems = [
 						class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
 						x-model="parentChecked"
 						@change="toggleParent"
+						x-effect="$el.indeterminate = areSomeChildrenChecked()"
 					>
 					<label for={parentCheckbox.id} class="text-slate-700 cursor-pointer text-sm font-medium">{parentCheckbox.label}</label>
 				</div>

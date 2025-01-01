@@ -1,14 +1,16 @@
 ---
 import AlpineContainer from "../components/alpine/alpineContainer.astro";
 import VanillaContainer from "../components/vanilla/vanillaContainer.astro";
+import VueContainer from "../components/vue/vueContainer.astro";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout>
 	<div class="bg-slate-100 min-h-screen flex items-center justify-center p-8">
 		<div class="space-y-8">
-			<AlpineContainer />
 			<VanillaContainer />
+			<AlpineContainer />
+			<VueContainer />
 		</div>
 	</div>
 </Layout>
