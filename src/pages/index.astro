@@ -1,5 +1,4 @@
 ---
-import Sortable from "sortablejs";
 import FrameworkSelector from "../components/FrameworkSelector";
 import AlpineContainer from "../components/alpine/alpineContainer.astro";
 import HyperscriptContainer from "../components/hyperscript/hyperscriptContainer.astro";
@@ -95,7 +94,8 @@ import Layout from "../layouts/Layout.astro";
 	// Update event listener with correct type
 	document.addEventListener('frameworkSelection', ((e: FrameworkSelectionEvent) => {
 		const selectedFrameworks = e.detail;
-		document.querySelectorAll('.framework-container').forEach((container) => {
+		document.querySelectorAll('.framework-container').forEach((element) => {
+			const container = element as HTMLElement;
 			const framework = container.getAttribute('data-framework');
 			if (framework) {
 				if (!selectedFrameworks.includes(framework)) {
