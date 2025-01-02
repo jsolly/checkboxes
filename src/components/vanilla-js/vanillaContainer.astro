@@ -27,10 +27,10 @@ const childCheckboxItems = [
 
 <div class="max-w-2xl w-full">
   <div class="bg-white rounded-lg p-3 border border-slate-200" data-checkbox-container>
-    <h2 class="text-lg font-semibold text-slate-800 mb-2">Vanilla JS</h2>
+    <h2 class="text-lg font-semibold text-slate-800 mb-3">Vanilla JS</h2>
     <div class="space-y-1">
       <!-- Parent checkbox -->
-      <div class="p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
+      <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
         <div class="flex items-center space-x-3">
           <input 
             type="checkbox" 
@@ -45,9 +45,9 @@ const childCheckboxItems = [
       </div>
 
       <!-- Child checkboxes -->
-      <div class="ml-6 space-y-1">
+      <div class="ml-8 space-y-1">
         {childCheckboxItems.map(item => (
-          <div class="p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
+          <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
             <div class="flex items-center space-x-3">
               <input 
                 type="checkbox" 
@@ -66,7 +66,7 @@ const childCheckboxItems = [
   </div>
 </div>
 
-<script lang="js">
+<script lang="js" is:inline>
 	function initializeCheckboxes(container) {
 		const parentCheckbox = container.querySelector('[data-parent-checkbox]');
 		const childCheckboxes = container.querySelectorAll('[data-child-checkbox]');
@@ -99,5 +99,10 @@ const childCheckboxItems = [
 
 <div class="max-w-2xl w-full">
   <Vanilla />
-  <CodeBlock code={code} displayName="Pure JavaScript" />
+  <CodeBlock 
+    code={code} 
+    displayName="Vanilla JS" 
+    lang="html" 
+    logo="src/assets/logos/javascript.svg"
+  />
 </div> 

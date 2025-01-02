@@ -5,9 +5,10 @@ interface Props {
 	code: string;
 	displayName: string;
 	lang?: "javascript" | "typescript" | "vue" | "html" | "css";
+	logo?: string;
 }
 
-const { code = "", displayName, lang = "javascript" } = Astro.props;
+const { code = "", displayName, lang = "javascript", logo } = Astro.props;
 const totalLines = code.split("\n").length;
 ---
 
@@ -17,9 +18,12 @@ const totalLines = code.split("\n").length;
 		@click="expanded = !expanded"
 	>
 		<div class="flex items-center space-x-3">
-			<div class="text-xs px-2 py-0.5 rounded bg-slate-200 text-slate-600">{displayName}</div>
-			<div class="text-sm text-slate-500" x-text="expanded ? 'Hide Code' : 'View Code'"></div>
-			<div class="text-xs text-slate-400">({totalLines} lines)</div>
+			{logo && <img src={logo} alt={`${displayName} logo`} class="h-5 w-5" />}
+			<div class="text-sm text-slate-500">
+				<span x-text="expanded ? 'Hide' : 'View'"></span>
+				<span> {displayName} code</span>
+				<span class="text-xs text-slate-400 ml-2">({totalLines} lines)</span>
+			</div>
 		</div>
 		<div class="text-slate-400">
 			<svg 
