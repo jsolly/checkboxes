@@ -1,4 +1,4 @@
-<div class="bg-white rounded-lg p-3 border border-slate-200">
+<div class="bg-white rounded-t-lg p-3 border border-slate-200">
   <h2 class="text-lg font-semibold text-slate-800 mb-3">Svelte</h2>
   <div>
     <!-- Parent Checkbox -->
