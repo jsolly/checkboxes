@@ -1,6 +1,7 @@
 ---
 import Vanilla from "./vanilla.astro";
 import CodeBlock from "../CodeBlock.astro";
+import javascriptLogo from "../../assets/logos/javascript.svg";
 
 const code = `
 ---
@@ -103,6 +104,6 @@ const childCheckboxItems = [
     code={code} 
     displayName="Vanilla JS" 
     lang="html" 
-    logo="src/assets/logos/javascript.svg"
+    logo={javascriptLogo}
   />
 </div> 

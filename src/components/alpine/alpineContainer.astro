@@ -1,6 +1,7 @@
 ---
 import Alpine from "./alpine.astro";
 import CodeBlock from "../CodeBlock.astro";
+import alpineLogo from "../../assets/logos/alpine.svg";
 
 const code = `---
 const parentCheckbox = {
@@ -92,6 +93,6 @@ const childCheckboxItems = [
     code={code} 
     displayName="Alpine.js" 
     lang="html" 
-    logo="src/assets/logos/alpine.svg"
+    logo={alpineLogo}
   />
 </div>

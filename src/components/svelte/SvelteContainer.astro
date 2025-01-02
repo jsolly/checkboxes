@@ -1,6 +1,7 @@
 ---
 import NestedCheckboxes from "./NestedCheckboxes.svelte";
 import CodeBlock from "../CodeBlock.astro";
+import svelteLogo from "../../assets/logos/svelte.svg";
 
 const code = `<div class="bg-white rounded-lg p-3 border border-slate-200">
   <h2 class="text-lg font-semibold text-slate-800 mb-3">Svelte</h2>
@@ -102,6 +103,6 @@ const code = `<div class="bg-white rounded-lg p-3 border border-slate-200">
     code={code} 
     displayName="Svelte" 
     lang="typescript" 
-    logo="src/assets/logos/svelte.svg"
+    logo={svelteLogo}
   />
 </div> 

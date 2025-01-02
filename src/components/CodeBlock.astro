@@ -1,11 +1,12 @@
 ---
+import { Image } from "astro:assets";
 import { Code } from "astro:components";
 
 interface Props {
 	code: string;
 	displayName: string;
 	lang?: "javascript" | "typescript" | "vue" | "html" | "css";
-	logo?: string;
+	logo?: ImageMetadata;
 }
 
 const { code = "", displayName, lang = "javascript", logo } = Astro.props;
@@ -18,7 +19,7 @@ const totalLines = code.split("\n").length;
 		@click="expanded = !expanded"
 	>
 		<div class="flex items-center space-x-3">
-			{logo && <img src={logo} alt={`${displayName} logo`} class="h-5 w-5" />}
+			{logo && <Image src={logo} alt={`${displayName} logo`} class="h-5 w-5" />}
 			<div class="text-sm text-slate-500">
 				<span x-text="expanded ? 'Hide' : 'View'"></span>
 				<span> {displayName} code</span>

@@ -1,6 +1,7 @@
 ---
 import NestedCheckboxes from "./NestedCheckboxes.vue";
 import CodeBlock from "../CodeBlock.astro";
+import vueLogo from "../../assets/logos/vue.svg";
 
 const code = `<script setup lang="ts">
 import { computed, ref } from "vue";
@@ -89,6 +90,6 @@ const areSomeChildrenChecked = computed(() =>
     code={code} 
     displayName="Vue.js" 
     lang="vue" 
-    logo="src/assets/logos/vue.svg"
+    logo={vueLogo}
   />
 </div> 
