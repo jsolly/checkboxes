@@ -73,7 +73,7 @@ function ChildCheckbox({
 	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
 	return (
-		<div className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+		<div className="p-1 rounded-lg hover:bg-slate-100 transition-colors">
 			<div className="flex items-center space-x-3">
 				<input
 					type="checkbox"

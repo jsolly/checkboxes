@@ -7,16 +7,15 @@ interface Props {
 const { title, framework } = Astro.props;
 ---
 
-<div class="bg-white rounded-lg shadow-lg overflow-hidden">
+<div class="bg-white rounded-lg shadow-lg overflow-hidden cursor-grab" data-drag-handle>
   <div 
     class="bg-slate-50 px-4 py-3 flex items-center justify-between"
-    data-drag-handle
   >
     <h3 class="font-medium text-slate-700 select-none">
       {title}
     </h3>
     <div 
-      class="text-slate-400 hover:text-slate-600 transition-colors cursor-grab select-none"
+      class="text-slate-400 hover:text-slate-600 transition-colors select-none"
       aria-label="Drag to reorder"
     >
       <svg 

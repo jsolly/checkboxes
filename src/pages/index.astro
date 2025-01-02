@@ -50,7 +50,6 @@ import Layout from "../layouts/Layout.astro";
 		new Sortable(grid, {
 			animation: 150,
 			draggable: '.framework-container:not(.hidden)',
-			handle: '[data-drag-handle]',
 			onStart: (evt: SortableEvent) => {
 				evt.item.classList.add('dragging');
 				document.body.style.cursor = 'grabbing';

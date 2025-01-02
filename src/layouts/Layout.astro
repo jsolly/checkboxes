@@ -36,20 +36,18 @@ const { title = "checkboxes.xyz" } = Astro.props;
 <style is:global>
   .framework-container {
     transition: transform 0.2s;
+    cursor: grab;
   }
   
   .framework-container.dragging {
     transform: scale(1.02);
     opacity: 0.9;
     box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1);
+    cursor: grabbing;
   }
 
   .sortable-ghost {
     opacity: 0.4;
     background: theme(colors.slate.100);
-  }
-
-  [data-drag-handle] {
-    cursor: grab;
   }
 </style>
