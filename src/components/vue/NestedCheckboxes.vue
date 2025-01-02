@@ -61,7 +61,7 @@ const areSomeChildrenChecked = computed(() =>
             <!-- Child Checkboxes -->
             <div class="ml-8">
                 <div v-for="item in childCheckboxItems" :key="item.id"
-                    class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+                    class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
                     <div class="flex items-center space-x-3">
                         <input type="checkbox" :id="item.id"
                             class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
