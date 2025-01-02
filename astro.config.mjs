@@ -17,7 +17,7 @@ import vercel from "@astrojs/vercel";
 
 // https://astro.build/config
 export default defineConfig({
-	site: "https://checkboxes.xyz",
+	site: "https://www.checkboxes.xyz",
 	integrations: [tailwind(), sitemap(), alpinejs(), vue(), react(), svelte()],
 	adapter: vercel(),
 });
