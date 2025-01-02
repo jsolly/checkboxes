@@ -6,9 +6,12 @@ A collection of checkbox implementations using different frameworks and approach
 
 - Parent/child checkbox relationships
 - Multiple implementation examples:
-  - Pure JavaScript
+  - React
+  - Vue.js
+  - Svelte
   - Alpine.js
-  - More coming soon...
+  - Pure JavaScript
+  - Hyperscript
 - Syntax highlighted code examples
 - Collapsible code sections
 
@@ -31,12 +34,26 @@ pnpm build
 src/
 ├── components/
 │   ├── alpine/
-│   │   ├── alpine.astro        # Implementation
-│   │   └── alpineContainer     # Display wrapper
-│   ├── vanilla/
-│   │   ├── vanilla.astro       # Implementation
-│   │   └── vanillaContainer    # Display wrapper
-│   └── CodeBlock.astro        # Code display
+│   │   ├── alpine.astro # Implementation
+│   │   └── alpineContainer.astro # Display wrapper
+│   ├── hyperscript/
+│   │   ├── hyperscript.astro
+│   │   └── hyperscriptContainer.astro
+│   ├── react/
+│   │   ├── NestedCheckboxes.tsx
+│   │   └── ReactContainer.astro
+│   ├── svelte/
+│   │   ├── NestedCheckboxes.svelte
+│   │   └── SvelteContainer.astro
+│   ├── vanilla-js/
+│   │   ├── vanilla.astro
+│   │   └── vanillaContainer.astro
+│   ├── vue/
+│   │   ├── NestedCheckboxes.vue
+│   │   └── vueContainer.astro
+│   └── CodeBlock.astro          # Shared code display component
+├── layouts/
+│   └── Layout.astro            # Base layout
 └── pages/
-    └── index.astro           # Main page
+    └── index.astro            # Main page
 ```
