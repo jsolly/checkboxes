@@ -1,4 +1,6 @@
 ---
+import Sortable from "sortablejs";
+import FrameworkSelector from "../components/FrameworkSelector";
 import AlpineContainer from "../components/alpine/alpineContainer.astro";
 import HyperscriptContainer from "../components/hyperscript/hyperscriptContainer.astro";
 import ReactContainer from "../components/react/ReactContainer.astro";
@@ -9,14 +11,123 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout>
-	<div class="bg-slate-100 min-h-screen flex items-center justify-center p-8">
-		<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-			<VanillaContainer />
-			<AlpineContainer />
-			<VueContainer />
-			<ReactContainer />
-			<SvelteContainer />
-			<HyperscriptContainer />
+	<div class="bg-slate-100 min-h-screen p-8">
+		<FrameworkSelector client:only="react" />
+		<div 
+			id="framework-grid" 
+			class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto"
+		>
+			<div class="framework-container" data-framework="vanilla">
+				<VanillaContainer />
+			</div>
+			<div class="framework-container" data-framework="alpine">
+				<AlpineContainer />
+			</div>
+			<div class="framework-container" data-framework="vue">
+				<VueContainer />
+			</div>
+			<div class="framework-container" data-framework="react">
+				<ReactContainer />
+			</div>
+			<div class="framework-container" data-framework="svelte">
+				<SvelteContainer />
+			</div>
+			<div class="framework-container" data-framework="hyperscript">
+				<HyperscriptContainer />
+			</div>
 		</div>
 	</div>
 </Layout>
+
+<script>
+	// Add type for Sortable events
+	interface SortableEvent {
+		item: HTMLElement;
+	}
+
+	// Initialize Sortable
+	const grid = document.getElementById('framework-grid');
+	if (grid) {
+		new Sortable(grid, {
+			animation: 150,
+			draggable: '.framework-container:not(.hidden)',
+			handle: '[data-drag-handle]',
+			onStart: (evt: SortableEvent) => {
+				evt.item.classList.add('dragging');
+				document.body.style.cursor = 'grabbing';
+			},
+			onEnd: (evt: SortableEvent) => {
+				evt.item.classList.remove('dragging');
+				document.body.style.cursor = '';
+				// Save the order to localStorage
+				const order = Array.from(grid.children)
+					.filter(child => !child.classList.contains('hidden'))
+					.map(child => child.getAttribute('data-framework'));
+				localStorage.setItem('frameworkOrder', JSON.stringify(order));
+			}
+		});
+
+		// Restore order from localStorage
+		const savedOrder = localStorage.getItem('frameworkOrder');
+		if (savedOrder) {
+			try {
+				const order = JSON.parse(savedOrder);
+				const containers = Array.from(grid.children);
+				order.forEach((frameworkId: string) => {
+					const container = containers.find(
+						c => c.getAttribute('data-framework') === frameworkId
+					);
+					if (container) {
+						grid.appendChild(container);
+					}
+				});
+			} catch (e) {
+				console.error('Error restoring framework order:', e);
+			}
+		}
+	}
+
+	// Fix CustomEvent type
+	interface FrameworkSelectionEvent extends CustomEvent {
+		detail: string[];
+	}
+
+	// Update event listener with correct type
+	document.addEventListener('frameworkSelection', ((e: FrameworkSelectionEvent) => {
+		const selectedFrameworks = e.detail;
+		document.querySelectorAll('.framework-container').forEach((container) => {
+			const framework = container.getAttribute('data-framework');
+			if (framework) {
+				if (!selectedFrameworks.includes(framework)) {
+					container.style.transform = 'scale(0.95)';
+					container.style.opacity = '0';
+					setTimeout(() => {
+						container.classList.add('hidden');
+					}, 300);
+				} else {
+					container.classList.remove('hidden');
+					// Force a reflow
+					void container.offsetWidth;
+					container.style.transform = 'scale(1)';
+					container.style.opacity = '1';
+				}
+			}
+		});
+	}) as EventListener);
+</script>
+
+<style>
+	.framework-container {
+		transform-origin: top;
+		transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+	}
+
+	.framework-container.hidden {
+		display: none;
+	}
+
+	#framework-grid {
+		display: grid;
+		grid-auto-rows: min-content;
+	}
+</style>

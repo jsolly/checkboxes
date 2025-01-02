@@ -1,5 +1,4 @@
-<div class="bg-white rounded-t-lg p-3 border border-slate-200">
-  <h2 class="text-lg font-semibold text-slate-800 mb-3">Svelte</h2>
+<div>
   <div>
     <!-- Parent Checkbox -->
     <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">

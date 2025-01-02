@@ -1,0 +1,51 @@
+---
+interface Props {
+  title: string;
+  framework: string;
+}
+
+const { title, framework } = Astro.props;
+---
+
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+  <div 
+    class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between"
+    data-drag-handle
+  >
+    <h3 class="font-medium text-slate-700 select-none">
+      {title}
+    </h3>
+    <div 
+      class="text-slate-400 hover:text-slate-600 transition-colors cursor-grab select-none"
+      aria-label="Drag to reorder"
+    >
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="16" 
+        height="16" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+      >
+        <circle cx="9" cy="5" r="1"/>
+        <circle cx="9" cy="12" r="1"/>
+        <circle cx="9" cy="19" r="1"/>
+        <circle cx="15" cy="5" r="1"/>
+        <circle cx="15" cy="12" r="1"/>
+        <circle cx="15" cy="19" r="1"/>
+      </svg>
+    </div>
+  </div>
+  <div class="p-4">
+    <slot />
+  </div>
+</div>
+
+<style>
+  [data-drag-handle]:active {
+    cursor: grabbing;
+  }
+</style> 
