@@ -6,7 +6,7 @@ import alpineLogo from "../../assets/logos/alpine.svg";
 const code = `---
 const parentCheckbox = {
 	id: "parent",
-	label: "Parent Checkbox",
+	label: "Parent",
 };
 
 const childCheckboxItems = [
@@ -46,7 +46,7 @@ const childCheckboxItems = [
 		x-effect="parentChecked = Object.values(childStates).every(v => v)"
 	>
 		<h2 class="text-lg font-semibold text-slate-800 mb-3">Alpine.js</h2>
-		<div class="space-y-1">
+		<div>
 			<!-- Parent checkbox -->
 			<div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
 				<div class="flex items-center space-x-3">
@@ -65,7 +65,7 @@ const childCheckboxItems = [
 			</div>
 
 			<!-- Child checkboxes -->
-			<div class="ml-8 space-y-1">
+			<div class="ml-8">
 				{childCheckboxItems.map(item => (
 					<div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
 						<div class="flex items-center space-x-3">
@@ -75,7 +75,7 @@ const childCheckboxItems = [
 								name="notifications" 
 								value={item.id}
 								class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-								x-model="childStates[item.id]"
+								x-model={childStates[item.id]}
 							>
 							<label for={item.id} class="text-slate-700 cursor-pointer text-sm font-medium">{item.label}</label>
 						</div>

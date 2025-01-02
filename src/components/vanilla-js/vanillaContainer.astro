@@ -3,11 +3,10 @@ import Vanilla from "./vanilla.astro";
 import CodeBlock from "../CodeBlock.astro";
 import javascriptLogo from "../../assets/logos/javascript.svg";
 
-const code = `
----
+const code = `---
 const parentCheckbox = {
 	id: "parent-vanilla",
-	label: "Parent Checkbox",
+	label: "Parent",
 };
 
 const childCheckboxItems = [
@@ -29,7 +28,7 @@ const childCheckboxItems = [
 <div class="max-w-2xl w-full">
   <div class="bg-white rounded-lg p-3 border border-slate-200" data-checkbox-container>
     <h2 class="text-lg font-semibold text-slate-800 mb-3">Vanilla JS</h2>
-    <div class="space-y-1">
+    <div>
       <!-- Parent checkbox -->
       <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
         <div class="flex items-center space-x-3">
@@ -46,7 +45,7 @@ const childCheckboxItems = [
       </div>
 
       <!-- Child checkboxes -->
-      <div class="ml-8 space-y-1">
+      <div class="ml-8">
         {childCheckboxItems.map(item => (
           <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
             <div class="flex items-center space-x-3">

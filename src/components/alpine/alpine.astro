@@ -1,7 +1,7 @@
 ---
 const parentCheckbox = {
 	id: "parent",
-	label: "Parent Checkbox",
+	label: "Parent",
 };
 
 const childCheckboxItems = [
@@ -41,7 +41,7 @@ const childCheckboxItems = [
 		x-effect="parentChecked = Object.values(childStates).every(v => v)"
 	>
 		<h2 class="text-lg font-semibold text-slate-800 mb-3">Alpine.js</h2>
-		<div class="space-y-1">
+		<div>
 			<!-- Parent checkbox -->
 			<div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
 				<div class="flex items-center space-x-3">
@@ -60,7 +60,7 @@ const childCheckboxItems = [
 			</div>
 
 			<!-- Child checkboxes -->
-			<div class="ml-8 space-y-1">
+			<div class="ml-8">
 				{childCheckboxItems.map(item => (
 					<div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
 						<div class="flex items-center space-x-3">

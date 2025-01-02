@@ -1,6 +1,6 @@
 <div class="bg-white rounded-lg p-3 border border-slate-200">
   <h2 class="text-lg font-semibold text-slate-800 mb-3">Svelte</h2>
-  <div class="space-y-1">
+  <div>
     <!-- Parent Checkbox -->
     <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
       <div class="flex items-center space-x-3">
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Child Checkboxes -->
-    <div class="ml-8 space-y-1">
+    <div class="ml-8">
       {#each childCheckboxItems as item (item.id)}
         <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
           <div class="flex items-center space-x-3">
@@ -57,7 +57,7 @@ interface CheckboxItem {
 
 const parentCheckbox: CheckboxItem = {
 	id: "parent-svelte",
-	label: "Parent Checkbox",
+	label: "Parent",
 };
 
 const childCheckboxItems: CheckboxItem[] = [

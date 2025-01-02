@@ -7,7 +7,7 @@ interface CheckboxItem {
 
 const parentCheckbox: CheckboxItem = {
 	id: "parent-react",
-	label: "Parent Checkbox",
+	label: "Parent",
 };
 
 const childCheckboxItems: CheckboxItem[] = [
@@ -144,7 +144,7 @@ export default function NestedCheckboxes() {
 	return (
 		<div className="bg-white rounded-lg p-3 border border-slate-200">
 			<h2 className="text-lg font-semibold text-slate-800 mb-3">React</h2>
-			<div className="space-y-1">
+			<div>
 				{/* Parent Checkbox */}
 				<ParentCheckbox
 					id={parentCheckbox.id}
@@ -155,7 +155,7 @@ export default function NestedCheckboxes() {
 				/>
 
 				{/* Child Checkboxes */}
-				<div className="ml-8 space-y-1">
+				<div className="ml-8">
 					{childCheckboxItems.map((item) => (
 						<ChildCheckbox
 							key={item.id}
