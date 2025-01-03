@@ -18,7 +18,6 @@ const childCheckboxItems = [
     { id: "child3-vue", label: "Child 3" },
 ];
 
-// Initialize 'childStates' dynamically based on 'childCheckboxItems'
 const childStates = ref(
     childCheckboxItems.reduce((acc, item) => {
         acc[item.id] = false;
@@ -26,7 +25,6 @@ const childStates = ref(
     }, {}),
 );
 
-// Computed for the parent checkbox's checked state
 const parentChecked = computed({
     get: () => Object.values(childStates.value).every(Boolean),
     set: (value) => {
@@ -36,7 +34,6 @@ const parentChecked = computed({
     },
 });
 
-// Computed for individual child states (all unchecked, some checked, or all checked)
 const areSomeChildrenChecked = computed(() =>
     Object.values(childStates.value).some(Boolean),
 );
@@ -45,7 +42,6 @@ const areSomeChildrenChecked = computed(() =>
 <template>
     <div class="px-3 py-2">
         <div>
-            <!-- Parent Checkbox -->
             <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
                 <div class="flex items-center space-x-3">
                     <input type="checkbox" :id="parentCheckbox.id"
@@ -56,8 +52,6 @@ const areSomeChildrenChecked = computed(() =>
                     </label>
                 </div>
             </div>
-
-            <!-- Child Checkboxes -->
             <div class="ml-8">
                 <div v-for="item in childCheckboxItems" :key="item.id"
                     class="p-1 rounded-lg hover:bg-slate-100 transition-colors">

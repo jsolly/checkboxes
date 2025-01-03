@@ -1,6 +1,5 @@
 <div class="px-3 py-2">
   <div>
-    <!-- Parent Checkbox -->
     <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
       <div class="flex items-center space-x-3">
         <input
@@ -23,8 +22,6 @@
         </label>
       </div>
     </div>
-
-    <!-- Child Checkboxes -->
     <div class="ml-8">
       {#each childCheckboxItems as item (item.id)}
         <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
