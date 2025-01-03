@@ -6,7 +6,7 @@ interface Props {
 const { title } = Astro.props;
 ---
 
-<div class="bg-white rounded-lg border border-slate-200 shadow-md overflow-hidden cursor-grab" data-drag-handle>
+<div class="bg-white rounded-lg border border-slate-200 shadow-md overflow-hidden" data-drag-handle>
   <div 
     class="bg-slate-50 px-4 py-3 flex border-b border-slate-200 items-center justify-between"
   >
@@ -14,7 +14,7 @@ const { title } = Astro.props;
       {title}
     </h3>
     <div 
-      class="text-slate-400 hover:text-slate-600 transition-colors select-none"
+      class="hidden lg:block text-slate-400 hover:text-slate-600 transition-colors select-none"
       aria-label="Drag to reorder"
     >
       <svg 
@@ -37,11 +37,5 @@ const { title } = Astro.props;
       </svg>
     </div>
   </div>
-    <slot />
+  <slot />
 </div>
-
-<style>
-  [data-drag-handle]:active {
-    cursor: grabbing;
-  }
-</style> 

@@ -15,7 +15,6 @@ const { title = "checkboxes.xyz" } = Astro.props;
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{title}</title>
 		<script src="https://unpkg.com/hyperscript.org@0.9.13"></script>
-		<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 	</head>
 	<body>
 		<slot />
@@ -36,14 +35,12 @@ const { title = "checkboxes.xyz" } = Astro.props;
 <style is:global>
   .framework-container {
     transition: transform 0.2s;
-    cursor: grab;
   }
-  
+
   .framework-container.dragging {
     transform: scale(1.02);
     opacity: 0.9;
     box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1);
-    cursor: grabbing;
   }
 
   .sortable-ghost {

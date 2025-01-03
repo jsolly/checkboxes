@@ -63,16 +63,16 @@ export default function FrameworkSelector() {
 						<label
 							key={framework.id}
 							className="flex items-center space-x-2 px-4 py-2 rounded-lg 
-                       border border-slate-200 cursor-pointer 
-                       hover:bg-slate-50 transition-colors"
+							border border-slate-200 cursor-pointer 
+							hover:bg-slate-50 transition-colors"
 						>
 							<input
 								type="checkbox"
 								checked={selectedFrameworks.includes(framework.id)}
 								onChange={() => handleFrameworkToggle(framework.id)}
 								className="w-4 h-4 rounded text-blue-600 
-                         focus:ring-blue-500 focus:ring-2 
-                         border-slate-300"
+								focus:ring-blue-500 focus:ring-2 
+								border-slate-300"
 							/>
 							<span className="text-slate-700 select-none">
 								{framework.name}
@@ -81,7 +81,7 @@ export default function FrameworkSelector() {
 					))}
 				</div>
 			</div>
-			<div className="mt-3 text-sm text-slate-500 px-4">
+			<div className="mt-3 text-sm text-slate-500 px-4 hidden lg:block">
 				Tip: Drag and drop framework containers to reorder them
 			</div>
 		</div>

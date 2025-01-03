@@ -51,8 +51,8 @@ const frameworks = [
 	 * @param gridElement The grid element to make sortable
 	 */
 	function initializeSortable(gridElement: HTMLElement) {
-		// Check if the device is likely mobile/touch (screen width less than 768px)
-		const isMobile = window.innerWidth < 768;
+		// Check if the device is likely mobile/touch (screen width less than 1024px)
+		const isMobile = window.innerWidth < 1024;
 
 		return new Sortable(gridElement, {
 			animation: 150,
@@ -148,7 +148,7 @@ const frameworks = [
 		const grid = document.getElementById('framework-grid');
 		if (!grid || !sortableInstance) return;
 
-		const isMobile = window.innerWidth < 768;
+		const isMobile = window.innerWidth < 1024;
 		sortableInstance.option('disabled', isMobile);
 	}
 
@@ -190,8 +190,8 @@ const frameworks = [
 		grid-auto-rows: min-content;
 	}
 
-	/* Only show grab cursor on non-touch devices */
-	@media (hover: hover) {
+	/* Only show grab cursor on desktop devices */
+	@media (min-width: 1024px) {
 		.framework-container {
 			cursor: grab;
 		}
