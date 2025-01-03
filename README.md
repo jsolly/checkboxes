@@ -37,25 +37,15 @@ At this point, you could open a PR, but if you want to add the whole integration
 ```
 src/
 ├── components/
-│   ├── alpine/
-│   │   ├── alpine.astro # Implementation
-│   │   └── alpineContainer.astro # Display wrapper
-│   ├── hyperscript/
-│   │   ├── hyperscript.astro
-│   │   └── hyperscriptContainer.astro
 │   ├── react/
 │   │   ├── NestedCheckboxes.tsx
 │   │   └── ReactContainer.astro
-│   ├── svelte/
-│   │   ├── NestedCheckboxes.svelte
-│   │   └── SvelteContainer.astro
-│   ├── vanilla-js/
-│   │   ├── vanilla.astro
-│   │   └── vanillaContainer.astro
-│   ├── vue/
-│   │   ├── NestedCheckboxes.vue
-│   │   └── vueContainer.astro
-│   └── CodeBlock.astro          # Shared code display component
+│   ├── alpine/
+│   │   ├── alpine.astro
+│   │   └── AlpineContainer.astro
+│   ├── [other-frameworks]/     # Similar structure for other frameworks
+│   │   └── ...
+│   └── CodeBlock.astro         # Shared code display component
 ├── layouts/
 │   └── Layout.astro            # Base layout
 └── pages/
