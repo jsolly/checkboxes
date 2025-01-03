@@ -19,7 +19,7 @@ const childCheckboxItems: CheckboxItem[] = [
 	{ id: "child3-vue", label: "Child 3" },
 ];
 
-// Initialize `childStates` dynamically based on `childCheckboxItems`
+// Initialize 'childStates' dynamically based on 'childCheckboxItems'
 const childStates = ref(
 	childCheckboxItems.reduce<Record<string, boolean>>((acc, item) => {
 		acc[item.id] = false;
