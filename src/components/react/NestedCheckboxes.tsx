@@ -142,7 +142,7 @@ export default function NestedCheckboxes() {
 		};
 
 	return (
-		<div>
+		<div className="px-3 py-2">
 			<div>
 				{/* Parent Checkbox */}
 				<ParentCheckbox
