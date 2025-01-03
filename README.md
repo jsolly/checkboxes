@@ -4,7 +4,6 @@ A collection of checkbox implementations using different frameworks and approach
 
 ## Features
 
-- Parent/child checkbox relationships
 - Multiple implementation examples:
   - React
   - Vue.js
@@ -12,8 +11,7 @@ A collection of checkbox implementations using different frameworks and approach
   - Alpine.js
   - Vanilla JavaScript
   - Hyperscript
-- Syntax highlighted code examples
-- Collapsible code sections
+- Syntax highlighted collapsible code snippets
 
 ## Development
 
@@ -27,6 +25,12 @@ pnpm dev
 # Build for production
 pnpm build
 ```
+
+## Contributing
+
+To add a new implementation, create a new directory in the `src/components` directory with the framework name. Then create a file with the implementation and a container file with the display wrapper.
+
+At this point, you could open a PR, but if you want to add the whole integration, see the [Astro Framework Integration Guide](https://docs.astro.build/en/guides/integrations/). This usually involves modifying the `astro.config.mjs` file to add the framework and its configuration.
 
 ## Project Structure
 
@@ -57,3 +61,8 @@ src/
 └── pages/
     └── index.astro            # Main page
 ```
+
+## Unimplemented Frameworks
+
+- Angular
+- SolidJS
