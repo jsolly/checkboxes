@@ -42,7 +42,7 @@ export default function FrameworkSelector() {
 
 	if (!mounted) {
 		return (
-			<div className="max-w-6xl mx-auto mb-8">
+			<div className="max-w-6xl mx-auto mb-8 hidden lg:block">
 				<div className="bg-white p-4 rounded-lg shadow-sm">
 					<h2 className="text-lg font-semibold mb-3 text-slate-700">
 						Loading framework selector...
@@ -53,7 +53,7 @@ export default function FrameworkSelector() {
 	}
 
 	return (
-		<div className="max-w-6xl mx-auto mb-8">
+		<div className="max-w-6xl mx-auto mb-8 hidden lg:block">
 			<div className="bg-white p-4 rounded-lg shadow-sm">
 				<h2 className="text-lg font-semibold mb-3 text-slate-700">
 					Select frameworks to compare:
@@ -81,7 +81,7 @@ export default function FrameworkSelector() {
 					))}
 				</div>
 			</div>
-			<div className="mt-3 text-sm text-slate-500 px-4 hidden lg:block">
+			<div className="mt-3 text-sm text-slate-500 px-4">
 				Tip: Drag and drop framework containers to reorder them
 			</div>
 		</div>
