@@ -7,6 +7,15 @@ import SvelteContainer from "../components/svelte/SvelteContainer.astro";
 import VanillaContainer from "../components/vanilla-js/vanillaContainer.astro";
 import VueContainer from "../components/vue/vueContainer.astro";
 import Layout from "../layouts/Layout.astro";
+
+const frameworks = [
+	{ id: "vanilla", Component: VanillaContainer },
+	{ id: "alpine", Component: AlpineContainer },
+	{ id: "vue", Component: VueContainer },
+	{ id: "react", Component: ReactContainer },
+	{ id: "svelte", Component: SvelteContainer },
+	{ id: "hyperscript", Component: HyperscriptContainer },
+];
 ---
 
 <Layout>
@@ -16,104 +25,133 @@ import Layout from "../layouts/Layout.astro";
 			id="framework-grid" 
 			class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto"
 		>
-			<div class="framework-container" data-framework="vanilla">
-				<VanillaContainer />
-			</div>
-			<div class="framework-container" data-framework="alpine">
-				<AlpineContainer />
-			</div>
-			<div class="framework-container" data-framework="vue">
-				<VueContainer />
-			</div>
-			<div class="framework-container" data-framework="react">
-				<ReactContainer />
-			</div>
-			<div class="framework-container" data-framework="svelte">
-				<SvelteContainer />
-			</div>
-			<div class="framework-container" data-framework="hyperscript">
-				<HyperscriptContainer />
-			</div>
+			{frameworks.map(({ id, Component }) => (
+				<div class="framework-container" data-framework={id}>
+					<Component />
+				</div>
+			))}
 		</div>
 	</div>
 </Layout>
 
 <script>
 	import Sortable from "sortablejs";
+
+	// Types
 	interface SortableEvent {
 		item: HTMLElement;
 	}
 
-	// Initialize Sortable
-	const grid = document.getElementById('framework-grid');
-	if (grid) {
-		new Sortable(grid, {
-			animation: 150,
-			draggable: '.framework-container:not(.hidden)',
-			onStart: (evt: SortableEvent) => {
-				evt.item.classList.add('dragging');
-				document.body.style.cursor = 'grabbing';
-			},
-			onEnd: (evt: SortableEvent) => {
-				evt.item.classList.remove('dragging');
-				document.body.style.cursor = '';
-				// Save the order to localStorage
-				const order = Array.from(grid.children)
-					.filter(child => !child.classList.contains('hidden'))
-					.map(child => child.getAttribute('data-framework'));
-				localStorage.setItem('frameworkOrder', JSON.stringify(order));
-			}
-		});
-
-		// Restore order from localStorage
-		const savedOrder = localStorage.getItem('frameworkOrder');
-		if (savedOrder) {
-			try {
-				const order = JSON.parse(savedOrder);
-				const containers = Array.from(grid.children);
-				order.forEach((frameworkId: string) => {
-					const container = containers.find(
-						c => c.getAttribute('data-framework') === frameworkId
-					);
-					if (container) {
-						grid.appendChild(container);
-					}
-				});
-			} catch (e) {
-				console.error('Error restoring framework order:', e);
-			}
-		}
-	}
 	interface FrameworkSelectionEvent extends CustomEvent {
 		detail: string[];
 	}
 
-	document.addEventListener('frameworkSelection', ((e: FrameworkSelectionEvent) => {
-		const selectedFrameworks = e.detail;
-		document.querySelectorAll('.framework-container').forEach((element) => {
-			const container = element as HTMLElement;
-			const framework = container.getAttribute('data-framework');
-			if (framework) {
-				if (!selectedFrameworks.includes(framework)) {
-					container.style.transform = 'scale(0.95)';
-					container.style.opacity = '0';
-					
-					container.addEventListener('transitionend', function hideContainer(e) {
-						if (e.propertyName === 'opacity') {
-							container.classList.add('hidden');
-							container.removeEventListener('transitionend', hideContainer);
-						}
-					});
-				} else {
-					container.classList.remove('hidden');
-					// Force a reflow
-					void container.offsetWidth;
-					container.style.transform = 'scale(1)';
-					container.style.opacity = '1';
+	/**
+	 * Initializes Sortable.js on the framework grid
+	 * @param gridElement The grid element to make sortable
+	 */
+	function initializeSortable(gridElement: HTMLElement) {
+		return new Sortable(gridElement, {
+			animation: 150,
+			draggable: '.framework-container:not(.hidden)',
+			onStart: handleDragStart,
+			onEnd: handleDragEnd,
+		});
+	}
+
+	function handleDragStart(evt: SortableEvent) {
+		evt.item.classList.add('dragging');
+		document.body.style.cursor = 'grabbing';
+	}
+
+	function handleDragEnd(evt: SortableEvent) {
+		evt.item.classList.remove('dragging');
+		document.body.style.cursor = '';
+		saveFrameworkOrder();
+	}
+
+	function saveFrameworkOrder() {
+		const grid = document.getElementById('framework-grid');
+		if (!grid) return;
+
+		const order = Array.from(grid.children)
+			.filter(child => !child.classList.contains('hidden'))
+			.map(child => child.getAttribute('data-framework'));
+		localStorage.setItem('frameworkOrder', JSON.stringify(order));
+	}
+
+	function restoreFrameworkOrder(gridElement: HTMLElement) {
+		const savedOrder = localStorage.getItem('frameworkOrder');
+		if (!savedOrder) return;
+
+		try {
+			const order = JSON.parse(savedOrder);
+			const containers = Array.from(gridElement.children);
+			
+			for (const frameworkId of order) {
+				const container = containers.find(
+					c => c.getAttribute('data-framework') === frameworkId
+				);
+				if (container) {
+					gridElement.appendChild(container);
 				}
 			}
+		} catch (e) {
+			console.error('Error restoring framework order:', e);
+		}
+	}
+
+	/**
+	 * Handles framework visibility transitions
+	 * @param container The framework container element
+	 * @param isVisible Whether the framework should be visible
+	 */
+	function handleFrameworkVisibility(container: HTMLElement, isVisible: boolean) {
+		if (!isVisible) {
+			hideFramework(container);
+		} else {
+			showFramework(container);
+		}
+	}
+
+	function hideFramework(container: HTMLElement) {
+		container.style.transform = 'scale(0.95)';
+		container.style.opacity = '0';
+		
+		container.addEventListener('transitionend', function hideContainer(e) {
+			if (e.propertyName === 'opacity') {
+				container.classList.add('hidden');
+				container.removeEventListener('transitionend', hideContainer);
+			}
 		});
-	}) as EventListener);
+	}
+
+	function showFramework(container: HTMLElement) {
+		container.classList.remove('hidden');
+		// Force a reflow
+		void container.offsetWidth;
+		container.style.transform = 'scale(1)';
+		container.style.opacity = '1';
+	}
+
+	// Initialize
+	const grid = document.getElementById('framework-grid');
+	if (grid) {
+		initializeSortable(grid);
+		restoreFrameworkOrder(grid);
+
+		// Handle framework selection events
+		document.addEventListener('frameworkSelection', ((e: FrameworkSelectionEvent) => {
+			const selectedFrameworks = e.detail;
+			document.querySelectorAll('.framework-container').forEach((element) => {
+				const container = element as HTMLElement;
+				const framework = container.getAttribute('data-framework');
+				if (framework) {
+					handleFrameworkVisibility(container, selectedFrameworks.includes(framework));
+				}
+			});
+		}) as EventListener);
+	}
 </script>
 
 <style>
@@ -131,3 +169,4 @@ import Layout from "../layouts/Layout.astro";
 		grid-auto-rows: min-content;
 	}
 </style>
+
