@@ -15,6 +15,7 @@ const { title = "checkboxes.xyz" } = Astro.props;
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{title}</title>
 		<script src="https://unpkg.com/hyperscript.org@0.9.13"></script>
+		<meta name="theme-color" content="#f8fafc" />
 	</head>
 	<body>
 		<slot />
@@ -34,17 +35,40 @@ const { title = "checkboxes.xyz" } = Astro.props;
 
 <style is:global>
   .framework-container {
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .framework-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), transparent);
+    pointer-events: none;
+  }
+
+  .framework-container:hover {
+    border-color: rgba(99, 102, 241, 0.3);
+    background-color: rgba(255, 255, 255, 0.95);
   }
 
   .framework-container.dragging {
     transform: scale(1.02);
-    opacity: 0.9;
-    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1);
+    opacity: 0.95;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
   }
 
   .sortable-ghost {
-    opacity: 0.4;
+    opacity: 0.3;
     background: theme(colors.slate.100);
+  }
+
+  footer a {
+    transition: all 0.3s ease;
   }
 </style>
