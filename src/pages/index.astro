@@ -51,11 +51,18 @@ const frameworks = [
 	 * @param gridElement The grid element to make sortable
 	 */
 	function initializeSortable(gridElement: HTMLElement) {
+		// Check if the device is likely mobile/touch (screen width less than 768px)
+		const isMobile = window.innerWidth < 768;
+
 		return new Sortable(gridElement, {
 			animation: 150,
 			draggable: '.framework-container:not(.hidden)',
 			onStart: handleDragStart,
 			onEnd: handleDragEnd,
+			// Disable dragging on mobile
+			disabled: isMobile,
+			// Remove touch delay on desktop
+			delay: isMobile ? 0 : 150,
 		});
 	}
 
@@ -134,11 +141,25 @@ const frameworks = [
 		container.style.opacity = '1';
 	}
 
+	// Add a resize handler to enable/disable Sortable based on screen width
+	let sortableInstance: Sortable | null = null;
+
+	function handleResize() {
+		const grid = document.getElementById('framework-grid');
+		if (!grid || !sortableInstance) return;
+
+		const isMobile = window.innerWidth < 768;
+		sortableInstance.option('disabled', isMobile);
+	}
+
 	// Initialize
 	const grid = document.getElementById('framework-grid');
 	if (grid) {
-		initializeSortable(grid);
+		sortableInstance = initializeSortable(grid);
 		restoreFrameworkOrder(grid);
+		
+		// Add resize listener
+		window.addEventListener('resize', handleResize);
 
 		// Handle framework selection events
 		document.addEventListener('frameworkSelection', ((e: FrameworkSelectionEvent) => {
@@ -167,6 +188,17 @@ const frameworks = [
 	#framework-grid {
 		display: grid;
 		grid-auto-rows: min-content;
+	}
+
+	/* Only show grab cursor on non-touch devices */
+	@media (hover: hover) {
+		.framework-container {
+			cursor: grab;
+		}
+		
+		.framework-container.dragging {
+			cursor: grabbing;
+		}
 	}
 </style>
 
