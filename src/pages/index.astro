@@ -39,7 +39,7 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
-	// Add type for Sortable events
+	import Sortable from "sortablejs";
 	interface SortableEvent {
 		item: HTMLElement;
 	}
@@ -84,8 +84,6 @@ import Layout from "../layouts/Layout.astro";
 			}
 		}
 	}
-
-	// Fix CustomEvent type
 	interface FrameworkSelectionEvent extends CustomEvent {
 		detail: string[];
 	}
