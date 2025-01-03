@@ -1,6 +1,7 @@
 ---
 import FrameworkSelector from "../components/FrameworkSelector";
 import AlpineContainer from "../components/alpine/alpineContainer.astro";
+import CssOnlyContainer from "../components/css-only/cssOnlyContainer.astro";
 import HyperscriptContainer from "../components/hyperscript/hyperscriptContainer.astro";
 import ReactContainer from "../components/react/ReactContainer.astro";
 import SvelteContainer from "../components/svelte/SvelteContainer.astro";
@@ -15,6 +16,7 @@ const frameworks = [
 	{ id: "react", Component: ReactContainer },
 	{ id: "svelte", Component: SvelteContainer },
 	{ id: "hyperscript", Component: HyperscriptContainer },
+	{ id: "css-only", Component: CssOnlyContainer },
 ];
 ---
 

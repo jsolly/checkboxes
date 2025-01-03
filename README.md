@@ -54,7 +54,8 @@ src/
     └── index.astro            # Main page
 ```
 
-## Unimplemented Frameworks
-
-- Angular
-- SolidJS
+## Future Enhancements
+- Add more frameworks (Angular, Solid.js)
+- Add performance comparisons
+- Create interactive playground
+- Add more complex checkbox scenarios
