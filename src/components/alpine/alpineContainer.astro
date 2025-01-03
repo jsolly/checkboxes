@@ -1,4 +1,5 @@
 ---
+import FrameworkContainer from "../FrameworkContainer.astro";
 import Alpine from "./alpine.astro";
 import CodeBlock from "../CodeBlock.astro";
 import alpineLogo from "../../assets/logos/alpine.svg";
@@ -25,27 +26,26 @@ const childCheckboxItems = [
 ];
 ---
 
-<div class="max-w-2xl w-full">
-	<div class="bg-white rounded-lg p-3 border border-slate-200" 
-		x-data="{ 
-			parentChecked: false,
-			childStates: {
-				child1: false,
-				child2: false,
-				child3: false
-			},
-			toggleParent() {
-				for (let key in this.childStates) {
-					this.childStates[key] = this.parentChecked;
-				}
-			},
-			areSomeChildrenChecked() {
-				return Object.values(this.childStates).some(v => v) && !this.parentChecked;
+<div
+	x-data="{ 
+		parentChecked: false,
+		childStates: {
+			child1: false,
+			child2: false,
+			child3: false
+		},
+		toggleParent() {
+			for (let key in this.childStates) {
+				this.childStates[key] = this.parentChecked;
 			}
-		}"
-		x-effect="parentChecked = Object.values(childStates).every(v => v)"
-	>
-		<h2 class="text-lg font-semibold text-slate-800 mb-3">Alpine.js</h2>
+		},
+		areSomeChildrenChecked() {
+			return Object.values(this.childStates).some(v => v) && !this.parentChecked;
+		}
+	}"
+	x-effect="parentChecked = Object.values(childStates).every(v => v)"
+>
+	<div class="px-3 py-2">
 		<div>
 			<!-- Parent checkbox -->
 			<div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
@@ -67,7 +67,7 @@ const childCheckboxItems = [
 			<!-- Child checkboxes -->
 			<div class="ml-8">
 				{childCheckboxItems.map(item => (
-					<div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+					<div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
 						<div class="flex items-center space-x-3">
 							<input 
 								type="checkbox" 
@@ -87,12 +87,12 @@ const childCheckboxItems = [
 </div>`;
 ---
 
-<div class="max-w-2xl w-full">
+<FrameworkContainer title="Alpine.js">
   <Alpine />
   <CodeBlock 
     code={code} 
     displayName="Alpine.js" 
-    lang="html" 
+    lang="javascript" 
     logo={alpineLogo}
   />
-</div>
+</FrameworkContainer>

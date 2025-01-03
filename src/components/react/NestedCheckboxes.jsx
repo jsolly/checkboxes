@@ -1,17 +1,12 @@
----
-import FrameworkContainer from "../FrameworkContainer.astro";
-import NestedCheckboxes from "./NestedCheckboxes";
-import CodeBlock from "../CodeBlock.astro";
-import reactLogo from "../../assets/logos/react.svg";
-
-const code = `import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 // Constants
 const CHECKBOX_STYLES = {
 	container: "rounded-lg hover:bg-slate-100 transition-colors",
 	wrapper: "flex items-center space-x-3",
-	input: "h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500",
-	label: "text-slate-700 cursor-pointer text-sm font-medium"
+	input:
+		"h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500",
+	label: "text-slate-700 cursor-pointer text-sm font-medium",
 };
 
 const parentCheckbox = {
@@ -36,7 +31,7 @@ function ParentCheckbox({ id, label, checked, indeterminate, onChange }) {
 	}, [indeterminate]);
 
 	return (
-		<div className={"p-1 " + CHECKBOX_STYLES.container}>
+		<div className={`p-2 ${CHECKBOX_STYLES.container}`}>
 			<div className={CHECKBOX_STYLES.wrapper}>
 				<input
 					ref={checkboxRef}
@@ -56,7 +51,7 @@ function ParentCheckbox({ id, label, checked, indeterminate, onChange }) {
 
 function ChildCheckbox({ id, label, checked, onChange }) {
 	return (
-		<div className={"p-2 " + CHECKBOX_STYLES.container}>
+		<div className={`p-1 ${CHECKBOX_STYLES.container}`}>
 			<div className={CHECKBOX_STYLES.wrapper}>
 				<input
 					type="checkbox"
@@ -76,13 +71,10 @@ function ChildCheckbox({ id, label, checked, onChange }) {
 // Main Component
 export default function NestedCheckboxes() {
 	const [childStates, setChildStates] = useState(() =>
-		childCheckboxItems.reduce(
-			(acc, item) => {
-				acc[item.id] = false;
-				return acc;
-			},
-			{}
-		)
+		childCheckboxItems.reduce((acc, item) => {
+			acc[item.id] = false;
+			return acc;
+		}, {}),
 	);
 
 	const { allChecked, someChecked } = useMemo(() => {
@@ -96,18 +88,17 @@ export default function NestedCheckboxes() {
 	const handleParentChange = (e) => {
 		const newValue = e.target.checked;
 		setChildStates(
-			childCheckboxItems.reduce(
-				(acc, item) => {
-					acc[item.id] = newValue;
-					return acc;
-				},
-				{}
-			)
+			childCheckboxItems.reduce((acc, item) => {
+				acc[item.id] = newValue;
+				return acc;
+			}, {}),
 		);
 	};
 
 	const handleChildChange = (id) => (e) => {
-		setChildStates((prev) => Object.assign({}, prev, { [id]: e.target.checked }));
+		setChildStates((prev) =>
+			Object.assign({}, prev, { [id]: e.target.checked }),
+		);
 	};
 
 	return (
@@ -135,15 +126,4 @@ export default function NestedCheckboxes() {
 			</div>
 		</div>
 	);
-}`;
----
-
-<FrameworkContainer title="React">
-  <NestedCheckboxes client:only="react" />
-  <CodeBlock 
-    code={code} 
-    displayName="React.js" 
-    lang="jsx" 
-    logo={reactLogo}
-  />
-</FrameworkContainer> 
+}

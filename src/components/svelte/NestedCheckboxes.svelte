@@ -1,5 +1,4 @@
-<div class="bg-white rounded-t-lg p-3 border border-slate-200">
-  <h2 class="text-lg font-semibold text-slate-800 mb-3">Svelte</h2>
+<div class="px-3 py-2">
   <div>
     <!-- Parent Checkbox -->
     <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
@@ -28,7 +27,7 @@
     <!-- Child Checkboxes -->
     <div class="ml-8">
       {#each childCheckboxItems as item (item.id)}
-        <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+        <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
           <div class="flex items-center space-x-3">
             <input
               type="checkbox"
@@ -49,33 +48,25 @@
   </div>
 </div> 
 
-<script lang="ts">
-interface CheckboxItem {
-	id: string;
-	label: string;
-}
-
-const parentCheckbox: CheckboxItem = {
+<script>
+const parentCheckbox = {
 	id: "parent-svelte",
 	label: "Parent",
 };
 
-const childCheckboxItems: CheckboxItem[] = [
+const childCheckboxItems = [
 	{ id: "child1-svelte", label: "Child 1" },
 	{ id: "child2-svelte", label: "Child 2" },
 	{ id: "child3-svelte", label: "Child 3" },
 ];
 
-let childStates: Record<string, boolean> = childCheckboxItems.reduce(
-	(acc, item) => {
-		acc[item.id] = false;
-		return acc;
-	},
-	{} as Record<string, boolean>,
-);
+let childStates = childCheckboxItems.reduce((acc, item) => {
+	acc[item.id] = false;
+	return acc;
+}, {});
 
-function setIndeterminate(node: HTMLInputElement, indeterminate: boolean) {
-	function update(indeterminate: boolean) {
+function setIndeterminate(node, indeterminate) {
+	function update(indeterminate) {
 		node.indeterminate = indeterminate;
 	}
 
