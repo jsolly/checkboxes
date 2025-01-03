@@ -59,10 +59,10 @@ const frameworks = [
 			draggable: '.framework-container:not(.hidden)',
 			onStart: handleDragStart,
 			onEnd: handleDragEnd,
-			// Disable dragging on mobile
 			disabled: isMobile,
-			// Remove touch delay on desktop
-			delay: isMobile ? 0 : 150,
+			delay: 0,
+			delayOnTouchOnly: true,
+			touchStartThreshold: 4
 		});
 	}
 
