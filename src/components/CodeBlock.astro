@@ -17,9 +17,19 @@ const totalLines = code.split("\n").length;
 	<button 
 		class="w-full bg-slate-50 px-4 py-2 flex items-center justify-between hover:bg-slate-100 transition-colors"
 		@click="expanded = !expanded"
+		aria-expanded="false"
+		:aria-expanded="expanded"
+		aria-controls="code-block"
 	>
 		<div class="flex items-center space-x-3">
-			{logo && <Image src={logo} alt={`${displayName} logo`} class="h-5 w-5" />}
+			{logo && <Image 
+				src={logo} 
+				alt={`${displayName} logo`} 
+				class="h-5 w-5" 
+				loading="eager"
+				width={20}
+				height={20}
+			/>}
 			<div class="text-sm text-slate-500">
 				<span x-text="expanded ? 'Hide' : 'View'"></span>
 				<span> {displayName} code</span>
@@ -34,18 +44,31 @@ const totalLines = code.split("\n").length;
 				fill="none" 
 				viewBox="0 0 24 24" 
 				stroke="currentColor"
+				aria-hidden="true"
 			>
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
 			</svg>
 		</div>
 	</button>
 	<div 
+		id="code-block"
 		class="overflow-hidden transition-[max-height] duration-300 ease-in-out"
 		x-ref="code"
 		:style="expanded ? { maxHeight: $refs.code.scrollHeight + 'px' } : { maxHeight: '0px' }"
+		role="region"
+		aria-label={`${displayName} code example`}
 	>
 		<div class="p-4 overflow-x-auto bg-white">
-			<Code code={code} lang={lang} theme="github-light" wrap />
+			<div class="code-wrapper">
+				<Code code={code} lang={lang} theme="github-light" wrap />
+			</div>
 		</div>
 	</div>
-</div> 
+</div>
+
+<script>
+	// Remove tabindex from pre elements (From Astro Audit Tool)
+	document.querySelectorAll('pre[tabindex]').forEach(pre => {
+		pre.removeAttribute('tabindex');
+	});
+</script> 
