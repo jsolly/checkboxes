@@ -1,6 +1,8 @@
 # Checkbox Examples
 
 A collection of checkbox implementations using different frameworks and approaches.
+![CleanShot 2025-01-03 at 18 22 30](https://github.com/user-attachments/assets/f8f45f40-1ab6-4533-9347-80e4fb6ed11d)
+
 
 ## Features
 
