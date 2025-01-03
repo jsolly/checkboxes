@@ -1,17 +1,16 @@
 ---
 interface Props {
   title: string;
-  framework: string;
 }
 
-const { title, framework } = Astro.props;
+const { title } = Astro.props;
 ---
 
-<div class="bg-white rounded-lg shadow-lg overflow-hidden cursor-grab" data-drag-handle>
+<div class="bg-white rounded-lg border border-slate-200 shadow-md overflow-hidden cursor-grab" data-drag-handle>
   <div 
-    class="bg-slate-50 px-4 py-3 flex items-center justify-between"
+    class="bg-slate-50 px-4 py-3 flex border-b border-slate-200 items-center justify-between"
   >
-    <h3 class="font-medium text-slate-700 select-none">
+    <h3 class="font-semibold text-slate-700 select-none">
       {title}
     </h3>
     <div 
@@ -38,9 +37,7 @@ const { title, framework } = Astro.props;
       </svg>
     </div>
   </div>
-  <div class="p-4">
     <slot />
-  </div>
 </div>
 
 <style>

@@ -13,7 +13,7 @@ const { code = "", displayName, lang = "javascript", logo } = Astro.props;
 const totalLines = code.split("\n").length;
 ---
 
-<div class="rounded-b-lg overflow-hidden border border-slate-200 mt-3" x-data="{ expanded: false }">
+<div class="rounded-b-lg overflow-hidden border-t border-slate-200 mt-2" x-data="{ expanded: false }">
 	<button 
 		class="w-full bg-slate-50 px-4 py-2 flex items-center justify-between hover:bg-slate-100 transition-colors"
 		@click="expanded = !expanded"
