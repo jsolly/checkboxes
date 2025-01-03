@@ -1,19 +1,12 @@
-<script setup lang="ts">
+<script setup>
 import { computed, ref } from "vue";
 
-// Define the interface for a checkbox item
-interface CheckboxItem {
-	id: string;
-	label: string;
-}
-
-// Data for parent and child checkboxes
-const parentCheckbox: CheckboxItem = {
+const parentCheckbox = {
 	id: "parent-vue",
 	label: "Parent",
 };
 
-const childCheckboxItems: CheckboxItem[] = [
+const childCheckboxItems = [
 	{ id: "child1-vue", label: "Child 1" },
 	{ id: "child2-vue", label: "Child 2" },
 	{ id: "child3-vue", label: "Child 3" },
@@ -21,16 +14,16 @@ const childCheckboxItems: CheckboxItem[] = [
 
 // Initialize 'childStates' dynamically based on 'childCheckboxItems'
 const childStates = ref(
-	childCheckboxItems.reduce<Record<string, boolean>>((acc, item) => {
+	childCheckboxItems.reduce((acc, item) => {
 		acc[item.id] = false;
 		return acc;
 	}, {}),
 );
 
 // Computed for the parent checkbox's checked state
-const parentChecked = computed<boolean>({
+const parentChecked = computed({
 	get: () => Object.values(childStates.value).every(Boolean),
-	set: (value: boolean) => {
+	set: (value) => {
 		for (const key of Object.keys(childStates.value)) {
 			childStates.value[key] = value;
 		}

@@ -54,33 +54,28 @@ const code = `<div class="px-3 py-2">
   </div>
 </div> 
 
-<script lang="ts">
-interface CheckboxItem {
-	id: string;
-	label: string;
-}
-
-const parentCheckbox: CheckboxItem = {
+<script>
+const parentCheckbox = {
 	id: "parent-svelte",
 	label: "Parent",
 };
 
-const childCheckboxItems: CheckboxItem[] = [
+const childCheckboxItems = [
 	{ id: "child1-svelte", label: "Child 1" },
 	{ id: "child2-svelte", label: "Child 2" },
 	{ id: "child3-svelte", label: "Child 3" },
 ];
 
-let childStates: Record<string, boolean> = childCheckboxItems.reduce(
+let childStates = childCheckboxItems.reduce(
 	(acc, item) => {
 		acc[item.id] = false;
 		return acc;
 	},
-	{} as Record<string, boolean>,
+	{},
 );
 
-function setIndeterminate(node: HTMLInputElement, indeterminate: boolean) {
-	function update(indeterminate: boolean) {
+function setIndeterminate(node, indeterminate) {
+	function update(indeterminate) {
 		node.indeterminate = indeterminate;
 	}
 
