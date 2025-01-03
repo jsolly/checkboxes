@@ -88,7 +88,6 @@ import Layout from "../layouts/Layout.astro";
 		detail: string[];
 	}
 
-	// Update event listener with correct type
 	document.addEventListener('frameworkSelection', ((e: FrameworkSelectionEvent) => {
 		const selectedFrameworks = e.detail;
 		document.querySelectorAll('.framework-container').forEach((element) => {
@@ -98,9 +97,13 @@ import Layout from "../layouts/Layout.astro";
 				if (!selectedFrameworks.includes(framework)) {
 					container.style.transform = 'scale(0.95)';
 					container.style.opacity = '0';
-					setTimeout(() => {
-						container.classList.add('hidden');
-					}, 300);
+					
+					container.addEventListener('transitionend', function hideContainer(e) {
+						if (e.propertyName === 'opacity') {
+							container.classList.add('hidden');
+							container.removeEventListener('transitionend', hideContainer);
+						}
+					});
 				} else {
 					container.classList.remove('hidden');
 					// Force a reflow
