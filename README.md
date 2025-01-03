@@ -10,7 +10,7 @@ A collection of checkbox implementations using different frameworks and approach
   - Vue.js
   - Svelte
   - Alpine.js
-  - Pure JavaScript
+  - Vanilla JavaScript
   - Hyperscript
 - Syntax highlighted code examples
 - Collapsible code sections
