@@ -12,7 +12,8 @@
 		"lint": "biome lint .",
 		"lint-fix": "biome lint --write .",
 		"format": "biome format --write .",
-		"check": "biome check --write ."
+		"check": "biome check --write .",
+		"generate-stats": "node src/utils/generate-stats.js"
 	},
 	"lint-staged": {
 		"*": ["biome check --no-errors-on-unmatched --write"]
@@ -47,6 +48,7 @@
 		"@biomejs/biome": "1.9.4",
 		"@types/sortablejs": "^1.15.8",
 		"husky": "^9.1.7",
-		"lint-staged": "^15.3.0"
+		"lint-staged": "^15.3.0",
+		"playwright": "^1.42.1"
 	}
 }

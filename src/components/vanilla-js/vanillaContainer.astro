@@ -1,13 +1,19 @@
 ---
-import FrameworkContainer from "../FrameworkContainer.astro";
-import VanillaJS from "./vanilla.astro";
-import CodeBlock from "../CodeBlock.astro";
 import javascriptLogo from "../../assets/logos/javascript.svg";
+import CodeBlock from "../CodeBlock.astro";
+import FrameworkContainer from "../FrameworkContainer.astro";
+import PerformanceBadge from "../PerformanceBadge.astro";
+import stats from "./stats.json";
+import VanillaJS from "./vanilla.astro";
 
-const code = await import('./vanilla.astro?raw').then(m => m.default);
+const code = await import("./vanilla.astro?raw").then((m) => m.default);
 ---
 
 <FrameworkContainer framework="vanilla" title="Vanilla JavaScript">
+  <PerformanceBadge 
+    renderTime={stats.renderTime} 
+    bundleSize={stats.bundleSize}
+  />
   <VanillaJS />
   <CodeBlock 
     code={code} 

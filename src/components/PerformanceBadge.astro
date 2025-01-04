@@ -1,0 +1,39 @@
+---
+interface Props {
+	renderTime: string;
+	bundleSize?: string;
+}
+
+const { renderTime, bundleSize } = Astro.props;
+---
+
+<div class="flex gap-2">
+  <div class="performance-badge">
+    <span class="value">Render: {renderTime}</span>
+  </div>
+  {bundleSize && (
+    <div class="performance-badge">
+      <span class="value">Bundle: {bundleSize}</span>
+    </div>
+  )}
+</div>
+
+<style>
+  .performance-badge {
+    background: #0ca678;
+    color: white;
+    border-radius: 9999px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .flex {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    display: flex;
+    gap: 0.5rem;
+  }
+</style> 

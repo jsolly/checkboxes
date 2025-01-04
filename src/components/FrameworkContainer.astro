@@ -1,14 +1,14 @@
 ---
 interface Props {
-  title: string;
-  framework: string;
+	title: string;
+	framework: string;
 }
 
-const { title, framework} = Astro.props;
+const { title, framework } = Astro.props;
 ---
 
 <div class="opacity-0 transition-opacity duration-300" data-framework-wrapper>
-  <div class="bg-white/40 rounded-xl border border-white/50 shadow-lg overflow-hidden" data-drag-handle>
+  <div class="bg-white/40 rounded-xl border border-white/50 shadow-lg overflow-hidden relative" data-drag-handle>
     <div 
       class="bg-white/60 px-4 py-3 flex border-b border-white/20 items-center justify-between backdrop-blur-md"
     >
