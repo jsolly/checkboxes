@@ -13,6 +13,7 @@ A collection of checkbox implementations using different frameworks and approach
   - Alpine.js
   - Vanilla JavaScript
   - Hyperscript
+  - CSS Only
 - Syntax highlighted collapsible code snippets
 
 ## Development
