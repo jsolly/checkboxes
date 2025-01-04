@@ -7,7 +7,7 @@ import alpineLogo from "../../assets/logos/alpine.svg";
 const code = await import('./alpine.astro?raw').then(m => m.default);
 ---
 
-<FrameworkContainer title="Alpine.js">
+<FrameworkContainer framework="alpine" title="Alpine.js">
   <Alpine />
   <CodeBlock 
     code={code} 

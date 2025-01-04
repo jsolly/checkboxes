@@ -7,8 +7,8 @@ import svelteLogo from "../../assets/logos/svelte.svg";
 const code = await import('./NestedCheckboxes.svelte?raw').then(m => m.default);
 ---
 
-<FrameworkContainer title="Svelte">
-  <NestedCheckboxes client:load />
+<FrameworkContainer framework="svelte" title="Svelte">
+  <NestedCheckboxes client:only="svelte" />
   <CodeBlock 
     code={code} 
     displayName="Svelte" 

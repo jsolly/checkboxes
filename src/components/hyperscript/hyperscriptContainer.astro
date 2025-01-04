@@ -7,7 +7,7 @@ import hyperscriptLogo from "../../assets/logos/hyperscript.svg";
 const code = await import('./hyperscript.astro?raw').then(m => m.default);
 ---
 
-<FrameworkContainer title="Hyperscript">
+<FrameworkContainer framework="hyperscript" title="Hyperscript">
   <Hyperscript />
   <CodeBlock 
     code={code} 

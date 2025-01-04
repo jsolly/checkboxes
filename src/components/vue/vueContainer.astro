@@ -7,8 +7,8 @@ import vueLogo from "../../assets/logos/vue.svg";
 const code = await import('./NestedCheckboxes.vue?raw').then(m => m.default);
 ---
 
-<FrameworkContainer title="Vue.js">
-  <NestedCheckboxes client:load />
+<FrameworkContainer framework="vue" title="Vue.js">
+  <NestedCheckboxes client:only="vue" />
   <CodeBlock 
     code={code} 
     displayName="Vue.js" 

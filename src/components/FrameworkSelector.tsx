@@ -12,6 +12,8 @@ const frameworks: Framework[] = [
 	{ id: "react", name: "React" },
 	{ id: "svelte", name: "Svelte" },
 	{ id: "hyperscript", name: "Hyperscript" },
+	{ id: "css-only", name: "CSS Only" },
+	{ id: "jquery", name: "jQuery" },
 ];
 
 export default function FrameworkSelector() {
