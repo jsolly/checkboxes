@@ -1,0 +1,113 @@
+<div class="px-3 py-2">
+  <div class="checkbox-group">
+    <!-- Parent checkbox -->
+    <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+      <div class="flex items-center space-x-3">
+        <input type="checkbox" class="parent-checkbox" id="parent-css" />
+        <label for="parent-css" class="text-slate-700 cursor-pointer text-sm font-medium">
+          Parent
+        </label>
+      </div>
+    </div>
+
+    <!-- Child checkboxes -->
+    <div class="ml-8">
+      <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
+        <div class="flex items-center space-x-3">
+          <input type="checkbox" class="child-checkbox" id="child1-css" />
+          <label for="child1-css" class="text-slate-700 cursor-pointer text-sm font-medium">
+            Child 1
+          </label>
+        </div>
+      </div>
+      <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
+        <div class="flex items-center space-x-3">
+          <input type="checkbox" class="child-checkbox" id="child2-css" />
+          <label for="child2-css" class="text-slate-700 cursor-pointer text-sm font-medium">
+            Child 2
+          </label>
+        </div>
+      </div>
+      <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
+        <div class="flex items-center space-x-3">
+          <input type="checkbox" class="child-checkbox" id="child3-css" />
+          <label for="child3-css" class="text-slate-700 cursor-pointer text-sm font-medium">
+            Child 3
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Base styles */
+.checkbox-group input[type="checkbox"] {
+  height: 1rem;
+  width: 1rem;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  border: 1px solid rgb(126, 137, 147);
+  border-radius: 0.20rem;
+  vertical-align: -0.125em;
+  position: relative;
+  margin-top: 0.125rem;
+  background-color: transparent;
+}
+
+/* Default checked style (for both parent & child) */
+.checkbox-group input[type="checkbox"]:checked {
+  background-color: rgb(37 99 235);
+  border-color: transparent;
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+}
+
+/* 
+  PARTIAL CHECK / INDETERMINATE VISUAL
+  Show a dash if the parent is NOT checked, but some child is checked,
+  AND some child is not checked. 
+*/
+.checkbox-group:has(.parent-checkbox:not(:checked)):has(.child-checkbox:checked):has(.child-checkbox:not(:checked))
+  .parent-checkbox {
+  background-color: rgb(37 99 235);
+  border-color: rgb(37 99 235);
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M3 8h10' stroke='white' stroke-width='2'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* 
+  PARENT LOOKS CHECKED (VISUALLY) IF
+  - The parent itself is NOT actually checked, but
+  - All child checkboxes are checked 
+*/
+.checkbox-group:has(.parent-checkbox:not(:checked)):has(.child-checkbox:checked):not(:has(.child-checkbox:not(:checked)))
+  .parent-checkbox {
+  background-color: rgb(37 99 235);
+  border-color: rgb(37 99 235);
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* When the parent is actually checked, visually override the child states to look checked. 
+   (In pure CSS, we can't truly set the child's checked property, but we can force their styling.) 
+*/
+.checkbox-group:has(.parent-checkbox:checked) .child-checkbox {
+  background-color: rgb(37 99 235) !important;
+  border-color: rgb(37 99 235) !important;
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+/* Add focus styles */
+.checkbox-group input[type="checkbox"]:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgb(255 255 255), 0 0 0 4px rgb(59 130 246);
+}
+</style>
+  
