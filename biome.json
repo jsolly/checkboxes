@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": true,
-		"ignore": ["src/**/*Container.astro"]
+		"ignore": ["**/*.min.js"]
 	},
 	"formatter": {
 		"enabled": true,
