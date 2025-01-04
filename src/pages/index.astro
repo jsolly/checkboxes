@@ -3,6 +3,7 @@ import FrameworkSelector from "../components/FrameworkSelector";
 import AlpineContainer from "../components/alpine/alpineContainer.astro";
 import CssOnlyContainer from "../components/css-only/cssOnlyContainer.astro";
 import HyperscriptContainer from "../components/hyperscript/hyperscriptContainer.astro";
+import JQueryContainer from "../components/jquery/jqueryContainer.astro";
 import ReactContainer from "../components/react/ReactContainer.astro";
 import SvelteContainer from "../components/svelte/SvelteContainer.astro";
 import VanillaContainer from "../components/vanilla-js/vanillaContainer.astro";
@@ -17,6 +18,7 @@ const frameworks = [
 	{ id: "svelte", Component: SvelteContainer },
 	{ id: "hyperscript", Component: HyperscriptContainer },
 	{ id: "css-only", Component: CssOnlyContainer },
+	{ id: "jquery", Component: JQueryContainer },
 ];
 ---
 
@@ -24,7 +26,7 @@ const frameworks = [
 	<div class="min-h-screen p-8 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
 		<div class="max-w-6xl mx-auto mb-12 text-center">
 			<h1 class="text-4xl font-bold text-gray-800 mb-2">Nested Checkboxes</h1>
-			<p class="text-lg text-gray-600">See how different frameworks handle parent-child checkbox relationships</p>
+			<p class="text-lg text-gray-600">See how different frameworks handle parent-child relationships</p>
 			<p class="text-sm text-slate-500 mt-4 lg:hidden">
 				Switch to desktop view to compare frameworks side by side
 			</p>

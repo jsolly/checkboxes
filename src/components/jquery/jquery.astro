@@ -1,0 +1,92 @@
+---
+const parentCheckbox = {
+	id: "parent-jquery",
+	label: "Parent",
+};
+
+const childCheckboxItems = [
+	{
+		id: "child1-jquery",
+		label: "Child 1",
+	},
+	{
+		id: "child2-jquery",
+		label: "Child 2",
+	},
+	{
+		id: "child3-jquery",
+		label: "Child 3",
+	},
+];
+---
+
+<div class="px-3 py-2" data-jquery-checkbox-container>
+  <div>
+    <!-- Parent checkbox -->
+    <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+      <div class="flex items-center space-x-3">
+        <input 
+          type="checkbox" 
+          id={parentCheckbox.id}
+          class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+          data-parent-checkbox
+        >
+        <label for={parentCheckbox.id} class="text-slate-700 cursor-pointer text-sm font-medium">
+          {parentCheckbox.label}
+        </label>
+      </div>
+    </div>
+
+    <!-- Child checkboxes -->
+    <div class="ml-8">
+      {childCheckboxItems.map(item => (
+        <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
+          <div class="flex items-center space-x-3">
+            <input 
+              type="checkbox" 
+              id={item.id}
+              class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+              data-child-checkbox
+            >
+            <label for={item.id} class="text-slate-700 cursor-pointer text-sm font-medium">
+              {item.label}
+            </label>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script is:inline src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script is:inline>
+$(document).ready(function() {
+  $('[data-jquery-checkbox-container]').each(function() {
+    const $container = $(this);
+    const $parentCheckbox = $container.find('[data-parent-checkbox]');
+    const $childCheckboxes = $container.find('[data-child-checkbox]');
+
+    function updateParentState() {
+      const totalChildren = $childCheckboxes.length;
+      const checkedChildren = $childCheckboxes.filter(':checked').length;
+      
+      $parentCheckbox.prop('checked', checkedChildren === totalChildren);
+      $parentCheckbox.prop('indeterminate', 
+        checkedChildren > 0 && checkedChildren < totalChildren
+      );
+    }
+
+    // When parent checkbox changes
+    $parentCheckbox.on('change', function() {
+      const isChecked = $(this).prop('checked');
+      $childCheckboxes.prop('checked', isChecked);
+      $(this).prop('indeterminate', false);
+    });
+
+    // When any child checkbox changes
+    $childCheckboxes.on('change', function() {
+      updateParentState();
+    });
+  });
+});
+</script> 
