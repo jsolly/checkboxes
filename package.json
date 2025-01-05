@@ -33,7 +33,6 @@
 		"@types/react-dom": "^19.0.2",
 		"alpinejs": "^3.14.8",
 		"astro": "^5.1.1",
-		"jquery": "^3.7.1",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"sharp": "^0.33.5",

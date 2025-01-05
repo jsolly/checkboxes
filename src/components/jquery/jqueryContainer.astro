@@ -8,7 +8,7 @@ import stats from "./stats.json";
 
 const code = await import("./jquery.astro?raw").then((m) => m.default);
 ---
-<script is:inline src="node_modules/jquery/dist/jquery.min.js"></script>
+<script is:inline src="/src/scripts/jquery.min.js"></script>
 
 <FrameworkContainer framework="jquery" title="jQuery">
   <PerformanceBadge 

@@ -8,7 +8,7 @@ import stats from "./stats.json";
 
 const code = await import("./hyperscript.astro?raw").then((m) => m.default);
 ---
-<script is:inline src="src/scripts/hyperscript.min.js"></script>
+<script src="/src/scripts/hyperscript.min.js"></script>
 
 <FrameworkContainer framework="hyperscript" title="Hyperscript">
   <PerformanceBadge 

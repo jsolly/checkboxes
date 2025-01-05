@@ -50,9 +50,6 @@ importers:
       astro:
         specifier: ^5.1.1
         version: 5.1.1(jiti@1.21.7)(rollup@4.29.1)(typescript@5.7.2)(yaml@2.7.0)
-      jquery:
-        specifier: ^3.7.1
-        version: 3.7.1
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -1900,9 +1897,6 @@ packages:
   jiti@1.21.7:
     resolution: {integrity: sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==}
     hasBin: true
-
-  jquery@3.7.1:
-    resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -5184,8 +5178,6 @@ snapshots:
       '@pkgjs/parseargs': 0.11.0
 
   jiti@1.21.7: {}
-
-  jquery@3.7.1: {}
 
   js-tokens@4.0.0: {}
 

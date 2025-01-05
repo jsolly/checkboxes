@@ -25,22 +25,46 @@ const FRAMEWORK_DIRS = {
 	jquery: "jquery",
 };
 
-async function measureBundleSize(page) {
-	return await page.evaluate(() => {
-		const resources = performance.getEntriesByType("resource");
-		const jsResources = resources.filter(
-			(r) =>
-				r.name.endsWith(".js") ||
-				r.name.endsWith(".mjs") ||
-				r.initiatorType === "script",
-		);
+async function measureBundleSize(frameworkId) {
+	// Build the project first
+	await new Promise((resolve, reject) => {
+		const build = spawn("pnpm", ["build"], {
+			stdio: "inherit",
+			shell: true,
+		});
 
-		const totalBytes = jsResources.reduce((acc, resource) => {
-			return acc + resource.encodedBodySize;
-		}, 0);
-
-		return `${(totalBytes / 1024).toFixed(1)}kb`;
+		build.on("close", (code) => {
+			if (code === 0) resolve();
+			else reject(new Error(`Build failed with code ${code}`));
+		});
 	});
+
+	// Read the dist directory
+	const distDir = join(process.cwd(), "dist");
+	const files = await fs.readdir(distDir, { recursive: true });
+
+	// Calculate size of framework-specific files
+	let totalSize = 0;
+	for (const file of files) {
+		if (typeof file !== "string") continue;
+
+		const filePath = join(distDir, file);
+		const stats = await fs.stat(filePath);
+
+		// Check if file is related to the framework
+		const lcFile = file.toLowerCase();
+		const frameworkName = frameworkId.toLowerCase();
+		if (
+			(lcFile.includes(frameworkName) ||
+				lcFile.includes(`/${frameworkName}/`) ||
+				lcFile.includes(`_${frameworkName}_`)) &&
+			(file.endsWith(".js") || file.endsWith(".mjs"))
+		) {
+			totalSize += stats.size;
+		}
+	}
+
+	return totalSize > 0 ? `${(totalSize / 1024).toFixed(1)}kb` : "0kb";
 }
 
 function startDevServer() {
@@ -75,47 +99,56 @@ function startDevServer() {
 }
 
 async function measureRenderTime(frameworkId) {
-	const browser = await chromium.launch();
-	const page = await browser.newPage();
+	// Start dev server for render time measurements
+	const server = await startDevServer();
 
 	try {
-		await page.evaluate(() => {
-			performance.clearResourceTimings();
-			performance.clearMarks();
-			performance.clearMeasures();
-		});
+		const browser = await chromium.launch();
+		const page = await browser.newPage();
 
-		await page.goto(`http://localhost:4321/?framework=${frameworkId}`, {
-			waitUntil: "networkidle",
-			timeout: 30000,
-		});
+		try {
+			await page.evaluate(() => {
+				performance.clearResourceTimings();
+				performance.clearMarks();
+				performance.clearMeasures();
+			});
 
-		// Add a small delay to ensure everything is loaded
-		await page.waitForTimeout(1000);
+			await page.goto(`http://localhost:4321/?framework=${frameworkId}`, {
+				waitUntil: "networkidle",
+				timeout: 30000,
+			});
 
-		const renderTime = await page.evaluate(() => {
-			const navigationEntry = performance.getEntriesByType("navigation")[0];
-			const paintEntry = performance
-				.getEntriesByType("paint")
-				.find((entry) => entry.name === "first-contentful-paint");
+			await page.waitForTimeout(1000);
 
-			if (paintEntry) {
-				return paintEntry.startTime;
-			}
+			const renderTime = await page.evaluate(() => {
+				const navigationEntry = performance.getEntriesByType("navigation")[0];
+				const paintEntry = performance
+					.getEntriesByType("paint")
+					.find((entry) => entry.name === "first-contentful-paint");
 
-			return (
-				navigationEntry.domContentLoadedEventEnd - navigationEntry.startTime
-			);
-		});
+				if (paintEntry) {
+					return paintEntry.startTime;
+				}
 
-		const bundleSize = await measureBundleSize(page);
+				return (
+					navigationEntry.domContentLoadedEventEnd - navigationEntry.startTime
+				);
+			});
 
-		return {
-			renderTime: `${Math.round(renderTime)}ms`,
-			bundleSize,
-		};
+			return {
+				renderTime: `${Math.round(renderTime)}ms`,
+				bundleSize: await measureBundleSize(frameworkId),
+			};
+		} finally {
+			await browser.close();
+		}
 	} finally {
-		await browser.close();
+		// Kill the dev server
+		if (process.platform === "win32") {
+			spawn("taskkill", ["/pid", server.pid, "/f", "/t"]);
+		} else {
+			process.kill(-server.pid, "SIGKILL");
+		}
 	}
 }
 
