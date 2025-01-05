@@ -31,17 +31,68 @@ async function getGzippedSize(content) {
 
 async function parseFrameworkSizes(buildOutput) {
 	const sizes = {};
-	const bundleRegex =
-		/(?:runtime-dom|react|svelte|client).*?\.js.*?gzip:\s*(\d+\.\d+)\s*kB/g;
+	const bundleRegex = /dist\/_astro\/.*?\.js\s+.*?│\s*gzip:\s*(\d+\.\d+)\s*kB/g;
+
+	// Keep track of framework bundle sizes
+	const frameworkBundles = {
+		react: [],
+		vue: [],
+		svelte: [],
+	};
 
 	let match = bundleRegex.exec(buildOutput);
+	// Debug: Log all bundle lines
+	console.log(
+		"All bundle lines:",
+		buildOutput
+			.split("\n")
+			.filter((line) => line.includes("dist/_astro/"))
+			.map((line) => line.trim()),
+	);
+
 	while (match) {
-		const size = match[1];
-		if (buildOutput.includes("runtime-dom")) sizes.vue = `${size}kb`;
-		else if (buildOutput.includes("react")) sizes.react = `${size}kb`;
-		else if (buildOutput.includes("svelte")) sizes.svelte = `${size}kb`;
-		else if (buildOutput.includes("alpine")) sizes.alpine = `${size}kb`;
+		const size = Number.parseFloat(match[1]);
+		const line = buildOutput.split("\n").find((l) => l.includes(match[0]));
+		if (line) {
+			// React bundles
+			if (
+				line.includes("ReactNestedCheckboxes") ||
+				line.includes("jsx-runtime") ||
+				(line.includes("client") && line.includes("177.92 kB"))
+			) {
+				frameworkBundles.react.push(size);
+			}
+			// Vue bundles
+			else if (
+				line.includes("VueNestedCheckboxes") ||
+				line.includes("runtime-dom.esm-bundler")
+			) {
+				frameworkBundles.vue.push(size);
+			}
+			// Svelte bundles
+			else if (
+				line.includes("SvelteNestedCheckboxes") ||
+				(line.includes("client") && line.includes("svelte"))
+			) {
+				frameworkBundles.svelte.push(size);
+			}
+		}
 		match = bundleRegex.exec(buildOutput);
+	}
+
+	// Debug log to see which bundles were found
+	console.log("Framework bundles found:", {
+		react: frameworkBundles.react,
+		vue: frameworkBundles.vue,
+		svelte: frameworkBundles.svelte,
+	});
+
+	// Sum up the bundle sizes for each framework
+	for (const [framework, bundles] of Object.entries(frameworkBundles)) {
+		if (bundles.length > 0) {
+			const total = bundles.reduce((sum, size) => sum + size, 0);
+			sizes[framework] = `${total.toFixed(1)}kb`;
+		}
 	}
 
 	return sizes;
@@ -50,6 +101,16 @@ async function parseFrameworkSizes(buildOutput) {
 async function measureBundleSizes() {
 	const buildOutput = await getBuildOutput();
 	const sizes = await parseFrameworkSizes(buildOutput);
+
+	// Handle Alpine.js from node_modules
+	const alpineContent = await fs.readFile(
+		"node_modules/alpinejs/dist/cdn.min.js",
+		"utf-8",
+	);
+	sizes.alpine = await getGzippedSize(alpineContent);
+
+	// Set CSS-only bundle size to 0kb since it has no JavaScript
+	sizes["css-only"] = "0kb";
 
 	// Handle vanilla JS
 	const vanillaContent = await fs.readFile(
@@ -71,10 +132,8 @@ async function measureBundleSizes() {
 	);
 	sizes.hyperscript = await getGzippedSize(hyperscriptContent);
 
-	// Set defaults for remaining frameworks
-	for (const framework of FRAMEWORKS) {
-		if (!sizes[framework]) sizes[framework] = "0kb";
-	}
+	// Log bundle sizes for debugging
+	console.log("Bundle sizes:", sizes);
 
 	return sizes;
 }

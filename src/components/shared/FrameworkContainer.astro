@@ -22,29 +22,6 @@ const frameworkStats = stats[framework as keyof typeof stats];
 				<h3 class="font-semibold text-gray-700 select-none">
 					{title}
 				</h3>
-				<div 
-					class="hidden lg:block text-gray-400 hover:text-gray-600 transition-colors select-none"
-					aria-label="Drag to reorder"
-				>
-					<svg 
-						xmlns="http://www.w3.org/2000/svg" 
-						width="16" 
-						height="16" 
-						viewBox="0 0 24 24" 
-						fill="none" 
-						stroke="currentColor" 
-						stroke-width="2" 
-						stroke-linecap="round" 
-						stroke-linejoin="round"
-					>
-						<circle cx="9" cy="5" r="1"/>
-						<circle cx="9" cy="12" r="1"/>
-						<circle cx="9" cy="19" r="1"/>
-						<circle cx="15" cy="5" r="1"/>
-						<circle cx="15" cy="12" r="1"/>
-						<circle cx="15" cy="19" r="1"/>
-					</svg>
-				</div>
 			</div>
 			<slot />
 		</div>
