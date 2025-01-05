@@ -57,19 +57,18 @@ async function measureBundleSizes() {
 	const bundleMap = {
 		vue: [
 			/runtime-dom.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-			/NestedCheckboxes\.DR.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+			/VueNestedCheckboxes.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
 		],
 		react: [
 			/jsx-runtime.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
 			/client\.BON.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-			/NestedCheckboxes\.CN.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+			/ReactNestedCheckboxes.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
 		],
 		svelte: [
 			/client\.svelte.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-			/NestedCheckboxes\.DRh.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+			/SvelteNestedCheckboxes.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
 		],
 		alpine: [/client\.BA2.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/],
-		hyperscript: [/hyperscriptContainer.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/],
 	};
 
 	// Calculate sizes for all frameworks at once
@@ -91,19 +90,32 @@ async function measureBundleSizes() {
 		"src/components/vanilla-js/vanilla.astro",
 	);
 	const vanillaContent = await fs.readFile(vanillaPath, "utf-8");
-	const scriptMatch = vanillaContent.match(/<script>([\s\S]*?)<\/script>/);
-
-	if (scriptMatch?.[1]) {
-		const scriptContent = scriptMatch[1].trim();
+	const scriptMatch = vanillaContent.match(/<script[^>]*>([\s\S]*?)<\/script>/);
+	if (!scriptMatch) {
+		console.warn("No script tag found in vanilla.astro");
+		sizes.vanilla = "0kb";
+	} else {
+		const scriptContent = scriptMatch[0].trim(); // Get the script tag content
 		const gzipped = await gzipAsync(Buffer.from(scriptContent));
 		const gzipSize = (gzipped.length / 1024).toFixed(1);
 		sizes.vanilla = `${gzipSize}kb`;
-	} else {
-		sizes.vanilla = "0kb";
 	}
 
-	// Add zero sizes for frameworks without JS bundles
-	sizes.jquery = "0kb";
+	// Special handling for jQuery - measure the minified script
+	const jqueryPath = join(process.cwd(), "src/scripts/jquery.min.js");
+	const jqueryContent = await fs.readFile(jqueryPath, "utf-8");
+	const gzippedJquery = await gzipAsync(Buffer.from(jqueryContent));
+	const jquerySize = (gzippedJquery.length / 1024).toFixed(1);
+	sizes.jquery = `${jquerySize}kb`;
+
+	// Special handling for Hyperscript - measure the minified script
+	const hyperscriptPath = join(process.cwd(), "src/scripts/hyperscript.min.js");
+	const hyperscriptContent = await fs.readFile(hyperscriptPath, "utf-8");
+	const gzippedHyperscript = await gzipAsync(Buffer.from(hyperscriptContent));
+	const hyperscriptSize = (gzippedHyperscript.length / 1024).toFixed(1);
+	sizes.hyperscript = `${hyperscriptSize}kb`;
+
+	// Add zero size for css-only
 	sizes["css-only"] = "0kb";
 
 	return sizes;

@@ -1,12 +1,12 @@
 ---
-import AlpineContainer from "../../components/alpine/alpineContainer.astro";
-import CssOnlyContainer from "../../components/css-only/cssOnlyContainer.astro";
-import HyperscriptContainer from "../../components/hyperscript/hyperscriptContainer.astro";
-import JQueryContainer from "../../components/jquery/jqueryContainer.astro";
-import ReactContainer from "../../components/react/ReactContainer.astro";
-import SvelteContainer from "../../components/svelte/SvelteContainer.astro";
-import VanillaContainer from "../../components/vanilla-js/vanillaContainer.astro";
-import VueContainer from "../../components/vue/vueContainer.astro";
+import Alpine from "../../components/alpine/alpine.astro";
+import CssOnly from "../../components/css-only/cssOnly.astro";
+import Hyperscript from "../../components/hyperscript/hyperscript.astro";
+import JQuery from "../../components/jquery/jquery.astro";
+import ReactNestedCheckboxes from "../../components/react/ReactNestedCheckboxes";
+import SvelteNestedCheckboxes from "../../components/svelte/SvelteNestedCheckboxes.svelte";
+import Vanilla from "../../components/vanilla-js/vanilla.astro";
+import VueNestedCheckboxes from "../../components/vue/VueNestedCheckboxes.vue";
 import Layout from "../../layouts/Layout.astro";
 
 export function getStaticPaths() {
@@ -34,33 +34,50 @@ type FrameworkId =
 	| "css-only"
 	| "jquery";
 
-const containers = {
-	vanilla: VanillaContainer,
-	alpine: AlpineContainer,
-	vue: VueContainer,
-	react: ReactContainer,
-	svelte: SvelteContainer,
-	hyperscript: HyperscriptContainer,
-	"css-only": CssOnlyContainer,
-	jquery: JQueryContainer,
+const components = {
+	vanilla: Vanilla,
+	alpine: Alpine,
+	vue: VueNestedCheckboxes,
+	react: ReactNestedCheckboxes,
+	svelte: SvelteNestedCheckboxes,
+	hyperscript: Hyperscript,
+	"css-only": CssOnly,
+	jquery: JQuery,
 } as const;
 
 // Type guard to check if framework is valid
 function isValidFramework(
 	framework: string | undefined,
 ): framework is FrameworkId {
-	return framework !== undefined && framework in containers;
+	return framework !== undefined && framework in components;
 }
 
 if (!isValidFramework(framework)) {
 	return Astro.redirect("/404");
 }
 
-const Container = containers[framework];
+const Component = components[framework];
 ---
 
 <Layout title={`${framework} Test Page`}>
 	<div class="min-h-screen p-8">
-		<Container />
+		{(() => {
+			switch(framework) {
+				case "vue":
+					return <VueNestedCheckboxes client:only="vue" />;
+				case "react":
+					return <ReactNestedCheckboxes client:only="react" />;
+				case "svelte":
+					return <SvelteNestedCheckboxes client:only="svelte" />;
+				case "alpine":
+				case "jquery":
+				case "vanilla":
+				case "hyperscript":
+				case "css-only":
+					return <Component />;
+				default:
+					return null;
+			}
+		})()}
 	</div>
 </Layout> 
