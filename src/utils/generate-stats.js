@@ -1,6 +1,8 @@
 import { spawn } from "node:child_process";
 import { promises as fs } from "node:fs";
 import { join } from "node:path";
+import { promisify } from "node:util";
+import { gzip } from "node:zlib";
 import { chromium } from "playwright";
 
 const FRAMEWORKS = [
@@ -24,6 +26,8 @@ const FRAMEWORK_DIRS = {
 	"css-only": "css-only",
 	jquery: "jquery",
 };
+
+const gzipAsync = promisify(gzip);
 
 async function measureBundleSizes() {
 	// Capture the build output
@@ -53,22 +57,18 @@ async function measureBundleSizes() {
 	const bundleMap = {
 		vue: [
 			/runtime-dom.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-			/vue\..*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
 			/NestedCheckboxes\.DR.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
 		],
 		react: [
 			/jsx-runtime.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-			/NestedCheckboxes\.CN.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
 			/client\.BON.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+			/NestedCheckboxes\.CN.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
 		],
 		svelte: [
 			/client\.svelte.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
 			/NestedCheckboxes\.DRh.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
 		],
-		alpine: [
-			/client\.BA2.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-			/alpine\..*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-		],
+		alpine: [/client\.BA2.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/],
 		hyperscript: [/hyperscriptContainer.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/],
 	};
 
@@ -85,9 +85,25 @@ async function measureBundleSizes() {
 		sizes[framework] = totalSize > 0 ? `${totalSize.toFixed(1)}kb` : "0kb";
 	}
 
+	// Special handling for vanilla JS - measure the inline script
+	const vanillaPath = join(
+		process.cwd(),
+		"src/components/vanilla-js/vanilla.astro",
+	);
+	const vanillaContent = await fs.readFile(vanillaPath, "utf-8");
+	const scriptMatch = vanillaContent.match(/<script>([\s\S]*?)<\/script>/);
+
+	if (scriptMatch?.[1]) {
+		const scriptContent = scriptMatch[1].trim();
+		const gzipped = await gzipAsync(Buffer.from(scriptContent));
+		const gzipSize = (gzipped.length / 1024).toFixed(1);
+		sizes.vanilla = `${gzipSize}kb`;
+	} else {
+		sizes.vanilla = "0kb";
+	}
+
 	// Add zero sizes for frameworks without JS bundles
 	sizes.jquery = "0kb";
-	sizes.vanilla = "0kb";
 	sizes["css-only"] = "0kb";
 
 	return sizes;
@@ -140,7 +156,7 @@ async function measureRenderTime(frameworkId, server) {
 					performance.clearMeasures();
 				});
 
-				await page.goto(`http://localhost:4321/?framework=${frameworkId}`, {
+				await page.goto(`http://localhost:4321/test/${frameworkId}`, {
 					waitUntil: "networkidle",
 					timeout: 30000,
 				});

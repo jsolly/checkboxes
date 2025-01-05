@@ -41,7 +41,7 @@ At this point, you could open a PR, but if you want to add the whole integration
 src/
 ├── components/
 │   ├── react/
-│   │   ├── NestedCheckboxes.tsx
+│   │   ├── ReactNestedCheckboxes.tsx
 │   │   └── ReactContainer.astro
 │   ├── alpine/
 │   │   ├── alpine.astro

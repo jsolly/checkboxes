@@ -3,10 +3,12 @@ import vueLogo from "../../assets/logos/vue.svg";
 import CodeBlock from "../CodeBlock.astro";
 import FrameworkContainer from "../FrameworkContainer.astro";
 import PerformanceBadge from "../PerformanceBadge.astro";
-import NestedCheckboxes from "./NestedCheckboxes.vue";
+import NestedCheckboxes from "./VueNestedCheckboxes.vue";
 import stats from "./stats.json";
 
-const code = await import("./NestedCheckboxes.vue?raw").then((m) => m.default);
+const code = await import("./VueNestedCheckboxes.vue?raw").then(
+	(m) => m.default,
+);
 ---
 
 <FrameworkContainer framework="vue" title="Vue">

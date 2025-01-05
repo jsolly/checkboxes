@@ -3,10 +3,12 @@ import reactLogo from "../../assets/logos/react.svg";
 import CodeBlock from "../CodeBlock.astro";
 import FrameworkContainer from "../FrameworkContainer.astro";
 import PerformanceBadge from "../PerformanceBadge.astro";
-import NestedCheckboxes from "./NestedCheckboxes";
+import NestedCheckboxes from "./ReactNestedCheckboxes";
 import stats from "./stats.json";
 
-const code = await import("./NestedCheckboxes.jsx?raw").then((m) => m.default);
+const code = await import("./ReactNestedCheckboxes.jsx?raw").then(
+	(m) => m.default,
+);
 ---
 
 <FrameworkContainer framework="react" title="React">

@@ -1,34 +1,34 @@
 {
 	"vanilla": {
-		"renderTime": "86ms",
+		"renderTime": "51ms",
 		"bundleSize": "0kb"
 	},
 	"alpine": {
-		"renderTime": "119ms",
+		"renderTime": "31ms",
 		"bundleSize": "56.5kb"
 	},
 	"vue": {
-		"renderTime": "113ms",
-		"bundleSize": "28.8kb"
+		"renderTime": "40ms",
+		"bundleSize": "27.8kb"
 	},
 	"react": {
-		"renderTime": "121ms",
+		"renderTime": "31ms",
 		"bundleSize": "1.1kb"
 	},
 	"svelte": {
-		"renderTime": "212ms",
-		"bundleSize": "2.4kb"
+		"renderTime": "40ms",
+		"bundleSize": "1.4kb"
 	},
 	"hyperscript": {
-		"renderTime": "185ms",
+		"renderTime": "31ms",
 		"bundleSize": "26.5kb"
 	},
 	"css-only": {
-		"renderTime": "200ms",
+		"renderTime": "42ms",
 		"bundleSize": "0kb"
 	},
 	"jquery": {
-		"renderTime": "147ms",
+		"renderTime": "59ms",
 		"bundleSize": "0kb"
 	}
 }
