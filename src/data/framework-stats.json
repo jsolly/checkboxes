@@ -2,49 +2,49 @@
 	"vanilla-js": {
 		"renderTime": "24ms",
 		"bundleSize": "0.3kb",
-		"renderTimeZScore": -2.513014143117246,
+		"renderTimeZScore": -2.4843445121372607,
 		"bundleSizeZScore": -0.6666175133955697
 	},
 	"alpine": {
-		"renderTime": "40ms",
+		"renderTime": "38ms",
 		"bundleSize": "0kb",
-		"renderTimeZScore": 0.41122049614645845,
+		"renderTimeZScore": 0.11609086505314302,
 		"bundleSizeZScore": -0.6821578925325233
 	},
 	"vue": {
-		"renderTime": "38ms",
+		"renderTime": "37ms",
 		"bundleSize": "56.45kb",
-		"renderTimeZScore": 0.04569116623849538,
+		"renderTimeZScore": -0.06965451903188581,
 		"bundleSizeZScore": 2.2420234484042356
 	},
 	"react": {
-		"renderTime": "37ms",
+		"renderTime": "38ms",
 		"bundleSize": "0kb",
-		"renderTimeZScore": -0.13707349871548616,
+		"renderTimeZScore": 0.11609086505314302,
 		"bundleSizeZScore": -0.6821578925325233
 	},
 	"svelte": {
-		"renderTime": "39ms",
+		"renderTime": "38ms",
 		"bundleSize": "0kb",
-		"renderTimeZScore": 0.22845583119247692,
+		"renderTimeZScore": 0.11609086505314302,
 		"bundleSizeZScore": -0.6821578925325233
 	},
 	"hyperscript": {
 		"renderTime": "40ms",
 		"bundleSize": "25.0kb",
-		"renderTimeZScore": 0.41122049614645845,
+		"renderTimeZScore": 0.4875816332232007,
 		"bundleSizeZScore": 0.6128737022136056
 	},
 	"css-only": {
 		"renderTime": "43ms",
 		"bundleSize": "0kb",
-		"renderTimeZScore": 0.959514491008403,
+		"renderTimeZScore": 1.0448177854782872,
 		"bundleSizeZScore": -0.6821578925325233
 	},
 	"jquery": {
 		"renderTime": "41ms",
 		"bundleSize": "23.6kb",
-		"renderTimeZScore": 0.59398516110044,
+		"renderTimeZScore": 0.6733270173082295,
 		"bundleSizeZScore": 0.5403519329078224
 	}
 }
