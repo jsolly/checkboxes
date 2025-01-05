@@ -25,12 +25,22 @@ const FRAMEWORK_DIRS = {
 	jquery: "jquery",
 };
 
-async function measureBundleSize(frameworkId) {
-	// Build the project first
+async function measureBundleSizes() {
+	// Capture the build output
+	let buildOutput = "";
 	await new Promise((resolve, reject) => {
 		const build = spawn("pnpm", ["build"], {
-			stdio: "inherit",
 			shell: true,
+			stdio: ["inherit", "pipe", "inherit"],
+		});
+
+		// Handle process errors
+		build.on("error", (error) => {
+			reject(new Error(`Build process failed: ${error.message}`));
+		});
+
+		build.stdout.on("data", (data) => {
+			buildOutput += data.toString();
 		});
 
 		build.on("close", (code) => {
@@ -39,32 +49,48 @@ async function measureBundleSize(frameworkId) {
 		});
 	});
 
-	// Read the dist directory
-	const distDir = join(process.cwd(), "dist");
-	const files = await fs.readdir(distDir, { recursive: true });
+	// Parse the build output to find framework bundles
+	const bundleMap = {
+		vue: [
+			/runtime-dom.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+			/vue\..*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+			/NestedCheckboxes\.DR.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+		],
+		react: [
+			/jsx-runtime.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+			/NestedCheckboxes\.CN.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+			/client\.BON.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+		],
+		svelte: [
+			/client\.svelte.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+			/NestedCheckboxes\.DRh.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+		],
+		alpine: [
+			/client\.BA2.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+			/alpine\..*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
+		],
+		hyperscript: [/hyperscriptContainer.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/],
+	};
 
-	// Calculate size of framework-specific files
-	let totalSize = 0;
-	for (const file of files) {
-		if (typeof file !== "string") continue;
-
-		const filePath = join(distDir, file);
-		const stats = await fs.stat(filePath);
-
-		// Check if file is related to the framework
-		const lcFile = file.toLowerCase();
-		const frameworkName = frameworkId.toLowerCase();
-		if (
-			(lcFile.includes(frameworkName) ||
-				lcFile.includes(`/${frameworkName}/`) ||
-				lcFile.includes(`_${frameworkName}_`)) &&
-			(file.endsWith(".js") || file.endsWith(".mjs"))
-		) {
-			totalSize += stats.size;
+	// Calculate sizes for all frameworks at once
+	const sizes = {};
+	for (const [framework, patterns] of Object.entries(bundleMap)) {
+		let totalSize = 0;
+		for (const pattern of patterns) {
+			const match = buildOutput.match(pattern);
+			if (match?.[1]) {
+				totalSize += Number.parseFloat(match[1]);
+			}
 		}
+		sizes[framework] = totalSize > 0 ? `${totalSize.toFixed(1)}kb` : "0kb";
 	}
 
-	return totalSize > 0 ? `${(totalSize / 1024).toFixed(1)}kb` : "0kb";
+	// Add zero sizes for frameworks without JS bundles
+	sizes.jquery = "0kb";
+	sizes.vanilla = "0kb";
+	sizes["css-only"] = "0kb";
+
+	return sizes;
 }
 
 function startDevServer() {
@@ -98,57 +124,76 @@ function startDevServer() {
 	});
 }
 
-async function measureRenderTime(frameworkId) {
-	// Start dev server for render time measurements
-	const server = await startDevServer();
+async function measureRenderTime(frameworkId, server) {
+	const MAX_RETRIES = 3;
+	let lastError;
 
-	try {
-		const browser = await chromium.launch();
-		const page = await browser.newPage();
-
+	for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
 		try {
-			await page.evaluate(() => {
-				performance.clearResourceTimings();
-				performance.clearMarks();
-				performance.clearMeasures();
-			});
+			const browser = await chromium.launch();
+			const page = await browser.newPage();
 
-			await page.goto(`http://localhost:4321/?framework=${frameworkId}`, {
-				waitUntil: "networkidle",
-				timeout: 30000,
-			});
+			try {
+				await page.evaluate(() => {
+					performance.clearResourceTimings();
+					performance.clearMarks();
+					performance.clearMeasures();
+				});
 
-			await page.waitForTimeout(1000);
+				await page.goto(`http://localhost:4321/?framework=${frameworkId}`, {
+					waitUntil: "networkidle",
+					timeout: 30000,
+				});
 
-			const renderTime = await page.evaluate(() => {
-				const navigationEntry = performance.getEntriesByType("navigation")[0];
-				const paintEntry = performance
-					.getEntriesByType("paint")
-					.find((entry) => entry.name === "first-contentful-paint");
+				await page.waitForTimeout(1000);
 
-				if (paintEntry) {
-					return paintEntry.startTime;
+				const renderTime = await page.evaluate(() => {
+					const navigationEntry = performance.getEntriesByType("navigation")[0];
+					const paintEntry = performance
+						.getEntriesByType("paint")
+						?.find?.((entry) => entry?.name === "first-contentful-paint");
+
+					if (paintEntry) {
+						return paintEntry.startTime;
+					}
+
+					return (
+						navigationEntry.domContentLoadedEventEnd - navigationEntry.startTime
+					);
+				});
+
+				// Validate the render time
+				if (!renderTime || renderTime < 0 || renderTime > 10000) {
+					throw new Error(
+						`Invalid render time for ${frameworkId}: ${renderTime}ms`,
+					);
 				}
 
-				return (
-					navigationEntry.domContentLoadedEventEnd - navigationEntry.startTime
-				);
-			});
-
-			return {
-				renderTime: `${Math.round(renderTime)}ms`,
-				bundleSize: await measureBundleSize(frameworkId),
-			};
-		} finally {
-			await browser.close();
+				return renderTime;
+			} finally {
+				await browser.close();
+			}
+		} catch (error) {
+			lastError = error;
+			console.warn(
+				`Attempt ${attempt} failed for ${frameworkId}: ${error.message}`,
+			);
+			if (attempt === MAX_RETRIES) throw lastError;
+			await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
 		}
-	} finally {
-		// Kill the dev server
+	}
+}
+
+async function cleanup(server) {
+	try {
 		if (process.platform === "win32") {
-			spawn("taskkill", ["/pid", server.pid, "/f", "/t"]);
+			await spawn("taskkill", ["/pid", server.pid, "/f", "/t"]);
 		} else {
 			process.kill(-server.pid, "SIGKILL");
 		}
+		console.log("Development server stopped.");
+	} catch (error) {
+		console.warn("Failed to stop development server:", error);
 	}
 }
 
@@ -157,22 +202,27 @@ async function generateStats() {
 	const server = await startDevServer();
 
 	try {
+		// Get all bundle sizes first
+		console.log("Building and measuring bundle sizes...");
+		const bundleSizes = await measureBundleSizes();
 		const stats = {};
 
 		for (const framework of FRAMEWORKS) {
-			console.log(`Generating stats for ${framework}...`);
+			console.log(`Measuring render time for ${framework}...`);
 
-			const metrics = await measureRenderTime(framework);
-			stats[framework] = metrics;
+			const renderTime = await measureRenderTime(framework, server);
+			stats[framework] = {
+				renderTime: `${Math.round(renderTime)}ms`,
+				bundleSize: bundleSizes[framework],
+			};
 
-			// Save individual framework stats using the correct directory name
+			// Save individual framework stats
 			const statsDir = join(
 				process.cwd(),
 				"src/components",
 				FRAMEWORK_DIRS[framework],
 			);
 
-			// Create directory if it doesn't exist
 			try {
 				await fs.mkdir(statsDir, { recursive: true });
 			} catch (err) {
@@ -181,11 +231,11 @@ async function generateStats() {
 
 			await fs.writeFile(
 				join(statsDir, "stats.json"),
-				JSON.stringify(metrics, null, 2),
+				JSON.stringify(stats[framework], null, 2),
 			);
 		}
 
-		// Create data directory if it doesn't exist
+		// Create data directory and save all stats
 		const dataDir = join(process.cwd(), "src/data");
 		try {
 			await fs.mkdir(dataDir, { recursive: true });
@@ -193,7 +243,6 @@ async function generateStats() {
 			if (err.code !== "EEXIST") throw err;
 		}
 
-		// Save all stats in one file
 		await fs.writeFile(
 			join(dataDir, "framework-stats.json"),
 			JSON.stringify(stats, null, 2),
@@ -201,15 +250,7 @@ async function generateStats() {
 
 		console.log("Stats generation complete!");
 	} finally {
-		// Ensure we kill the entire process group
-		if (process.platform === "win32") {
-			// Windows needs different handling
-			spawn("taskkill", ["/pid", server.pid, "/f", "/t"]);
-		} else {
-			// Unix-like systems
-			process.kill(-server.pid, "SIGKILL");
-		}
-		console.log("Development server stopped.");
+		await cleanup(server);
 	}
 }
 
