@@ -1,25 +1,17 @@
 ---
 import hyperscriptLogo from "../../assets/logos/hyperscript.svg";
-import CodeBlock from "../../components/shared/CodeBlock.astro";
-import FrameworkContainer from "../../components/shared/FrameworkContainer.astro";
-import PerformanceBadge from "../../components/shared/PerformanceBadge.astro";
+import CodeBlock from "../shared/CodeBlock.astro";
+import FrameworkContainer from "../shared/FrameworkContainer.astro";
 import Hyperscript from "./hyperscript.astro";
-import stats from "./stats.json";
 
 const code = await import("./hyperscript.astro?raw").then((m) => m.default);
 ---
 <script src="/src/scripts/hyperscript.min.js"></script>
 
-<FrameworkContainer framework="hyperscript" title="Hyperscript">
-  <PerformanceBadge 
-    renderTime={stats.renderTime} 
-    bundleSize={stats.bundleSize}
-  />
+<FrameworkContainer 
+  framework="hyperscript" 
+  title="Hyperscript"
+>
   <Hyperscript />
-  <CodeBlock 
-    code={code} 
-    displayName="Hyperscript" 
-    lang="javascript" 
-    logo={hyperscriptLogo}
-  />
+  <CodeBlock code={code} displayName="Hyperscript" lang="astro" logo={hyperscriptLogo} />
 </FrameworkContainer> 

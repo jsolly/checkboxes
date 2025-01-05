@@ -4,9 +4,18 @@ import { join } from "node:path";
 import { promisify } from "node:util";
 import { gzip } from "node:zlib";
 import { chromium } from "playwright";
+import { calculateStatsZScores } from "./calculateZScores.js";
+
+/**
+ * @typedef {Object} FrameworkStats
+ * @property {string} renderTime
+ * @property {string} [bundleSize]
+ * @property {number} renderTimeZScore
+ * @property {number} [bundleSizeZScore]
+ */
 
 const FRAMEWORKS = [
-	"vanilla",
+	"vanilla-js",
 	"alpine",
 	"vue",
 	"react",
@@ -16,72 +25,44 @@ const FRAMEWORKS = [
 	"jquery",
 ];
 
-const FRAMEWORK_DIRS = {
-	vanilla: "vanilla-js",
-	alpine: "alpine",
-	vue: "vue",
-	react: "react",
-	svelte: "svelte",
-	hyperscript: "hyperscript",
-	"css-only": "css-only",
-	jquery: "jquery",
-};
-
 const gzipAsync = promisify(gzip);
 
 async function measureBundleSizes() {
-	// Capture the build output
-	let buildOutput = "";
-	await new Promise((resolve, reject) => {
+	const sizes = {};
+
+	// Get the build output
+	const buildOutput = await new Promise((resolve) => {
+		let output = "";
 		const build = spawn("pnpm", ["build"], {
 			shell: true,
 			stdio: ["inherit", "pipe", "inherit"],
 		});
 
-		// Handle process errors
-		build.on("error", (error) => {
-			reject(new Error(`Build process failed: ${error.message}`));
-		});
-
 		build.stdout.on("data", (data) => {
-			buildOutput += data.toString();
+			output += data.toString();
 		});
 
-		build.on("close", (code) => {
-			if (code === 0) resolve();
-			else reject(new Error(`Build failed with code ${code}`));
+		build.on("close", () => {
+			resolve(output);
 		});
 	});
 
-	// Parse the build output to find framework bundles
-	const bundleMap = {
-		vue: [
-			/runtime-dom.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-			/VueNestedCheckboxes.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-		],
-		react: [
-			/jsx-runtime.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-			/client\.BON.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-			/ReactNestedCheckboxes.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-		],
-		svelte: [
-			/client\.svelte.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-			/SvelteNestedCheckboxes.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/,
-		],
-		alpine: [/client\.BA2.*\.js.*?gzip:\s*(\d+\.\d+)\s*kB/],
-	};
-
-	// Calculate sizes for all frameworks at once
-	const sizes = {};
-	for (const [framework, patterns] of Object.entries(bundleMap)) {
-		let totalSize = 0;
-		for (const pattern of patterns) {
-			const match = buildOutput.match(pattern);
-			if (match?.[1]) {
-				totalSize += Number.parseFloat(match[1]);
-			}
+	// Parse bundle sizes for each framework
+	const bundleRegex =
+		/(?:runtime-dom|react|svelte|client).*?\.js.*?gzip:\s*(\d+\.\d+)\s*kB/g;
+	let match = bundleRegex.exec(buildOutput);
+	while (match) {
+		const size = match[1];
+		if (buildOutput.includes("runtime-dom")) {
+			sizes.vue = `${size}kb`;
+		} else if (buildOutput.includes("react")) {
+			sizes.react = `${size}kb`;
+		} else if (buildOutput.includes("svelte")) {
+			sizes.svelte = `${size}kb`;
+		} else if (buildOutput.includes("alpine")) {
+			sizes.alpine = `${size}kb`;
 		}
-		sizes[framework] = totalSize > 0 ? `${totalSize.toFixed(1)}kb` : "0kb";
+		match = bundleRegex.exec(buildOutput);
 	}
 
 	// Special handling for vanilla JS - measure the inline script
@@ -93,12 +74,19 @@ async function measureBundleSizes() {
 	const scriptMatch = vanillaContent.match(/<script[^>]*>([\s\S]*?)<\/script>/);
 	if (!scriptMatch) {
 		console.warn("No script tag found in vanilla.astro");
-		sizes.vanilla = "0kb";
+		sizes["vanilla-js"] = "0kb";
 	} else {
-		const scriptContent = scriptMatch[0].trim(); // Get the script tag content
+		const scriptContent = scriptMatch[1].trim(); // Get the script content only
 		const gzipped = await gzipAsync(Buffer.from(scriptContent));
 		const gzipSize = (gzipped.length / 1024).toFixed(1);
-		sizes.vanilla = `${gzipSize}kb`;
+		sizes["vanilla-js"] = `${gzipSize}kb`;
+	}
+
+	// Ensure all frameworks have a size
+	for (const framework of FRAMEWORKS) {
+		if (!sizes[framework]) {
+			sizes[framework] = "0kb";
+		}
 	}
 
 	// Special handling for jQuery - measure the minified script
@@ -121,34 +109,31 @@ async function measureBundleSizes() {
 	return sizes;
 }
 
-function startDevServer() {
+async function startDevServer() {
+	// Wait for server to be ready
 	return new Promise((resolve, reject) => {
 		const server = spawn("pnpm", ["dev"], {
-			stdio: "inherit",
 			shell: true,
 			detached: true,
+			stdio: ["inherit", "pipe", "inherit"],
 		});
 
-		// Wait for server to be ready
-		const checkServer = async () => {
-			try {
-				const response = await fetch("http://localhost:4321");
-				if (response.ok) {
-					resolve(server);
-				} else {
-					setTimeout(checkServer, 1000);
-				}
-			} catch (e) {
-				setTimeout(checkServer, 1000);
+		let output = "";
+		server.stdout.on("data", (data) => {
+			output += data.toString();
+			// Check if server is ready
+			if (output.includes("Local    http://localhost:4321")) {
+				// Give it a moment to fully initialize
+				setTimeout(() => resolve(server), 1000);
 			}
-		};
-
-		// Initial check after 2 seconds to give server time to start
-		setTimeout(checkServer, 2000);
-
-		server.on("error", (err) => {
-			reject(err);
 		});
+
+		server.on("error", reject);
+
+		// Set a timeout in case server doesn't start
+		setTimeout(() => {
+			reject(new Error("Server failed to start within timeout"));
+		}, 30000);
 	});
 }
 
@@ -213,6 +198,7 @@ async function measureRenderTime(frameworkId, server) {
 }
 
 async function cleanup(server) {
+	if (!server) return;
 	try {
 		if (process.platform === "win32") {
 			await spawn("taskkill", ["/pid", server.pid, "/f", "/t"]);
@@ -226,54 +212,52 @@ async function cleanup(server) {
 }
 
 async function generateStats() {
-	console.log("Starting development server...");
-	const server = await startDevServer();
-
+	let server;
 	try {
 		// Get all bundle sizes first
 		console.log("Building and measuring bundle sizes...");
 		const bundleSizes = await measureBundleSizes();
+		/** @type {StatsMap} */
 		const stats = {};
+
+		// Initialize stats with bundle sizes
+		for (const framework of FRAMEWORKS) {
+			stats[framework] = {
+				renderTime: "0ms",
+				bundleSize: bundleSizes[framework],
+				renderTimeZScore: 0,
+				bundleSizeZScore: 0,
+			};
+		}
+
+		// Write initial stats file
+		await fs.mkdir(join(process.cwd(), "src/data"), { recursive: true });
+		await fs.writeFile(
+			"src/data/framework-stats.json",
+			JSON.stringify(stats, null, 2),
+		);
+
+		console.log("Starting development server...");
+		server = await startDevServer();
+		console.log("Server started successfully");
 
 		for (const framework of FRAMEWORKS) {
 			console.log(`Measuring render time for ${framework}...`);
 
 			const renderTime = await measureRenderTime(framework, server);
 			stats[framework] = {
+				...stats[framework],
 				renderTime: `${Math.round(renderTime)}ms`,
-				bundleSize: bundleSizes[framework],
 			};
-
-			// Save individual framework stats
-			const statsDir = join(
-				process.cwd(),
-				"src/components",
-				FRAMEWORK_DIRS[framework],
-			);
-
-			try {
-				await fs.mkdir(statsDir, { recursive: true });
-			} catch (err) {
-				if (err.code !== "EEXIST") throw err;
-			}
-
-			await fs.writeFile(
-				join(statsDir, "stats.json"),
-				JSON.stringify(stats[framework], null, 2),
-			);
 		}
 
-		// Create data directory and save all stats
-		const dataDir = join(process.cwd(), "src/data");
-		try {
-			await fs.mkdir(dataDir, { recursive: true });
-		} catch (err) {
-			if (err.code !== "EEXIST") throw err;
-		}
+		// Add Z-scores to the stats
+		const statsWithZScores = calculateStatsZScores(stats);
 
+		// Write the combined stats file
 		await fs.writeFile(
-			join(dataDir, "framework-stats.json"),
-			JSON.stringify(stats, null, 2),
+			"src/data/framework-stats.json",
+			JSON.stringify(statsWithZScores, null, 2),
 		);
 
 		console.log("Stats generation complete!");

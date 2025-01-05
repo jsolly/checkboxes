@@ -1,26 +1,18 @@
 ---
 import reactLogo from "../../assets/logos/react.svg";
-import CodeBlock from "../../components/shared/CodeBlock.astro";
-import FrameworkContainer from "../../components/shared/FrameworkContainer.astro";
-import PerformanceBadge from "../../components/shared/PerformanceBadge.astro";
-import NestedCheckboxes from "./ReactNestedCheckboxes";
-import stats from "./stats.json";
+import CodeBlock from "../shared/CodeBlock.astro";
+import FrameworkContainer from "../shared/FrameworkContainer.astro";
+import ReactNestedCheckboxes from "./ReactNestedCheckboxes";
 
 const code = await import("./ReactNestedCheckboxes.jsx?raw").then(
 	(m) => m.default,
 );
 ---
 
-<FrameworkContainer framework="react" title="React">
-  <PerformanceBadge 
-    renderTime={stats.renderTime} 
-    bundleSize={stats.bundleSize}
-  />
-  <NestedCheckboxes client:only="react" />
-  <CodeBlock 
-    code={code} 
-    displayName="React.js" 
-    lang="jsx" 
-    logo={reactLogo}
-  />
+<FrameworkContainer 
+  framework="react" 
+  title="React"
+>
+  <ReactNestedCheckboxes client:only="react" />
+  <CodeBlock code={code} displayName="React" lang="jsx" logo={reactLogo} />
 </FrameworkContainer> 

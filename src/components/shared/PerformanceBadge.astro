@@ -1,39 +1,49 @@
 ---
+import type { FrameworkStats } from "../../types";
+
 interface Props {
-	renderTime: string;
-	bundleSize?: string;
+	stats: FrameworkStats;
 }
 
-const { renderTime, bundleSize } = Astro.props;
+const { stats } = Astro.props;
+
+function getColorClass(zScore: number) {
+	// Lower is better, so negative z-scores are good
+	if (zScore <= -1.5) return "bg-green-500"; // Much better than average
+	if (zScore <= -0.5) return "bg-green-400"; // Better than average
+	if (zScore <= 0.5) return "bg-yellow-500"; // Average
+	if (zScore <= 1.5) return "bg-orange-500"; // Worse than average
+	return "bg-red-500"; // Much worse than average
+}
 ---
 
 <div class="flex gap-2">
-  <div class="performance-badge">
-    <span class="value">Render: {renderTime}</span>
-  </div>
-  {bundleSize && (
-    <div class="performance-badge">
-      <span class="value">JS Bundle: {bundleSize}</span>
-    </div>
-  )}
+	<div class={`performance-badge ${getColorClass(stats.renderTimeZScore)}`}>
+		<span class="value">Render: {stats.renderTime}</span>
+	</div>
+	{stats.bundleSize && (
+		<div class={`performance-badge ${getColorClass(stats.bundleSizeZScore || 0)}`}>
+			<span class="value">JS Bundle: {stats.bundleSize}</span>
+		</div>
+	)}
 </div>
 
 <style>
-  .performance-badge {
-    background: #0ca678;
-    color: white;
-    border-radius: 9999px;
-    padding: 2px 8px;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
+	.performance-badge {
+		color: white;
+		border-radius: 9999px;
+		padding: 2px 8px;
+		font-size: 0.75rem;
+		font-weight: 500;
+		transition: background-color 0.2s;
+	}
 
-  .flex {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    z-index: 10;
-    display: flex;
-    gap: 0.5rem;
-  }
+	.flex {
+		position: absolute;
+		top: 8px;
+		right: 8px;
+		z-index: 10;
+		display: flex;
+		gap: 0.5rem;
+	}
 </style> 

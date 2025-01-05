@@ -7,11 +7,12 @@ import ReactNestedCheckboxes from "../../components/react/ReactNestedCheckboxes"
 import SvelteNestedCheckboxes from "../../components/svelte/SvelteNestedCheckboxes.svelte";
 import Vanilla from "../../components/vanilla-js/vanilla.astro";
 import VueNestedCheckboxes from "../../components/vue/VueNestedCheckboxes.vue";
+import stats from "../../data/framework-stats.json";
 import Layout from "../../layouts/Layout.astro";
 
 export function getStaticPaths() {
 	return [
-		{ params: { framework: "vanilla" } },
+		{ params: { framework: "vanilla-js" } },
 		{ params: { framework: "alpine" } },
 		{ params: { framework: "vue" } },
 		{ params: { framework: "react" } },
@@ -25,7 +26,7 @@ export function getStaticPaths() {
 const { framework } = Astro.params;
 
 type FrameworkId =
-	| "vanilla"
+	| "vanilla-js"
 	| "alpine"
 	| "vue"
 	| "react"
@@ -35,7 +36,7 @@ type FrameworkId =
 	| "jquery";
 
 const components = {
-	vanilla: Vanilla,
+	"vanilla-js": Vanilla,
 	alpine: Alpine,
 	vue: VueNestedCheckboxes,
 	react: ReactNestedCheckboxes,
@@ -71,7 +72,7 @@ const Component = components[framework];
 					return <SvelteNestedCheckboxes client:only="svelte" />;
 				case "alpine":
 				case "jquery":
-				case "vanilla":
+				case "vanilla-js":
 				case "hyperscript":
 				case "css-only":
 					return <Component />;

@@ -1,24 +1,16 @@
 ---
 import cssLogo from "../../assets/logos/css.svg";
-import CodeBlock from "../../components/shared/CodeBlock.astro";
-import FrameworkContainer from "../../components/shared/FrameworkContainer.astro";
-import PerformanceBadge from "../../components/shared/PerformanceBadge.astro";
+import CodeBlock from "../shared/CodeBlock.astro";
+import FrameworkContainer from "../shared/FrameworkContainer.astro";
 import CssOnly from "./cssOnly.astro";
-import stats from "./stats.json";
 
 const code = await import("./cssOnly.astro?raw").then((m) => m.default);
 ---
 
-<FrameworkContainer framework="css" title="CSS-only">
-  <PerformanceBadge 
-    renderTime={stats.renderTime} 
-    bundleSize={stats.bundleSize}
-  />
+<FrameworkContainer 
+  framework="css-only" 
+  title="CSS Only"
+>
   <CssOnly />
-  <CodeBlock 
-    code={code} 
-    displayName="CSS Only" 
-    lang="html"
-    logo={cssLogo}
-  />
+  <CodeBlock code={code} displayName="CSS Only" lang="astro" logo={cssLogo} />
 </FrameworkContainer> 

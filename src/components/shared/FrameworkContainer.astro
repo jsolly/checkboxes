@@ -1,65 +1,73 @@
 ---
+import stats from "../../data/framework-stats.json";
+import PerformanceBadge from "../shared/PerformanceBadge.astro";
+
 interface Props {
-	title: string;
 	framework: string;
+	title: string;
 }
 
-const { title, framework } = Astro.props;
+const { framework, title } = Astro.props;
+
+const frameworkStats = stats[framework as keyof typeof stats];
 ---
 
-<div class="opacity-0 transition-opacity duration-300" data-framework-wrapper>
-  <div class="bg-white/40 rounded-xl border border-white/50 shadow-lg overflow-hidden relative" data-drag-handle>
-    <div 
-      class="bg-white/60 px-4 py-3 flex border-b border-white/20 items-center justify-between backdrop-blur-md"
-    >
-      <h3 class="font-semibold text-gray-700 select-none">
-        {title}
-      </h3>
-      <div 
-        class="hidden lg:block text-gray-400 hover:text-gray-600 transition-colors select-none"
-        aria-label="Drag to reorder"
-      >
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          width="16" 
-          height="16" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          stroke-width="2" 
-          stroke-linecap="round" 
-          stroke-linejoin="round"
-        >
-          <circle cx="9" cy="5" r="1"/>
-          <circle cx="9" cy="12" r="1"/>
-          <circle cx="9" cy="19" r="1"/>
-          <circle cx="15" cy="5" r="1"/>
-          <circle cx="15" cy="12" r="1"/>
-          <circle cx="15" cy="19" r="1"/>
-        </svg>
-      </div>
-    </div>
-    <slot />
-  </div>
+<div class="framework-container">
+	<PerformanceBadge stats={frameworkStats} />
+	<div class="opacity-0 transition-opacity duration-300" data-framework-wrapper>
+		<div class="bg-white/40 rounded-xl border border-white/50 shadow-lg overflow-hidden relative" data-drag-handle>
+			<div 
+				class="bg-white/60 px-4 py-3 flex border-b border-white/20 items-center justify-between backdrop-blur-md"
+			>
+				<h3 class="font-semibold text-gray-700 select-none">
+					{title}
+				</h3>
+				<div 
+					class="hidden lg:block text-gray-400 hover:text-gray-600 transition-colors select-none"
+					aria-label="Drag to reorder"
+				>
+					<svg 
+						xmlns="http://www.w3.org/2000/svg" 
+						width="16" 
+						height="16" 
+						viewBox="0 0 24 24" 
+						fill="none" 
+						stroke="currentColor" 
+						stroke-width="2" 
+						stroke-linecap="round" 
+						stroke-linejoin="round"
+					>
+						<circle cx="9" cy="5" r="1"/>
+						<circle cx="9" cy="12" r="1"/>
+						<circle cx="9" cy="19" r="1"/>
+						<circle cx="15" cy="5" r="1"/>
+						<circle cx="15" cy="12" r="1"/>
+						<circle cx="15" cy="19" r="1"/>
+					</svg>
+				</div>
+			</div>
+			<slot />
+		</div>
+	</div>
 </div>
 
 <script define:vars={{ framework }}>
-  // Only initialize when the component becomes visible
-  const wrappers = document.querySelectorAll(`[data-framework-wrapper]`);
-  wrappers.forEach(wrapper => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          wrapper.classList.remove('opacity-0');
-          wrapper.classList.add('opacity-100');
-          observer.unobserve(wrapper);
-        }
-      });
-    }, {
-      threshold: 0.1,
-      rootMargin: '50px'
-    });
-    
-    observer.observe(wrapper);
-  });
+	// Only initialize when the component becomes visible
+	const wrappers = document.querySelectorAll(`[data-framework-wrapper]`);
+	wrappers.forEach(wrapper => {
+		const observer = new IntersectionObserver((entries) => {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					wrapper.classList.remove('opacity-0');
+					wrapper.classList.add('opacity-100');
+					observer.unobserve(wrapper);
+				}
+			});
+		}, {
+			threshold: 0.1,
+			rootMargin: '50px'
+		});
+		
+		observer.observe(wrapper);
+	});
 </script>
