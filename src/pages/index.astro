@@ -198,16 +198,5 @@ const frameworks = [
 		display: grid;
 		grid-auto-rows: min-content;
 	}
-
-	/* Only show grab cursor on desktop devices */
-	@media (min-width: 1024px) {
-		[data-framework] {
-			cursor: grab;
-		}
-		
-		[data-framework].dragging {
-			cursor: grabbing;
-		}
-	}
 </style>
 

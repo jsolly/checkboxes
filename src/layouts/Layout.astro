@@ -38,14 +38,14 @@ const { title = "checkboxes.xyz" } = Astro.props;
 </html>
 
 <style is:global>
-  .framework-container {
+  [data-framework] {
     transition: all 0.3s ease;
     backdrop-filter: blur(12px);
     position: relative;
     overflow: hidden;
   }
 
-  .framework-container::before {
+  [data-framework]::before {
     content: '';
     position: absolute;
     top: 0;
@@ -56,12 +56,12 @@ const { title = "checkboxes.xyz" } = Astro.props;
     pointer-events: none;
   }
 
-  .framework-container:hover {
+  [data-framework]:hover {
     border-color: rgba(99, 102, 241, 0.3);
     background-color: rgba(255, 255, 255, 0.95);
   }
 
-  .framework-container.dragging {
+  [data-framework].dragging {
     transform: scale(1.02);
     opacity: 0.95;
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
@@ -74,5 +74,16 @@ const { title = "checkboxes.xyz" } = Astro.props;
 
   footer a {
     transition: all 0.3s ease;
+  }
+
+  /* Only show grab cursor on desktop devices */
+  @media (min-width: 1024px) {
+    [data-framework] {
+      cursor: grab;
+    }
+    
+    [data-framework].dragging {
+      cursor: grabbing;
+    }
   }
 </style>

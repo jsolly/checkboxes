@@ -13,7 +13,7 @@ const frameworkStats = stats[framework as keyof typeof stats];
 ---
 
 <div class="framework-container backdrop-blur-sm bg-white/90 rounded-xl shadow-lg border border-slate-200" data-framework={framework}>
-	<!-- <PerformanceBadge stats={frameworkStats} /> -->
+	<PerformanceBadge stats={frameworkStats} />
 	<div class="opacity-0 transition-opacity duration-300" data-framework-wrapper>
 		<div class="bg-white/40 rounded-xl border border-white/50 shadow-lg overflow-hidden relative">
 			<div 

@@ -1,5 +1,10 @@
 ---
-import type { FrameworkStats } from "../../types";
+interface FrameworkStats {
+	renderTime: string;
+	bundleSize?: string;
+	renderTimeZScore: number;
+	bundleSizeZScore?: number;
+}
 
 interface Props {
 	stats: FrameworkStats;
