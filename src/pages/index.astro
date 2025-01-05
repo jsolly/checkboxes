@@ -38,12 +38,7 @@ const frameworks = [
 			class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto"
 		>
 			{frameworks.map(({ id, Component }) => (
-				<div 
-					class="framework-container backdrop-blur-sm bg-white/90 rounded-xl shadow-lg border border-slate-200" 
-					data-framework={id}
-				>
-					<Component />
-				</div>
+				<Component />
 			))}
 		</div>
 	</div>
@@ -66,7 +61,6 @@ const frameworks = [
 	 * @param gridElement The grid element to make sortable
 	 */
 	function initializeSortable(gridElement: HTMLElement) {
-		// Check if the device is likely mobile/touch (screen width less than 1024px)
 		const isMobile = window.innerWidth < 1024;
 
 		return new Sortable(gridElement, {
@@ -207,11 +201,11 @@ const frameworks = [
 
 	/* Only show grab cursor on desktop devices */
 	@media (min-width: 1024px) {
-		.framework-container {
+		[data-framework] {
 			cursor: grab;
 		}
 		
-		.framework-container.dragging {
+		[data-framework].dragging {
 			cursor: grabbing;
 		}
 	}
