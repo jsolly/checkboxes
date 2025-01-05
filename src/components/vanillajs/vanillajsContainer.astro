@@ -2,15 +2,15 @@
 import vanillaLogo from "../../assets/logos/javascript.svg";
 import CodeBlock from "../shared/CodeBlock.astro";
 import FrameworkContainer from "../shared/FrameworkContainer.astro";
-import Vanilla from "./vanilla.astro";
+import Vanillajs from "./vanillajs.astro";
 
-const code = await import("./vanilla.astro?raw").then((m) => m.default);
+const code = await import("./vanillajs.astro?raw").then((m) => m.default);
 ---
 
 <FrameworkContainer 
-	framework="vanilla-js" 
+	framework="vanillajs" 
 	title="Vanilla JavaScript"
 >
-	<Vanilla />
+	<Vanillajs />
 	<CodeBlock code={code} displayName="Vanilla JS" lang="astro" logo={vanillaLogo} />
 </FrameworkContainer> 

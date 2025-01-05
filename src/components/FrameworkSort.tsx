@@ -25,6 +25,16 @@ export default function FrameworkSort() {
 
 	useEffect(() => {
 		setMounted(true);
+
+		// Listen for manual sort events
+		const handleManualSort = () => {
+			setSortBy("none");
+		};
+		document.addEventListener("manualSort", handleManualSort);
+
+		return () => {
+			document.removeEventListener("manualSort", handleManualSort);
+		};
 	}, []);
 
 	const handleSort = (option: SortOption) => {
@@ -48,7 +58,7 @@ export default function FrameworkSort() {
 				const valueB = Number.parseFloat(b[metric].replace(/kb|ms/, ""));
 				return isAscending ? valueA - valueB : valueB - valueA;
 			})
-			.map(([id]) => id.replace("-js", "")); // Convert 'vanilla-js' to 'vanilla'
+			.map(([id]) => id);
 
 		const event = new CustomEvent("frameworkSort", {
 			detail: { type: option, order: sortedFrameworks },
