@@ -2,13 +2,19 @@
 import jqueryLogo from "../../assets/logos/jquery.svg";
 import CodeBlock from "../CodeBlock.astro";
 import FrameworkContainer from "../FrameworkContainer.astro";
+import PerformanceBadge from "../PerformanceBadge.astro";
 import JQuery from "./jquery.astro";
+import stats from "./stats.json";
 
 const code = await import("./jquery.astro?raw").then((m) => m.default);
 ---
 <script is:inline src="node_modules/jquery/dist/jquery.min.js"></script>
 
 <FrameworkContainer framework="jquery" title="jQuery">
+  <PerformanceBadge 
+    renderTime={stats.renderTime} 
+    bundleSize={stats.bundleSize}
+  />
   <JQuery />
   <CodeBlock 
     code={code} 

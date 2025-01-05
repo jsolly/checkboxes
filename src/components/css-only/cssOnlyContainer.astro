@@ -2,12 +2,18 @@
 import cssLogo from "../../assets/logos/css.svg";
 import CodeBlock from "../CodeBlock.astro";
 import FrameworkContainer from "../FrameworkContainer.astro";
+import PerformanceBadge from "../PerformanceBadge.astro";
 import CssOnly from "./cssOnly.astro";
+import stats from "./stats.json";
 
 const code = await import("./cssOnly.astro?raw").then((m) => m.default);
 ---
 
 <FrameworkContainer framework="css" title="CSS-only">
+  <PerformanceBadge 
+    renderTime={stats.renderTime} 
+    bundleSize={stats.bundleSize}
+  />
   <CssOnly />
   <CodeBlock 
     code={code} 

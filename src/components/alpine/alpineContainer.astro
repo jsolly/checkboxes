@@ -1,13 +1,19 @@
 ---
-import FrameworkContainer from "../FrameworkContainer.astro";
-import Alpine from "./alpine.astro";
-import CodeBlock from "../CodeBlock.astro";
 import alpineLogo from "../../assets/logos/alpine.svg";
+import CodeBlock from "../CodeBlock.astro";
+import FrameworkContainer from "../FrameworkContainer.astro";
+import PerformanceBadge from "../PerformanceBadge.astro";
+import Alpine from "./alpine.astro";
+import stats from "./stats.json";
 
-const code = await import('./alpine.astro?raw').then(m => m.default);
+const code = await import("./alpine.astro?raw").then((m) => m.default);
 ---
 
 <FrameworkContainer framework="alpine" title="Alpine.js">
+  <PerformanceBadge 
+    renderTime={stats.renderTime} 
+    bundleSize={stats.bundleSize}
+  />
   <Alpine />
   <CodeBlock 
     code={code} 
