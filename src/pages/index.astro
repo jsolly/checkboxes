@@ -1,5 +1,6 @@
 ---
 import FrameworkSelector from "../components/FrameworkSelector";
+import FrameworkSort from "../components/FrameworkSort";
 import AlpineContainer from "../components/alpine/alpineContainer.astro";
 import CssOnlyContainer from "../components/css-only/cssOnlyContainer.astro";
 import HyperscriptContainer from "../components/hyperscript/hyperscriptContainer.astro";
@@ -33,11 +34,12 @@ const frameworks = [
 		</div>
 
 		<FrameworkSelector client:only="react" />
+		<FrameworkSort client:only="react" />
 		<div 
 			id="framework-grid" 
 			class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto"
 		>
-			{frameworks.map(({ id, Component }) => (
+			{frameworks.map(({ Component }) => (
 				<Component />
 			))}
 		</div>
@@ -182,6 +184,37 @@ const frameworks = [
 			});
 		}) as EventListener);
 	}
+
+	// Add handler for sort events
+	document.addEventListener('frameworkSort', ((e: CustomEvent) => {
+		const grid = document.getElementById('framework-grid');
+		if (!grid) return;
+
+		if (e.detail.type === 'none') {
+			// Restore original order from localStorage if exists
+			const savedOrder = localStorage.getItem('frameworkOrder');
+			if (savedOrder) {
+				restoreFrameworkOrder(grid);
+			}
+			return;
+		}
+
+		// Reorder elements based on sort
+		const sortedFrameworks = e.detail.order;
+		const containers = Array.from(grid.children);
+		
+		sortedFrameworks.forEach((frameworkId: string) => {
+			const container = containers.find(
+				c => c.getAttribute('data-framework') === frameworkId
+			);
+			if (container) {
+				grid.appendChild(container);
+			}
+		});
+
+		// Save the new order
+		saveFrameworkOrder();
+	}) as EventListener);
 </script>
 
 <style>

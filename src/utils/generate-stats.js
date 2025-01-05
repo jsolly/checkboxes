@@ -219,7 +219,7 @@ async function cleanup(server) {
 	if (!server) return;
 	try {
 		if (process.platform === "win32") {
-			await spawn("taskkill", ["/pid", server.pid, "/f", "/t"]);
+			spawn("taskkill", ["/pid", server.pid, "/f", "/t"]);
 		} else {
 			process.kill(-server.pid, "SIGKILL");
 		}

@@ -28,7 +28,7 @@ const frameworkStats = stats[framework as keyof typeof stats];
 	</div>
 </div>
 
-<script define:vars={{ framework }}>
+<script is:inline define:vars={{ framework }}>
 	// Only initialize when the component becomes visible
 	const wrappers = document.querySelectorAll(`[data-framework-wrapper]`);
 	wrappers.forEach(wrapper => {
