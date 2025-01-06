@@ -1,10 +1,4 @@
-/**
- * Counts the number of characters in code, excluding comments and whitespace
- * @param {string} code - The source code to analyze
- * @param {string} lang - The programming language of the code
- * @returns {number} The number of characters excluding comments and whitespace
- */
-export function getCharacterCount(code: string, lang: string) {
+export function getCharacterCount(code: string, lang: string): number {
 	let cleanCode = code;
 
 	// Remove single-line comments based on language

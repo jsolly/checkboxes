@@ -58,6 +58,15 @@ async function measureFramework(
 		waitUntil: "networkidle0",
 	});
 
+	// Wait for framework to be ready
+	await page
+		.waitForFunction(() => window.frameworkReady === true, {
+			timeout: 5000,
+		})
+		.catch(() => {
+			console.warn("⚠️ Framework ready timeout");
+		});
+
 	// Get more accurate render timing
 	const timings = await page.evaluate(() => {
 		const navigationEntry = performance.getEntriesByType(
@@ -85,6 +94,9 @@ async function measureFramework(
 				interactive: Math.round(
 					navigationEntry.domInteractive - navigationEntry.startTime,
 				),
+
+				// Framework ready time (when framework signals it's fully initialized)
+				frameworkReady: window.frameworkReady ? performance.now() : null,
 			};
 		}
 		return {
@@ -92,6 +104,7 @@ async function measureFramework(
 			domContentLoaded: 0,
 			loadComplete: 0,
 			interactive: 0,
+			frameworkReady: null,
 		};
 	});
 
@@ -101,8 +114,10 @@ async function measureFramework(
 	console.log(`  DOM Interactive: ${timings.interactive}ms`);
 	console.log(`  Load Complete: ${timings.loadComplete}ms`);
 
-	// Use domContentLoaded as the primary render time metric
-	const renderTime = timings.domContentLoaded;
+	// Use framework ready time if available, fall back to interactive time
+	const renderTime = timings.frameworkReady
+		? Math.round(timings.frameworkReady)
+		: timings.interactive;
 
 	console.log(`Render time: ${renderTime}ms`);
 

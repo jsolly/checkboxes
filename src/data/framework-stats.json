@@ -1,50 +1,50 @@
 {
 	"vanillajs": {
-		"renderTime": "34ms",
+		"renderTime": "38ms",
 		"bundleSize": "0.31kb",
-		"renderTimeZScore": 2.082322158977926,
-		"bundleSizeZScore": -0.42994035268275493
+		"renderTimeZScore": 2.1855518098950566,
+		"bundleSizeZScore": -0.662595433207376
 	},
 	"alpine": {
-		"renderTime": "27ms",
+		"renderTime": "20ms",
 		"bundleSize": "0.14kb",
-		"renderTimeZScore": 0.8148217143826667,
-		"bundleSizeZScore": -0.7659856858141036
+		"renderTimeZScore": -0.39411590014501025,
+		"bundleSizeZScore": -1.0412213950401623
 	},
 	"vue": {
-		"renderTime": "21ms",
+		"renderTime": "18ms",
 		"bundleSize": "1.05kb",
-		"renderTimeZScore": -0.2716072381275556,
-		"bundleSizeZScore": 1.032845215065469
+		"renderTimeZScore": -0.6807456457050176,
+		"bundleSizeZScore": 0.9855411065353408
 	},
 	"react": {
-		"renderTime": "21ms",
+		"renderTime": "15ms",
 		"bundleSize": "1.36kb",
-		"renderTimeZScore": -0.2716072381275556,
-		"bundleSizeZScore": 1.6456337637167522
+		"renderTimeZScore": -1.110690264045029,
+		"bundleSizeZScore": 1.6759766839951276
 	},
 	"svelte": {
-		"renderTime": "17ms",
+		"renderTime": "16ms",
 		"bundleSize": "1.08kb",
-		"renderTimeZScore": -0.9958932064677039,
-		"bundleSizeZScore": 1.0921473326768836
+		"renderTimeZScore": -0.9673753912650251,
+		"bundleSizeZScore": 1.0523574527411266
 	},
 	"hyperscript": {
-		"renderTime": "23ms",
-		"bundleSize": "0.14kb",
-		"renderTimeZScore": 0.09053574604251853,
-		"bundleSizeZScore": -0.7659856858141036
+		"renderTime": "26ms",
+		"bundleSize": "0.45kb",
+		"renderTimeZScore": 0.4657733365350121,
+		"bundleSizeZScore": -0.3507858175803756
 	},
 	"cssOnly": {
-		"renderTime": "15ms",
-		"bundleSize": "0.00kb",
-		"renderTimeZScore": -1.3580361906377778,
-		"bundleSizeZScore": -1.042728901334038
+		"renderTime": "23ms",
+		"bundleSize": "0.14kb",
+		"renderTimeZScore": 0.03582871819500093,
+		"bundleSizeZScore": -1.0412213950401623
 	},
 	"jquery": {
-		"renderTime": "22ms",
-		"bundleSize": "0.14kb",
-		"renderTimeZScore": -0.09053574604251853,
-		"bundleSizeZScore": -0.7659856858141036
+		"renderTime": "26ms",
+		"bundleSize": "0.33kb",
+		"renderTimeZScore": 0.4657733365350121,
+		"bundleSizeZScore": -0.6180512024035189
 	}
 }

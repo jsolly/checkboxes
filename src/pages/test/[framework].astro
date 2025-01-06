@@ -30,14 +30,29 @@ const frameworkId = framework as FrameworkId;
 ---
 
 <Layout title={`${FRAMEWORKS[frameworkId].displayName} Test Page`}>
+	<script>
+		// Signal when the page is ready
+		window.addEventListener('load', () => {
+			// Give a small delay for frameworks to initialize
+			setTimeout(() => {
+				window.frameworkReady = true;
+			}, 50);
+		});
+	</script>
 	<div class="min-h-screen p-8">
-		{frameworkId === "vue" && <VueNestedCheckboxes client:only="vue" />}
-		{frameworkId === "react" && <ReactNestedCheckboxes client:only="react" />}
-		{frameworkId === "svelte" && <SvelteNestedCheckboxes client:only="svelte" />}
-		{frameworkId === "alpine" && <Alpine />}
-		{frameworkId === "jquery" && <JQuery />}
-		{frameworkId === "vanillajs" && <Vanillajs />}
-		{frameworkId === "hyperscript" && <Hyperscript />}
-		{frameworkId === "cssOnly" && <CssOnly />}
+		<div 
+			class="framework-container" 
+			data-framework={framework}
+			data-framework-ready={framework}
+		>
+			{frameworkId === "vue" && <VueNestedCheckboxes client:only="vue" />}
+			{frameworkId === "react" && <ReactNestedCheckboxes client:only="react" />}
+			{frameworkId === "svelte" && <SvelteNestedCheckboxes client:only="svelte" />}
+			{frameworkId === "alpine" && <Alpine />}
+			{frameworkId === "jquery" && <JQuery />}
+			{frameworkId === "vanillajs" && <Vanillajs />}
+			{frameworkId === "hyperscript" && <Hyperscript />}
+			{frameworkId === "cssOnly" && <CssOnly />}
+		</div>
 	</div>
 </Layout> 

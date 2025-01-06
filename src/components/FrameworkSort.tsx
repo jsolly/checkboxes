@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
-import frameworkStats from "../data/framework-stats.json";
+import { useFrameworkSort } from "../contexts/FrameworkSortContext";
 
 type SortOption =
 	| "bundleSizeAsc"
@@ -9,54 +8,13 @@ type SortOption =
 	| "renderTimeDsc"
 	| "none";
 
-type Metric = "bundleSize" | "renderTime";
-
 export default function FrameworkSort() {
-	const [sortBy, setSortBy] = useState<SortOption>("none");
 	const [mounted, setMounted] = useState(false);
+	const { sortBy, setSortBy } = useFrameworkSort();
 
 	useEffect(() => {
 		setMounted(true);
-
-		// Listen for manual sort events
-		const handleManualSort = () => {
-			setSortBy("none");
-		};
-		document.addEventListener("manualSort", handleManualSort);
-
-		return () => {
-			document.removeEventListener("manualSort", handleManualSort);
-		};
 	}, []);
-
-	const handleSort = (option: SortOption) => {
-		setSortBy(option);
-
-		if (option === "none") {
-			const event = new CustomEvent("frameworkSort", {
-				detail: { type: "none" },
-			});
-			document.dispatchEvent(event);
-			return;
-		}
-
-		const metric: Metric = option.includes("bundleSize")
-			? "bundleSize"
-			: "renderTime";
-		const isAscending = option.includes("Asc");
-
-		const frameworkIds = Object.keys(FRAMEWORKS) as FrameworkId[];
-		const sortedFrameworks = [...frameworkIds].sort((a, b) => {
-			const valueA = Number.parseFloat(frameworkStats[a][metric]);
-			const valueB = Number.parseFloat(frameworkStats[b][metric]);
-			return isAscending ? valueA - valueB : valueB - valueA;
-		});
-
-		const event = new CustomEvent("frameworkSort", {
-			detail: { type: option, order: sortedFrameworks },
-		});
-		document.dispatchEvent(event);
-	};
 
 	if (!mounted) {
 		return (
@@ -79,7 +37,7 @@ export default function FrameworkSort() {
 				<select
 					id="framework-sort"
 					value={sortBy}
-					onChange={(e) => handleSort(e.target.value as SortOption)}
+					onChange={(e) => setSortBy(e.target.value as SortOption)}
 					className="px-3 py-2 border border-slate-200 rounded-lg text-slate-700
             focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
 				>

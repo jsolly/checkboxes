@@ -35,8 +35,25 @@ export const FRAMEWORKS = {
 
 export type FrameworkId = keyof typeof FRAMEWORKS;
 
+// Custom Events
+export interface FrameworkSelectionEvent extends CustomEvent {
+	detail: FrameworkId[];
+}
+
+export interface FrameworkSortEvent
+	extends CustomEvent<{
+		type: string;
+		order: FrameworkId[];
+	}> {}
+
+export interface SortableEvent {
+	item: HTMLElement;
+}
+
 export function isValidFramework(
-	framework: string | undefined,
+	framework: string | null | undefined,
 ): framework is FrameworkId {
-	return framework !== undefined && framework in FRAMEWORKS;
+	return (
+		framework !== null && framework !== undefined && framework in FRAMEWORKS
+	);
 }

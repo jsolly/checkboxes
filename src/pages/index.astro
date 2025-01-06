@@ -1,6 +1,5 @@
 ---
-import FrameworkSelector from "../components/FrameworkSelector";
-import FrameworkSort from "../components/FrameworkSort";
+import FrameworkControls from "../components/FrameworkControls";
 import AlpineContainer from "../components/alpine/alpineContainer.astro";
 import CssOnlyContainer from "../components/cssOnly/cssOnlyContainer.astro";
 import HyperscriptContainer from "../components/hyperscript/hyperscriptContainer.astro";
@@ -39,8 +38,8 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 			</p>
 		</div>
 
-		<FrameworkSelector client:only="react" />
-		<FrameworkSort client:only="react" />
+		<FrameworkControls client:only="react" />
+		
 		<div 
 			id="framework-grid" 
 			class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto"
@@ -53,16 +52,14 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 </Layout>
 
 <script>
+	import { 
+		type SortableEvent, 
+		type FrameworkSelectionEvent, 
+		type FrameworkSortEvent, 
+		type FrameworkId,
+		isValidFramework 
+	} from "../config/frameworks";
 	import Sortable from "sortablejs";
-
-	// Types
-	interface SortableEvent {
-		item: HTMLElement;
-	}
-
-	interface FrameworkSelectionEvent extends CustomEvent {
-		detail: FrameworkId[];
-	}
 
 	/**
 	 * Initializes Sortable.js on the framework grid
@@ -187,7 +184,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 			document.querySelectorAll('.framework-container').forEach((element) => {
 				const container = element as HTMLElement;
 				const framework = container.getAttribute('data-framework');
-				if (framework) {
+				if (isValidFramework(framework)) {
 					handleFrameworkVisibility(container, selectedFrameworks.includes(framework));
 				}
 			});
@@ -195,27 +192,13 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 	}
 
 	// Add handler for sort events
-	document.addEventListener('frameworkSort', ((e: CustomEvent<{
-		type: string;
-		order: FrameworkId[];
-	}>) => {
+	document.addEventListener('frameworkSort', ((e: FrameworkSortEvent) => {
 		const grid = document.getElementById('framework-grid');
 		if (!grid) return;
 
-		if (e.detail.type === 'none') {
-			// Restore original order from localStorage if exists
-			const savedOrder = localStorage.getItem('frameworkOrder');
-			if (savedOrder) {
-				restoreFrameworkOrder(grid);
-			}
-			return;
-		}
-
-		// Reorder elements based on sort
-		const sortedFrameworks = e.detail.order;
 		const containers = Array.from(grid.children);
 		
-		sortedFrameworks.forEach((frameworkId: string) => {
+		e.detail.order.forEach((frameworkId) => {
 			const container = containers.find(
 				c => c.getAttribute('data-framework') === frameworkId
 			);
@@ -224,8 +207,10 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 			}
 		});
 
-		// Save the new order
-		saveFrameworkOrder();
+		// Save the new order if it's not a "none" sort
+		if (e.detail.type !== 'none') {
+			saveFrameworkOrder();
+		}
 	}) as EventListener);
 </script>
 
