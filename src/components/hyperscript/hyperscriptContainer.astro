@@ -1,19 +1,16 @@
 ---
 import hyperscriptLogo from "../../assets/logos/hyperscript.svg";
-import CodeBlock from "../CodeBlock.astro";
-import FrameworkContainer from "../FrameworkContainer.astro";
+import CodeBlock from "../shared/CodeBlock.astro";
+import FrameworkContainer from "../shared/FrameworkContainer.astro";
 import Hyperscript from "./hyperscript.astro";
 
-const code = await import("./hyperscript.astro?raw").then((m) => m.default);
+const { default: code } = await import("./hyperscript.astro?raw");
 ---
-<script is:inline src="src/scripts/hyperscript.min.js"></script>
 
-<FrameworkContainer framework="hyperscript" title="Hyperscript">
+<FrameworkContainer 
+  framework="hyperscript" 
+  title="Hyperscript"
+>
   <Hyperscript />
-  <CodeBlock 
-    code={code} 
-    displayName="Hyperscript" 
-    lang="javascript" 
-    logo={hyperscriptLogo}
-  />
+  <CodeBlock code={code} displayName="Hyperscript" lang="astro" logo={hyperscriptLogo} />
 </FrameworkContainer> 

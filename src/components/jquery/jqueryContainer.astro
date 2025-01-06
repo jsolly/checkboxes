@@ -1,14 +1,16 @@
 ---
 import jqueryLogo from "../../assets/logos/jquery.svg";
-import CodeBlock from "../CodeBlock.astro";
-import FrameworkContainer from "../FrameworkContainer.astro";
+import CodeBlock from "../shared/CodeBlock.astro";
+import FrameworkContainer from "../shared/FrameworkContainer.astro";
 import JQuery from "./jquery.astro";
 
-const code = await import("./jquery.astro?raw").then((m) => m.default);
+const { default: code } = await import("./jquery.astro?raw");
 ---
-<script is:inline src="node_modules/jquery/dist/jquery.min.js"></script>
 
-<FrameworkContainer framework="jquery" title="jQuery">
+<FrameworkContainer 
+  framework="jquery" 
+  title="jQuery"
+>
   <JQuery />
   <CodeBlock 
     code={code} 

@@ -58,34 +58,40 @@ const childCheckboxItems = [
   </div>
 </div>
 
-<script is:inline>
-$(document).ready(function() {
-  $('[data-jquery-checkbox-container]').each(function() {
-    const $container = $(this);
-    const $parentCheckbox = $container.find('[data-parent-checkbox]');
-    const $childCheckboxes = $container.find('[data-child-checkbox]');
+<script>
+	import $ from 'jquery';
+  $(function() {
+    function initCheckboxContainer($container: JQuery) {
+      const $parentCheckbox = $container.find('[data-parent-checkbox]');
+      const $childCheckboxes = $container.find('[data-child-checkbox]');
 
-    function updateParentState() {
-      const totalChildren = $childCheckboxes.length;
-      const checkedChildren = $childCheckboxes.filter(':checked').length;
-      
-      $parentCheckbox.prop('checked', checkedChildren === totalChildren);
-      $parentCheckbox.prop('indeterminate', 
-        checkedChildren > 0 && checkedChildren < totalChildren
-      );
+      // Clean up existing event handlers if any
+      $parentCheckbox.off('change');
+      $childCheckboxes.off('change');
+
+      function updateParentState() {
+        const totalChildCheckboxes = $childCheckboxes.length;
+        const numCheckedChildren = $childCheckboxes.filter(':checked').length;
+
+        $parentCheckbox.prop('checked', numCheckedChildren === totalChildCheckboxes);
+        $parentCheckbox.prop('indeterminate',
+          numCheckedChildren > 0 && numCheckedChildren < totalChildCheckboxes
+        );
+      }
+
+      // Parent checkbox handler
+      $parentCheckbox.on('change', function() {
+        const isChecked = $(this).prop('checked');
+        $childCheckboxes.prop('checked', isChecked);
+        $(this).prop('indeterminate', false);
+      });
+
+      // Child checkboxes handler
+      $childCheckboxes.on('change', updateParentState);
     }
 
-    // When parent checkbox changes
-    $parentCheckbox.on('change', function() {
-      const isChecked = $(this).prop('checked');
-      $childCheckboxes.prop('checked', isChecked);
-      $(this).prop('indeterminate', false);
-    });
-
-    // When any child checkbox changes
-    $childCheckboxes.on('change', function() {
-      updateParentState();
+    $('[data-jquery-checkbox-container]').each(function() {
+      initCheckboxContainer($(this));
     });
   });
-});
 </script> 

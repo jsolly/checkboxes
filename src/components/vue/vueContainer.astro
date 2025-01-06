@@ -1,17 +1,20 @@
 ---
-import FrameworkContainer from "../FrameworkContainer.astro";
-import NestedCheckboxes from "./NestedCheckboxes.vue";
-import CodeBlock from "../CodeBlock.astro";
 import vueLogo from "../../assets/logos/vue.svg";
+import CodeBlock from "../shared/CodeBlock.astro";
+import FrameworkContainer from "../shared/FrameworkContainer.astro";
+import VueNestedCheckboxes from "./VueNestedCheckboxes.vue";
 
-const code = await import('./NestedCheckboxes.vue?raw').then(m => m.default);
+const { default: code } = await import("./VueNestedCheckboxes.vue?raw");
 ---
 
-<FrameworkContainer framework="vue" title="Vue.js">
-  <NestedCheckboxes client:only="vue" />
+<FrameworkContainer 
+  framework="vue" 
+  title="Vue"
+>
+  <VueNestedCheckboxes client:only="vue" />
   <CodeBlock 
     code={code} 
-    displayName="Vue.js" 
+    displayName="Vue" 
     lang="vue" 
     logo={vueLogo}
   />

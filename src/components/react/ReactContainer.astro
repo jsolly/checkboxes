@@ -1,18 +1,16 @@
 ---
-import FrameworkContainer from "../FrameworkContainer.astro";
-import NestedCheckboxes from "./NestedCheckboxes";
-import CodeBlock from "../CodeBlock.astro";
 import reactLogo from "../../assets/logos/react.svg";
+import CodeBlock from "../shared/CodeBlock.astro";
+import FrameworkContainer from "../shared/FrameworkContainer.astro";
+import ReactNestedCheckboxes from "./ReactNestedCheckboxes";
 
-const code = await import('./NestedCheckboxes.jsx?raw').then(m => m.default);
+const { default: code } = await import("./ReactNestedCheckboxes.jsx?raw");
 ---
 
-<FrameworkContainer framework="react" title="React">
-  <NestedCheckboxes client:only="react" />
-  <CodeBlock 
-    code={code} 
-    displayName="React.js" 
-    lang="jsx" 
-    logo={reactLogo}
-  />
+<FrameworkContainer 
+  framework="react" 
+  title="React"
+>
+  <ReactNestedCheckboxes client:only="react" />
+  <CodeBlock code={code} displayName="React" lang="jsx" logo={reactLogo} />
 </FrameworkContainer> 

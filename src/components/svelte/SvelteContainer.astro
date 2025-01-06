@@ -1,18 +1,21 @@
 ---
-import FrameworkContainer from "../FrameworkContainer.astro";
-import NestedCheckboxes from "./NestedCheckboxes.svelte";
-import CodeBlock from "../CodeBlock.astro";
 import svelteLogo from "../../assets/logos/svelte.svg";
+import CodeBlock from "../shared/CodeBlock.astro";
+import FrameworkContainer from "../shared/FrameworkContainer.astro";
+import NestedCheckboxes from "./SvelteNestedCheckboxes.svelte";
 
-const code = await import('./NestedCheckboxes.svelte?raw').then(m => m.default);
+const { default: code } = await import("./SvelteNestedCheckboxes.svelte?raw");
 ---
 
-<FrameworkContainer framework="svelte" title="Svelte">
+<FrameworkContainer 
+  framework="svelte" 
+  title="Svelte"
+>
   <NestedCheckboxes client:only="svelte" />
   <CodeBlock 
     code={code} 
     displayName="Svelte" 
-    lang="typescript" 
+    lang="svelte" 
     logo={svelteLogo}
   />
 </FrameworkContainer> 

@@ -1,25 +1,31 @@
 ---
-import FrameworkSelector from "../components/FrameworkSelector";
+import FrameworkControls from "../components/FrameworkControls";
 import AlpineContainer from "../components/alpine/alpineContainer.astro";
-import CssOnlyContainer from "../components/css-only/cssOnlyContainer.astro";
+import CssOnlyContainer from "../components/cssOnly/cssOnlyContainer.astro";
 import HyperscriptContainer from "../components/hyperscript/hyperscriptContainer.astro";
 import JQueryContainer from "../components/jquery/jqueryContainer.astro";
 import ReactContainer from "../components/react/ReactContainer.astro";
 import SvelteContainer from "../components/svelte/SvelteContainer.astro";
-import VanillaContainer from "../components/vanilla-js/vanillaContainer.astro";
+import VanillajsContainer from "../components/vanillajs/vanillajsContainer.astro";
 import VueContainer from "../components/vue/vueContainer.astro";
+import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
 import Layout from "../layouts/Layout.astro";
 
-const frameworks = [
-	{ id: "vanilla", Component: VanillaContainer },
-	{ id: "alpine", Component: AlpineContainer },
-	{ id: "vue", Component: VueContainer },
-	{ id: "react", Component: ReactContainer },
-	{ id: "svelte", Component: SvelteContainer },
-	{ id: "hyperscript", Component: HyperscriptContainer },
-	{ id: "css-only", Component: CssOnlyContainer },
-	{ id: "jquery", Component: JQueryContainer },
-];
+const containerMap = {
+	vanillajs: VanillajsContainer,
+	alpine: AlpineContainer,
+	vue: VueContainer,
+	react: ReactContainer,
+	svelte: SvelteContainer,
+	hyperscript: HyperscriptContainer,
+	cssOnly: CssOnlyContainer,
+	jquery: JQueryContainer,
+} as const;
+
+const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
+	id: id as FrameworkId,
+	Component: containerMap[id as keyof typeof containerMap],
+}));
 ---
 
 <Layout>
@@ -32,41 +38,34 @@ const frameworks = [
 			</p>
 		</div>
 
-		<FrameworkSelector client:only="react" />
+		<FrameworkControls client:only="react" />
+		
 		<div 
 			id="framework-grid" 
 			class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto"
 		>
-			{frameworks.map(({ id, Component }) => (
-				<div 
-					class="framework-container backdrop-blur-sm bg-white/90 rounded-xl shadow-lg border border-slate-200" 
-					data-framework={id}
-				>
-					<Component />
-				</div>
+			{frameworks.map(({ Component }) => (
+				<Component />
 			))}
 		</div>
 	</div>
 </Layout>
 
 <script>
+	import { 
+		type SortableEvent, 
+		type FrameworkSelectionEvent, 
+		type FrameworkSortEvent, 
+		type FrameworkId,
+		isValidFramework 
+	} from "../config/frameworks";
 	import Sortable from "sortablejs";
-
-	// Types
-	interface SortableEvent {
-		item: HTMLElement;
-	}
-
-	interface FrameworkSelectionEvent extends CustomEvent {
-		detail: string[];
-	}
 
 	/**
 	 * Initializes Sortable.js on the framework grid
 	 * @param gridElement The grid element to make sortable
 	 */
 	function initializeSortable(gridElement: HTMLElement) {
-		// Check if the device is likely mobile/touch (screen width less than 1024px)
 		const isMobile = window.innerWidth < 1024;
 
 		return new Sortable(gridElement, {
@@ -90,6 +89,9 @@ const frameworks = [
 		evt.item.classList.remove('dragging');
 		document.body.style.cursor = '';
 		saveFrameworkOrder();
+		
+		// Dispatch event to reset sort dropdown
+		document.dispatchEvent(new CustomEvent("frameworkManualSort"));
 	}
 
 	function saveFrameworkOrder() {
@@ -98,7 +100,7 @@ const frameworks = [
 
 		const order = Array.from(grid.children)
 			.filter(child => !child.classList.contains('hidden'))
-			.map(child => child.getAttribute('data-framework'));
+			.map(child => child.getAttribute('data-framework') as FrameworkId);
 		localStorage.setItem('frameworkOrder', JSON.stringify(order));
 	}
 
@@ -176,18 +178,46 @@ const frameworks = [
 		// Add resize listener
 		window.addEventListener('resize', handleResize);
 
+		// Clean up on page unload
+		window.addEventListener('unload', () => {
+			window.removeEventListener('resize', handleResize);
+			sortableInstance?.destroy();
+		});
+
 		// Handle framework selection events
 		document.addEventListener('frameworkSelection', ((e: FrameworkSelectionEvent) => {
 			const selectedFrameworks = e.detail;
 			document.querySelectorAll('.framework-container').forEach((element) => {
 				const container = element as HTMLElement;
 				const framework = container.getAttribute('data-framework');
-				if (framework) {
+				if (isValidFramework(framework)) {
 					handleFrameworkVisibility(container, selectedFrameworks.includes(framework));
 				}
 			});
 		}) as EventListener);
 	}
+
+	// Add handler for sort events
+	document.addEventListener('frameworkSort', ((e: FrameworkSortEvent) => {
+		const grid = document.getElementById('framework-grid');
+		if (!grid) return;
+
+		const containers = Array.from(grid.children);
+		
+		e.detail.order.forEach((frameworkId) => {
+			const container = containers.find(
+				c => c.getAttribute('data-framework') === frameworkId
+			);
+			if (container) {
+				grid.appendChild(container);
+			}
+		});
+
+		// Save the new order if it's not a "none" sort
+		if (e.detail.type !== 'none') {
+			saveFrameworkOrder();
+		}
+	}) as EventListener);
 </script>
 
 <style>
