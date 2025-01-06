@@ -4,7 +4,7 @@ import CodeBlock from "../shared/CodeBlock.astro";
 import FrameworkContainer from "../shared/FrameworkContainer.astro";
 import Vanillajs from "./vanillajs.astro";
 
-const code = await import("./vanillajs.astro?raw").then((m) => m.default);
+const { default: code } = await import("./vanillajs.astro?raw");
 ---
 
 <FrameworkContainer 
@@ -12,5 +12,5 @@ const code = await import("./vanillajs.astro?raw").then((m) => m.default);
 	title="Vanilla JavaScript"
 >
 	<Vanillajs />
-	<CodeBlock code={code} displayName="Vanilla JS" lang="astro" logo={vanillaLogo} />
+	<CodeBlock code={code} displayName="Vanilla JS" lang="javascript" logo={vanillaLogo} />
 </FrameworkContainer> 

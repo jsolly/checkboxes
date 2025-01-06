@@ -4,7 +4,7 @@
  * @param {string} lang - The programming language of the code
  * @returns {number} The number of characters excluding comments and whitespace
  */
-export function getCharacterCount(code, lang) {
+export function getCharacterCount(code: string, lang: string) {
 	let cleanCode = code;
 
 	// Remove single-line comments based on language

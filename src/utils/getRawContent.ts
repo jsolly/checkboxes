@@ -1,4 +1,4 @@
-export async function getRawContent(path) {
+export async function getRawContent(path: string) {
 	const response = await fetch(path);
 	return await response.text();
 }

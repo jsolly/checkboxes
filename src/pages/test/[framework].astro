@@ -1,83 +1,43 @@
 ---
 import Alpine from "../../components/alpine/alpine.astro";
-import CssOnly from "../../components/css-only/cssOnly.astro";
+import CssOnly from "../../components/cssOnly/cssOnly.astro";
 import Hyperscript from "../../components/hyperscript/hyperscript.astro";
 import JQuery from "../../components/jquery/jquery.astro";
 import ReactNestedCheckboxes from "../../components/react/ReactNestedCheckboxes";
 import SvelteNestedCheckboxes from "../../components/svelte/SvelteNestedCheckboxes.svelte";
 import Vanillajs from "../../components/vanillajs/vanillajs.astro";
 import VueNestedCheckboxes from "../../components/vue/VueNestedCheckboxes.vue";
+import {
+	FRAMEWORKS,
+	type FrameworkId,
+	isValidFramework,
+} from "../../config/frameworks";
 import Layout from "../../layouts/Layout.astro";
 
 export function getStaticPaths() {
-	return [
-		{ params: { framework: "vanillajs" } },
-		{ params: { framework: "alpine" } },
-		{ params: { framework: "vue" } },
-		{ params: { framework: "react" } },
-		{ params: { framework: "svelte" } },
-		{ params: { framework: "hyperscript" } },
-		{ params: { framework: "css-only" } },
-		{ params: { framework: "jquery" } },
-	];
+	return Object.keys(FRAMEWORKS).map((framework) => ({
+		params: { framework },
+	}));
 }
 
 const { framework } = Astro.params;
-
-type FrameworkId =
-	| "vanillajs"
-	| "alpine"
-	| "vue"
-	| "react"
-	| "svelte"
-	| "hyperscript"
-	| "css-only"
-	| "jquery";
-
-const components = {
-	vanillajs: Vanillajs,
-	alpine: Alpine,
-	vue: VueNestedCheckboxes,
-	react: ReactNestedCheckboxes,
-	svelte: SvelteNestedCheckboxes,
-	hyperscript: Hyperscript,
-	"css-only": CssOnly,
-	jquery: JQuery,
-} as const;
-
-// Type guard to check if framework is valid
-function isValidFramework(
-	framework: string | undefined,
-): framework is FrameworkId {
-	return framework !== undefined && framework in components;
-}
 
 if (!isValidFramework(framework)) {
 	return Astro.redirect("/404");
 }
 
-const Component = components[framework];
+const frameworkId = framework as FrameworkId;
 ---
 
-<Layout title={`${framework} Test Page`}>
+<Layout title={`${FRAMEWORKS[frameworkId].displayName} Test Page`}>
 	<div class="min-h-screen p-8">
-		{(() => {
-			switch(framework) {
-				case "vue":
-					return <VueNestedCheckboxes client:only="vue" />;
-				case "react":
-					return <ReactNestedCheckboxes client:only="react" />;
-				case "svelte":
-					return <SvelteNestedCheckboxes client:only="svelte" />;
-				case "alpine":
-				case "jquery":
-				case "vanillajs":
-				case "hyperscript":
-				case "css-only":
-					return <Component />;
-				default:
-					return null;
-			}
-		})()}
+		{frameworkId === "vue" && <VueNestedCheckboxes client:only="vue" />}
+		{frameworkId === "react" && <ReactNestedCheckboxes client:only="react" />}
+		{frameworkId === "svelte" && <SvelteNestedCheckboxes client:only="svelte" />}
+		{frameworkId === "alpine" && <Alpine />}
+		{frameworkId === "jquery" && <JQuery />}
+		{frameworkId === "vanillajs" && <Vanillajs />}
+		{frameworkId === "hyperscript" && <Hyperscript />}
+		{frameworkId === "cssOnly" && <CssOnly />}
 	</div>
 </Layout> 

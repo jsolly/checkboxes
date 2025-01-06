@@ -1,29 +1,41 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import puppeteer from "puppeteer";
-import { calculateStatsZScores } from "./calculateZScores.js";
+import puppeteer, { type Page, type Protocol } from "puppeteer";
+import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
+import { calculateStatsZScores } from "./calculateZScores";
 
-const FRAMEWORKS = [
-	"vanillajs",
-	"alpine",
-	"vue",
-	"react",
-	"svelte",
-	"hyperscript",
-	"css-only",
-	"jquery",
-];
+const frameworkIds = Object.keys(FRAMEWORKS) as FrameworkId[];
 
-async function measureFramework(page, framework) {
+interface JsFile {
+	url: string;
+	size: string;
+}
+
+interface FrameworkStats {
+	renderTime: string;
+	bundleSize: string;
+}
+
+interface CDPResponseEvent {
+	type: string;
+	response: Protocol.Network.Response & {
+		encodedDataLength: number;
+	};
+}
+
+async function measureFramework(
+	page: Page,
+	framework: FrameworkId,
+): Promise<FrameworkStats> {
 	// Enable request interception
-	const client = await page.target().createCDPSession();
+	const client = await page.createCDPSession();
 	await client.send("Network.enable");
 
 	let totalJsSize = 0;
-	const jsFiles = [];
+	const jsFiles: JsFile[] = [];
 
-	client.on("Network.responseReceived", (event) => {
+	client.on("Network.responseReceived", (event: CDPResponseEvent) => {
 		if (event.type === "Script") {
 			const size = event.response.encodedDataLength;
 			totalJsSize += size;
@@ -48,7 +60,9 @@ async function measureFramework(page, framework) {
 
 	// Get more accurate render timing
 	const timings = await page.evaluate(() => {
-		const navigationEntry = performance.getEntriesByType("navigation")[0];
+		const navigationEntry = performance.getEntriesByType(
+			"navigation",
+		)[0] as PerformanceNavigationTiming;
 
 		if (navigationEntry) {
 			return {
@@ -107,13 +121,16 @@ async function measureFramework(page, framework) {
 	};
 }
 
-async function generateStats() {
+async function generateStats(): Promise<void> {
 	const browser = await puppeteer.launch();
 	const page = await browser.newPage();
 
-	const stats = {};
+	const stats: Record<FrameworkId, FrameworkStats> = {} as Record<
+		FrameworkId,
+		FrameworkStats
+	>;
 
-	for (const framework of FRAMEWORKS) {
+	for (const framework of frameworkIds) {
 		console.log(`Measuring ${framework}...`);
 		stats[framework] = await measureFramework(page, framework);
 	}

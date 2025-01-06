@@ -1,20 +1,17 @@
 import { useEffect, useState } from "react";
+import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
 
 interface Framework {
-	id: string;
+	id: FrameworkId;
 	name: string;
 }
 
-const frameworks: Framework[] = [
-	{ id: "vanilla", name: "Vanilla JS" },
-	{ id: "alpine", name: "Alpine.js" },
-	{ id: "vue", name: "Vue" },
-	{ id: "react", name: "React" },
-	{ id: "svelte", name: "Svelte" },
-	{ id: "hyperscript", name: "Hyperscript" },
-	{ id: "css-only", name: "CSS Only" },
-	{ id: "jquery", name: "jQuery" },
-];
+const frameworks: Framework[] = Object.entries(FRAMEWORKS).map(
+	([id, config]) => ({
+		id: id as FrameworkId,
+		name: config.displayName,
+	}),
+);
 
 export default function FrameworkSelector() {
 	const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>([]);

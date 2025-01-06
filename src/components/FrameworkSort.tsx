@@ -1,16 +1,6 @@
 import { useEffect, useState } from "react";
+import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
 import frameworkStats from "../data/framework-stats.json";
-
-interface FrameworkStat {
-	renderTime: string;
-	bundleSize: string;
-	renderTimeZScore: number;
-	bundleSizeZScore: number;
-}
-
-interface FrameworkStats {
-	[key: string]: FrameworkStat;
-}
 
 type SortOption =
 	| "bundleSizeAsc"
@@ -18,6 +8,8 @@ type SortOption =
 	| "renderTimeAsc"
 	| "renderTimeDsc"
 	| "none";
+
+type Metric = "bundleSize" | "renderTime";
 
 export default function FrameworkSort() {
 	const [sortBy, setSortBy] = useState<SortOption>("none");
@@ -48,17 +40,17 @@ export default function FrameworkSort() {
 			return;
 		}
 
-		const metric = option.includes("bundleSize") ? "bundleSize" : "renderTime";
+		const metric: Metric = option.includes("bundleSize")
+			? "bundleSize"
+			: "renderTime";
 		const isAscending = option.includes("Asc");
 
-		// Get frameworks sorted by the selected metric
-		const sortedFrameworks = Object.entries(frameworkStats as FrameworkStats)
-			.sort(([, a], [, b]) => {
-				const valueA = Number.parseFloat(a[metric].replace(/kb|ms/, ""));
-				const valueB = Number.parseFloat(b[metric].replace(/kb|ms/, ""));
-				return isAscending ? valueA - valueB : valueB - valueA;
-			})
-			.map(([id]) => id);
+		const frameworkIds = Object.keys(FRAMEWORKS) as FrameworkId[];
+		const sortedFrameworks = [...frameworkIds].sort((a, b) => {
+			const valueA = Number.parseFloat(frameworkStats[a][metric]);
+			const valueB = Number.parseFloat(frameworkStats[b][metric]);
+			return isAscending ? valueA - valueB : valueB - valueA;
+		});
 
 		const event = new CustomEvent("frameworkSort", {
 			detail: { type: option, order: sortedFrameworks },

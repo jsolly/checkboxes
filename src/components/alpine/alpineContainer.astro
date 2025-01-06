@@ -4,7 +4,7 @@ import CodeBlock from "../shared/CodeBlock.astro";
 import FrameworkContainer from "../shared/FrameworkContainer.astro";
 import Alpine from "./alpine.astro";
 
-const code = await import("./alpine.astro?raw").then((m) => m.default);
+const { default: code } = await import("./alpine.astro?raw");
 ---
 
 <FrameworkContainer 

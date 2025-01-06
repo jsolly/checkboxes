@@ -4,9 +4,7 @@ import CodeBlock from "../shared/CodeBlock.astro";
 import FrameworkContainer from "../shared/FrameworkContainer.astro";
 import VueNestedCheckboxes from "./VueNestedCheckboxes.vue";
 
-const code = await import("./VueNestedCheckboxes.vue?raw").then(
-	(m) => m.default,
-);
+const { default: code } = await import("./VueNestedCheckboxes.vue?raw");
 ---
 
 <FrameworkContainer 

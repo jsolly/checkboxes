@@ -6,6 +6,8 @@
 		"jsx": "react-jsx",
 		"jsxImportSource": "react",
 		"types": ["sortablejs"],
-		"lib": ["DOM", "DOM.Iterable", "ESNext"]
+		"lib": ["DOM", "DOM.Iterable", "ESNext"],
+		"module": "ESNext",
+		"moduleResolution": "Node"
 	}
 }

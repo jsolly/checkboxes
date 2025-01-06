@@ -4,11 +4,11 @@ import CodeBlock from "../shared/CodeBlock.astro";
 import FrameworkContainer from "../shared/FrameworkContainer.astro";
 import CssOnly from "./cssOnly.astro";
 
-const code = await import("./cssOnly.astro?raw").then((m) => m.default);
+const { default: code } = await import("./cssOnly.astro?raw");
 ---
 
 <FrameworkContainer 
-  framework="css-only" 
+  framework="cssOnly" 
   title="CSS Only"
 >
   <CssOnly />
