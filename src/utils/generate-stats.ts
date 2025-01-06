@@ -28,10 +28,21 @@ function formatTime(ms: number): string {
 	return `${(ms / 1000).toFixed(2)}s`;
 }
 
-async function measureFramework(
+function getMedian(numbers: number[]): number {
+	const sorted = [...numbers].sort((a, b) => a - b);
+	const middle = Math.floor(sorted.length / 2);
+
+	if (sorted.length % 2 === 0) {
+		return (sorted[middle - 1] + sorted[middle]) / 2;
+	}
+
+	return sorted[middle];
+}
+
+async function measureFrameworkOnce(
 	page: Page,
 	framework: FrameworkId,
-): Promise<FrameworkStats> {
+): Promise<{ renderTime: number; bundleSize: number }> {
 	// Enable request interception
 	const client = await page.createCDPSession();
 	await client.send("Network.enable");
@@ -50,9 +61,6 @@ async function measureFramework(
 				});
 			}
 		});
-
-		// Navigate to the framework's test page and measure render time
-		console.log(`\n📦 Loading ${framework}...`);
 
 		// Reset performance metrics before navigation
 		await page.evaluate(() => {
@@ -74,7 +82,7 @@ async function measureFramework(
 				);
 			});
 
-		// Get more accurate render timing
+		// Get timing measurements
 		const timings = await page.evaluate(() => {
 			const navigationEntry = performance.getEntriesByType(
 				"navigation",
@@ -106,38 +114,58 @@ async function measureFramework(
 					};
 		});
 
-		console.log("\nTiming metrics:");
-		console.log(`  Time to First Byte: ${formatTime(timings.ttfb)}`);
-		console.log(
-			`  DOM Content Loaded: ${formatTime(timings.domContentLoaded)}`,
-		);
-		console.log(`  DOM Interactive: ${formatTime(timings.interactive)}`);
-		console.log(`  Load Complete: ${formatTime(timings.loadComplete)}`);
-
 		// Use framework ready time if available, fall back to interactive time
 		const renderTime = Math.round(
 			timings.frameworkReady ?? timings.interactive,
 		);
 
-		console.log(`Render time: ${formatTime(renderTime)}`);
-
-		// Log all JavaScript files
-		console.log("\nJavaScript files loaded:");
-		for (const { url, size } of jsFiles) {
-			console.log(`  ${size.padEnd(8)} ${url}`);
-		}
-		console.log(`\nTotal JS size: ${(totalJsSize / 1024).toFixed(2)}kb`);
-
-		const bundleSize = (totalJsSize / 1024).toFixed(2);
-
 		return {
-			renderTime: formatTime(renderTime),
-			bundleSize: `${bundleSize}kb`,
+			renderTime,
+			bundleSize: Number((totalJsSize / 1024).toFixed(2)),
 		};
 	} finally {
-		// Clean up CDP session
 		await client.detach();
 	}
+}
+
+// Configuration
+const MEASUREMENT_RUNS = 5;
+
+async function measureFramework(
+	page: Page,
+	framework: FrameworkId,
+): Promise<FrameworkStats> {
+	console.log(
+		`\n📦 Measuring ${framework} (${MEASUREMENT_RUNS} iterations)...`,
+	);
+
+	const measurements: { renderTime: number; bundleSize: number }[] = [];
+
+	// Run measurements based on configuration
+	for (let i = 1; i <= MEASUREMENT_RUNS; i++) {
+		console.log(`\n  📊 Iteration ${i}/${MEASUREMENT_RUNS}...`);
+		const result = await measureFrameworkOnce(page, framework);
+		measurements.push(result);
+		console.log(`    ⏱️  Render time: ${formatTime(result.renderTime)}`);
+	}
+
+	// Calculate median render time
+	const medianRenderTime = getMedian(measurements.map((m) => m.renderTime));
+
+	// Use the bundle size from the first measurement since it shouldn't vary
+	const bundleSize = measurements[0].bundleSize;
+
+	console.log(`\n📈 Results for ${framework}:`);
+	console.log(
+		`  🏃 All render times: ${measurements.map((m) => formatTime(m.renderTime)).join(", ")}`,
+	);
+	console.log(`  📊 Median render time: ${formatTime(medianRenderTime)}`);
+	console.log(`  📦 Bundle size: ${bundleSize}kb`);
+
+	return {
+		renderTime: formatTime(medianRenderTime),
+		bundleSize: `${bundleSize}kb`,
+	};
 }
 
 async function generateStats(): Promise<void> {
