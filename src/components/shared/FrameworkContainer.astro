@@ -2,17 +2,31 @@
 import stats from "../../data/framework-stats.json";
 import PerformanceBadge from "../shared/PerformanceBadge.astro";
 
+// Define valid frameworks type based on the stats object
+type ValidFrameworks = keyof typeof stats;
+
 interface Props {
-	framework: string;
+	framework: ValidFrameworks;
 	title: string;
 }
 
 const { framework, title } = Astro.props;
 
-const frameworkStats = stats[framework as keyof typeof stats];
+// The type assertion is now safe because Props ensures framework is valid
+const frameworkStats = stats[framework];
+
+// Optional: Add runtime validation if you want to be extra safe
+if (!frameworkStats) {
+	throw new Error(
+		`Invalid framework: ${framework}. Valid frameworks are: ${Object.keys(stats).join(", ")}`,
+	);
+}
 ---
 
-<div class="framework-container backdrop-blur-sm bg-white/90 rounded-xl shadow-lg border border-slate-200" data-framework={framework}>
+<div 
+	class="framework-container backdrop-blur-sm bg-white/90 rounded-xl shadow-lg border border-slate-200" 
+	data-framework={framework}
+>
 	<PerformanceBadge stats={frameworkStats} />
 	<div class="opacity-0 transition-opacity duration-300" data-framework-wrapper>
 		<div class="bg-white/40 rounded-xl border border-white/50 shadow-lg overflow-hidden relative">
@@ -23,14 +37,16 @@ const frameworkStats = stats[framework as keyof typeof stats];
 					{title}
 				</h3>
 			</div>
-			<slot />
+			<div class="framework-content">
+				<slot />
+			</div>
 		</div>
 	</div>
 </div>
 
 <script is:inline define:vars={{ framework }}>
 	// Only initialize when the component becomes visible
-	const wrappers = document.querySelectorAll(`[data-framework-wrapper]`);
+	const wrappers = document.querySelectorAll(`[data-framework="${framework}"] [data-framework-wrapper]`);
 	wrappers.forEach(wrapper => {
 		const observer = new IntersectionObserver((entries) => {
 			entries.forEach(entry => {

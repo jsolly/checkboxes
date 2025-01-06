@@ -234,5 +234,16 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		display: grid;
 		grid-auto-rows: min-content;
 	}
+
+	/* Only show grab cursor on desktop devices */
+	@media (min-width: 1024px) {
+		.framework-container {
+			cursor: grab;
+		}
+		
+		.framework-container.dragging {
+			cursor: grabbing;
+		}
+	}
 </style>
 
