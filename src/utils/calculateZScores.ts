@@ -5,7 +5,7 @@ interface FrameworkStats {
 
 interface FrameworkStatsWithZScores extends FrameworkStats {
 	renderTimeZScore: number;
-	bundleSizeZScore?: number;
+	bundleSizeZScore: number;
 }
 
 type StatsRecord = Record<string, FrameworkStats>;
@@ -63,14 +63,11 @@ export function calculateStatsZScores(
 	const renderTimeStdDev = calculateStdDev(renderTimes, renderTimeMean);
 
 	// Calculate z-scores for bundle sizes
-	const bundleSizes = Object.values(stats)
-		.map((s) => s.bundleSize)
-		.filter(Boolean)
-		.map(parseMetricValue);
-	const bundleSizeMean = bundleSizes.length ? calculateMean(bundleSizes) : 0;
-	const bundleSizeStdDev = bundleSizes.length
-		? calculateStdDev(bundleSizes, bundleSizeMean)
-		: 0;
+	const bundleSizes = Object.values(stats).map((s) =>
+		parseMetricValue(s.bundleSize),
+	);
+	const bundleSizeMean = calculateMean(bundleSizes);
+	const bundleSizeStdDev = calculateStdDev(bundleSizes, bundleSizeMean);
 
 	const statsWithZScores: StatsWithZScoresRecord = {};
 	for (const [framework, frameworkStats] of Object.entries(stats)) {
@@ -81,13 +78,11 @@ export function calculateStatsZScores(
 				renderTimeMean,
 				renderTimeStdDev,
 			),
-			bundleSizeZScore: frameworkStats.bundleSize
-				? calculateZScore(
-						parseMetricValue(frameworkStats.bundleSize),
-						bundleSizeMean,
-						bundleSizeStdDev,
-					)
-				: undefined,
+			bundleSizeZScore: calculateZScore(
+				parseMetricValue(frameworkStats.bundleSize),
+				bundleSizeMean,
+				bundleSizeStdDev,
+			),
 		};
 	}
 

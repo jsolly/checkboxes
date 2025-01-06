@@ -2,36 +2,47 @@ export const FRAMEWORKS = {
 	vanillajs: {
 		displayName: "Vanilla JS",
 		clientOnly: false,
+		clientFramework: null,
 	},
 	alpine: {
 		displayName: "Alpine.js",
 		clientOnly: false,
+		clientFramework: null,
 	},
 	vue: {
 		displayName: "Vue",
-		clientOnly: "vue" as const,
+		clientOnly: true,
+		clientFramework: "vue" as const,
 	},
 	react: {
 		displayName: "React",
-		clientOnly: "react" as const,
+		clientOnly: true,
+		clientFramework: "react" as const,
 	},
 	svelte: {
 		displayName: "Svelte",
-		clientOnly: "svelte" as const,
+		clientOnly: true,
+		clientFramework: "svelte" as const,
 	},
 	hyperscript: {
 		displayName: "Hyperscript",
 		clientOnly: false,
+		clientFramework: null,
 	},
 	cssOnly: {
 		displayName: "CSS Only",
 		clientOnly: false,
+		clientFramework: null,
 	},
 	jquery: {
 		displayName: "jQuery",
 		clientOnly: false,
+		clientFramework: null,
 	},
 } as const;
+
+// Add type for the client framework names
+export type ClientFramework = "vue" | "react" | "svelte" | null;
 
 export type FrameworkId = keyof typeof FRAMEWORKS;
 

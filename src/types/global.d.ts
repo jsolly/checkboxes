@@ -1,3 +1,7 @@
-interface Window {
-	frameworkReady: boolean;
+declare global {
+	interface Window {
+		frameworkReady: boolean;
+	}
 }
+
+export {};

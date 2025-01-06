@@ -1,4 +1,9 @@
 export async function getRawContent(path: string) {
 	const response = await fetch(path);
-	return await response.text();
+	if (!response.ok) {
+		throw new Error(
+			`Failed to fetch content from ${path}: ${response.statusText}`,
+		);
+	}
+	return response.text();
 }

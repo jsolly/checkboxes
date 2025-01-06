@@ -178,6 +178,12 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		// Add resize listener
 		window.addEventListener('resize', handleResize);
 
+		// Clean up on page unload
+		window.addEventListener('unload', () => {
+			window.removeEventListener('resize', handleResize);
+			sortableInstance?.destroy();
+		});
+
 		// Handle framework selection events
 		document.addEventListener('frameworkSelection', ((e: FrameworkSelectionEvent) => {
 			const selectedFrameworks = e.detail;
