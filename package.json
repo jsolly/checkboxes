@@ -33,6 +33,7 @@
 		"@types/react-dom": "^19.0.2",
 		"alpinejs": "^3.14.8",
 		"astro": "^5.1.1",
+		"jquery": "^3.7.1",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"sharp": "^0.33.5",
@@ -44,11 +45,12 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
+		"@types/jquery": "^3.5.32",
 		"@types/sortablejs": "^1.15.8",
 		"husky": "^9.1.7",
 		"lint-staged": "^15.3.0",
 		"puppeteer": "^23.11.1",
-		"typescript": "^5.7.2",
-		"tsx": "^4.0.0"
+		"tsx": "^4.0.0",
+		"typescript": "^5.7.2"
 	}
 }

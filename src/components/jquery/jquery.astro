@@ -19,7 +19,6 @@ const childCheckboxItems = [
 	},
 ];
 ---
-<script is:inline src="/src/components/scripts/jquery.min.js"></script>
 
 <div class="px-3 py-2" data-jquery-checkbox-container>
   <div>
@@ -59,9 +58,10 @@ const childCheckboxItems = [
   </div>
 </div>
 
-<script is:inline>
-  $(document).ready(function() {
-    function initCheckboxContainer($container) {
+<script>
+	import $ from 'jquery';
+  $(function() {
+    function initCheckboxContainer($container: JQuery) {
       const $parentCheckbox = $container.find('[data-parent-checkbox]');
       const $childCheckboxes = $container.find('[data-child-checkbox]');
 

@@ -21,14 +21,13 @@ const FrameworkSortContext = createContext<
 >(undefined);
 
 export function FrameworkSortProvider({ children }: { children: ReactNode }) {
-	// Add validation of framework stats
+	// Listen for manual sort events
 	useEffect(() => {
-		// Validate framework stats on mount
-		const frameworkIds = Object.keys(FRAMEWORKS) as FrameworkId[];
-		const missingStats = frameworkIds.filter((id) => !frameworkStats[id]);
-		if (missingStats.length > 0) {
-			console.error("Missing stats for frameworks:", missingStats);
-		}
+		const handleManualSort = () => {
+			setSortBy("none");
+		};
+		document.addEventListener("manualSort", handleManualSort);
+		return () => document.removeEventListener("manualSort", handleManualSort);
 	}, []);
 
 	const [sortBy, setSortBy] = useState<SortOption>("none");
@@ -38,41 +37,27 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 			const defaultOrder = Object.keys(FRAMEWORKS) as FrameworkId[];
 
 			// Try to get saved order
-			if (typeof window !== "undefined") {
-				const savedOrder = localStorage.getItem("frameworkOrder");
-				if (savedOrder) {
-					try {
-						const parsed = JSON.parse(savedOrder);
-						// Ensure all saved frameworks exist in FRAMEWORKS
-						const validOrder = parsed.filter(
-							(id: unknown): id is FrameworkId =>
-								id !== null && typeof id === "string" && id in FRAMEWORKS,
-						);
-						// If we have valid frameworks, use them
-						if (validOrder.length > 0) {
-							// Add any missing frameworks to the end
-							const missingFrameworks = defaultOrder.filter(
-								(id) => !validOrder.includes(id),
-							);
-							return [...validOrder, ...missingFrameworks];
-						}
-					} catch (e) {
-						console.error("Error parsing saved framework order:", e);
-					}
-				}
+			const savedOrder = localStorage.getItem("frameworkOrder");
+			if (!savedOrder) return defaultOrder;
+
+			try {
+				const parsed = JSON.parse(savedOrder);
+				const validOrder = parsed.filter(
+					(id: unknown): id is FrameworkId =>
+						typeof id === "string" && id in FRAMEWORKS,
+				);
+
+				if (!validOrder.length) return defaultOrder;
+
+				const missingFrameworks = defaultOrder.filter(
+					(id) => !validOrder.includes(id),
+				);
+				return [...validOrder, ...missingFrameworks];
+			} catch {
+				return defaultOrder;
 			}
-			return defaultOrder;
 		},
 	);
-
-	// Listen for manual sort events
-	useEffect(() => {
-		const handleManualSort = () => {
-			setSortBy("none");
-		};
-		document.addEventListener("manualSort", handleManualSort);
-		return () => document.removeEventListener("manualSort", handleManualSort);
-	}, []);
 
 	const handleSort = (option: SortOption) => {
 		setSortBy(option);

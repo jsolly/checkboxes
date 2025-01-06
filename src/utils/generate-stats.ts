@@ -80,40 +80,30 @@ async function measureFramework(
 				"navigation",
 			)[0] as PerformanceNavigationTiming;
 
-			if (navigationEntry) {
-				return {
-					// Time to first byte (server response time)
-					ttfb: Math.round(
-						navigationEntry.responseStart - navigationEntry.requestStart,
-					),
-
-					// DOM Content Loaded (initial HTML parsed)
-					domContentLoaded: Math.round(
-						navigationEntry.domContentLoadedEventEnd -
-							navigationEntry.startTime,
-					),
-
-					// Full page load (including all resources)
-					loadComplete: Math.round(
-						navigationEntry.loadEventEnd - navigationEntry.startTime,
-					),
-
-					// DOM Interactive (HTML parsed, can start interacting)
-					interactive: Math.round(
-						navigationEntry.domInteractive - navigationEntry.startTime,
-					),
-
-					// Framework ready time (when framework signals it's fully initialized)
-					frameworkReady: window.frameworkReady ? performance.now() : null,
-				};
-			}
-			return {
-				ttfb: 0,
-				domContentLoaded: 0,
-				loadComplete: 0,
-				interactive: 0,
-				frameworkReady: null,
-			};
+			return navigationEntry
+				? {
+						ttfb: Math.round(
+							navigationEntry.responseStart - navigationEntry.requestStart,
+						),
+						domContentLoaded: Math.round(
+							navigationEntry.domContentLoadedEventEnd -
+								navigationEntry.startTime,
+						),
+						loadComplete: Math.round(
+							navigationEntry.loadEventEnd - navigationEntry.startTime,
+						),
+						interactive: Math.round(
+							navigationEntry.domInteractive - navigationEntry.startTime,
+						),
+						frameworkReady: window.frameworkReady ? performance.now() : null,
+					}
+				: {
+						ttfb: 0,
+						domContentLoaded: 0,
+						loadComplete: 0,
+						interactive: 0,
+						frameworkReady: null,
+					};
 		});
 
 		console.log("\nTiming metrics:");
@@ -125,9 +115,9 @@ async function measureFramework(
 		console.log(`  Load Complete: ${formatTime(timings.loadComplete)}`);
 
 		// Use framework ready time if available, fall back to interactive time
-		const renderTime = timings.frameworkReady
-			? Math.round(timings.frameworkReady)
-			: timings.interactive;
+		const renderTime = Math.round(
+			timings.frameworkReady ?? timings.interactive,
+		);
 
 		console.log(`Render time: ${formatTime(renderTime)}`);
 

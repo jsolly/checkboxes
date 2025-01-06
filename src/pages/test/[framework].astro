@@ -7,11 +7,7 @@ import ReactNestedCheckboxes from "../../components/react/ReactNestedCheckboxes"
 import SvelteNestedCheckboxes from "../../components/svelte/SvelteNestedCheckboxes.svelte";
 import Vanillajs from "../../components/vanillajs/vanillajs.astro";
 import VueNestedCheckboxes from "../../components/vue/VueNestedCheckboxes.vue";
-import {
-	FRAMEWORKS,
-	type FrameworkId,
-	isValidFramework,
-} from "../../config/frameworks";
+import { FRAMEWORKS, isValidFramework } from "../../config/frameworks";
 import Layout from "../../layouts/Layout.astro";
 
 export function getStaticPaths() {
@@ -26,12 +22,13 @@ if (!isValidFramework(framework)) {
 	return Astro.redirect("/404");
 }
 
-const frameworkId = framework as FrameworkId;
+const frameworkId = framework;
 ---
 
 <Layout title={`${FRAMEWORKS[frameworkId].displayName} Test Page`}>
 	<script>
 		// Signal when the page is ready
+		
 		window.addEventListener('load', () => {
 			// Give a small delay for frameworks to initialize
 			setTimeout(() => {
