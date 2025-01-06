@@ -91,7 +91,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		saveFrameworkOrder();
 		
 		// Dispatch event to reset sort dropdown
-		document.dispatchEvent(new CustomEvent("manualSort"));
+		document.dispatchEvent(new CustomEvent("frameworkManualSort"));
 	}
 
 	function saveFrameworkOrder() {

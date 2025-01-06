@@ -14,7 +14,17 @@ export default function FrameworkSort() {
 
 	useEffect(() => {
 		setMounted(true);
-	}, []);
+
+		const handleManualSort = () => {
+			setSortBy("none");
+		};
+
+		document.addEventListener("frameworkManualSort", handleManualSort);
+
+		return () => {
+			document.removeEventListener("frameworkManualSort", handleManualSort);
+		};
+	}, [setSortBy]);
 
 	if (!mounted) {
 		return (
