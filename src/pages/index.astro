@@ -80,7 +80,9 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 			disabled: isMobile,
 			delay: 0,
 			delayOnTouchOnly: true,
-			touchStartThreshold: 3
+			touchStartThreshold: 3,
+			filter: '.code-wrapper, button, [role="region"], input, [data-checkbox-container]',
+			preventOnFilter: true,
 		});
 	}
 
