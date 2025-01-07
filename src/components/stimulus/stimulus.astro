@@ -1,0 +1,43 @@
+<div data-controller="checkbox-group" class="px-3 py-2">
+  <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+    <div class="flex items-center space-x-3">
+      <input type="checkbox" id="stimulus-parent" data-checkbox-group-target="parent" data-action="checkbox-group#parentToggle" class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" />
+      <label for="stimulus-parent" class="text-slate-700 cursor-pointer text-sm font-medium">Parent</label>
+    </div>
+  </div>
+
+  <div class="ml-8">
+    { Array.from([1, 2, 3]).map((i) =>
+      <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
+        <div class="flex items-center space-x-3">
+          <input type="checkbox" id="stimulus-child-{i}" data-checkbox-group-target="child" data-action="checkbox-group#childToggle" class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" />
+          <label for="stimulus-child-{i}" class="text-slate-700 cursor-pointer text-sm font-medium">Child {i}</label>
+        </div>
+      </div> )}
+</div>
+
+<script>
+  import { Application, Controller } from "@hotwired/stimulus"
+
+  window.Stimulus = Application.start()
+
+  class CheckboxGroupController extends Controller {
+    static targets = [ 'parent', 'child' ]
+
+    parentToggle() {
+      const checked = this.parentTarget.checked
+
+      this.childTargets.forEach(child => child.checked = checked)
+    }
+
+    childToggle() {
+      const allChecked = this.childTargets.every(child => child.checked)
+      const someChecked = this.childTargets.some(child => child.checked)
+
+      this.parentTarget.checked = allChecked || someChecked
+      this.parentTarget.indeterminate = someChecked && !allChecked
+    }
+  }
+
+  Stimulus.register("checkbox-group", CheckboxGroupController)
+</script>

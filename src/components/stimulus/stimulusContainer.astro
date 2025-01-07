@@ -1,0 +1,16 @@
+---
+import stimulusLogo from "../../assets/logos/stimulus.svg";
+import CodeBlock from "../shared/CodeBlock.astro";
+import FrameworkContainer from "../shared/FrameworkContainer.astro";
+import Stimulus from "./stimulus.astro";
+
+const { default: code } = await import("./stimulus.astro?raw");
+---
+
+<FrameworkContainer
+  framework="stimulus"
+  title="Stimulus"
+>
+  <Stimulus />
+  <CodeBlock code={code} displayName="Stimulus" lang="html" logo={stimulusLogo} />
+</FrameworkContainer>

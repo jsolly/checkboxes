@@ -38,6 +38,9 @@ importers:
       '@google/generative-ai':
         specifier: ^0.21.0
         version: 0.21.0
+      '@hotwired/stimulus':
+        specifier: ^3.2.2
+        version: 3.2.2
       '@types/alpinejs':
         specifier: ^3.13.11
         version: 3.13.11
@@ -868,6 +871,9 @@ packages:
   '@google/generative-ai@0.21.0':
     resolution: {integrity: sha512-7XhUbtnlkSEZK15kN3t+tzIMxsbKm/dSkKBFalj+20NvPKe1kBY7mR2P7vuijEn+f06z5+A8bVGKO0v39cr6Wg==}
     engines: {node: '>=18.0.0'}
+
+  '@hotwired/stimulus@3.2.2':
+    resolution: {integrity: sha512-eGeIqNOQpXoPAIP7tC1+1Yc1yl1xnwYqg+3mzqxyrbE5pg5YFBZcA6YoTiByJB6DKAEsiWtl6tjTJS4IYtbB7A==}
 
   '@img/sharp-darwin-arm64@0.33.5':
     resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
@@ -4402,6 +4408,8 @@ snapshots:
     optional: true
 
   '@google/generative-ai@0.21.0': {}
+
+  '@hotwired/stimulus@3.2.2': {}
 
   '@img/sharp-darwin-arm64@0.33.5':
     optionalDependencies:
