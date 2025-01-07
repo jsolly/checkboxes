@@ -28,6 +28,7 @@ if (!frameworkStats) {
 <div 
 	class="framework-container backdrop-blur-sm bg-white/90 rounded-xl shadow-lg border border-slate-200" 
 	data-framework={framework}
+	style="transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.2s ease-out"
 >
 	<PerformanceBadge stats={frameworkStats} />
 	<div class="opacity-0 transition-opacity duration-300" data-framework-wrapper>

@@ -1,10 +1,34 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import type { FrameworkId } from "../config/frameworks";
+import { SchemaType } from "@google/generative-ai";
+import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
 import { getModelResponse } from "./googleAI";
 
 interface ComplexityResults {
 	scores: Record<string, number>;
 }
+
+// Generate properties dynamically from FRAMEWORKS
+const scoreProperties = Object.fromEntries(
+	Object.keys(FRAMEWORKS).map((framework) => [
+		framework,
+		{ type: SchemaType.NUMBER, minimum: 0, maximum: 100 },
+	]),
+) as Record<
+	FrameworkId,
+	{ type: SchemaType.NUMBER; minimum: number; maximum: number }
+>;
+
+export const complexitySchema = {
+	type: SchemaType.OBJECT,
+	properties: {
+		scores: {
+			type: SchemaType.OBJECT,
+			description: "Framework complexity scores (0-100)",
+			properties: scoreProperties,
+			required: Object.keys(FRAMEWORKS) as FrameworkId[],
+		},
+	},
+	required: ["scores"],
+};
 
 function formatImplementation([framework, code]: [string, string]): string {
 	return `### ${framework}
@@ -57,6 +81,9 @@ ${Object.entries(implementations).map(formatImplementation).join("\n\n")}`;
 export async function evaluateFrameworkComplexity(
 	implementations: Record<FrameworkId, string>,
 ): Promise<ComplexityResults> {
-	const response = await getModelResponse(prompt(implementations));
+	const response = await getModelResponse(
+		prompt(implementations),
+		complexitySchema,
+	);
 	return JSON.parse(response) as ComplexityResults;
 }

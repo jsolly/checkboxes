@@ -1,50 +1,50 @@
 {
 	"vanillajs": {
 		"bundleSize": 0.31,
-		"complexityScore": 95,
-		"bundleSizeZScore": -0.71,
-		"complexityZScore": 0.84
+		"complexityScore": 70,
+		"bundleSizeZScore": -0.5448480957111208,
+		"complexityZScore": 1.1929006011951044
 	},
 	"alpine": {
 		"bundleSize": 0.14,
-		"complexityScore": 85,
-		"bundleSizeZScore": -1.09,
-		"complexityZScore": -0.63
+		"complexityScore": 45,
+		"bundleSizeZScore": -1.3416152034177056,
+		"complexityZScore": -0.4524795383843499
 	},
 	"vue": {
-		"bundleSize": 1.05,
-		"complexityScore": 90,
-		"bundleSizeZScore": 0.97,
-		"complexityZScore": 0.11
+		"bundleSize": 0.73,
+		"complexityScore": 60,
+		"bundleSizeZScore": 1.4236353468580887,
+		"complexityZScore": 0.5347485453633226
 	},
 	"react": {
-		"bundleSize": 1.36,
-		"complexityScore": 88,
-		"bundleSizeZScore": 1.67,
-		"complexityZScore": -0.26
+		"bundleSize": 0.73,
+		"complexityScore": 65,
+		"bundleSizeZScore": 1.4236353468580887,
+		"complexityZScore": 0.8638245732792135
 	},
 	"svelte": {
-		"bundleSize": 1.08,
-		"complexityScore": 92,
-		"bundleSizeZScore": 1.04,
-		"complexityZScore": 0.47
+		"bundleSize": 0.46,
+		"complexityScore": 55,
+		"bundleSizeZScore": 0.15818170520645408,
+		"complexityZScore": 0.20567251744743179
 	},
 	"hyperscript": {
 		"bundleSize": 0.45,
-		"complexityScore": 82,
-		"bundleSizeZScore": -0.39,
-		"complexityZScore": -1.0
+		"complexityScore": 40,
+		"bundleSizeZScore": 0.11131305181194906,
+		"complexityZScore": -0.7815555663002408
 	},
 	"cssOnly": {
 		"bundleSize": 0.14,
-		"complexityScore": 98,
-		"bundleSizeZScore": -1.09,
-		"complexityZScore": 1.21
+		"complexityScore": 20,
+		"bundleSizeZScore": -1.3416152034177056,
+		"complexityZScore": -2.0978596779638043
 	},
 	"jquery": {
 		"bundleSize": 0.45,
-		"complexityScore": 80,
-		"bundleSizeZScore": -0.39,
-		"complexityZScore": -1.21
+		"complexityScore": 60,
+		"bundleSizeZScore": 0.11131305181194906,
+		"complexityZScore": 0.5347485453633226
 	}
 }

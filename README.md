@@ -29,6 +29,7 @@ pnpm dev
 pnpm build
 
 # Generate performance metrics
+pnpm preview
 pnpm generate-stats
 ```
 

@@ -70,13 +70,17 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 
 		return new Sortable(gridElement, {
 			animation: 150,
+			easing: "cubic-bezier(0.2, 0, 0.2, 1)",
+			dragoverBubble: true,
 			draggable: '.framework-container:not(.hidden)',
+			ghostClass: "sortable-ghost",
+			chosenClass: "dragging",
 			onStart: handleDragStart,
 			onEnd: handleDragEnd,
 			disabled: isMobile,
 			delay: 0,
 			delayOnTouchOnly: true,
-			touchStartThreshold: 4
+			touchStartThreshold: 3
 		});
 	}
 

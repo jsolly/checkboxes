@@ -19,7 +19,7 @@ function getColorClass(zScore: number) {
 
 <div class="badge-container">
 	<div class={`performance-badge ${getColorClass(stats.complexityZScore)}`}>
-		<span class="value">Complexity: {stats.complexityScore}%</span>
+		<span class="value">Complexity: {stats.complexityScore.toFixed(0)}%</span>
 	</div>
 	<div class={`performance-badge ${getColorClass(stats.bundleSizeZScore)}`}>
 		<span class="value">JS Bundle: {stats.bundleSize.toFixed(2)}kb</span>
