@@ -2,13 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
 import frameworkStats from "../data/framework-stats.json";
-
-type SortOption =
-	| "bundleSizeAsc"
-	| "bundleSizeDsc"
-	| "renderTimeAsc"
-	| "renderTimeDsc"
-	| "none";
+import { SortOption } from "../types/sort";
 
 interface FrameworkSortContextType {
 	sortBy: SortOption;
@@ -24,13 +18,13 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 	// Listen for manual sort events
 	useEffect(() => {
 		const handleManualSort = () => {
-			setSortBy("none");
+			setSortBy(SortOption.None);
 		};
 		document.addEventListener("manualSort", handleManualSort);
 		return () => document.removeEventListener("manualSort", handleManualSort);
 	}, []);
 
-	const [sortBy, setSortBy] = useState<SortOption>("none");
+	const [sortBy, setSortBy] = useState<SortOption>(SortOption.None);
 	const [sortedFrameworks, setSortedFrameworks] = useState<FrameworkId[]>(
 		() => {
 			// Get default order from FRAMEWORKS object
@@ -63,7 +57,7 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 		setSortBy(option);
 
 		let newOrder: FrameworkId[];
-		if (option === "none") {
+		if (option === SortOption.None) {
 			// Restore saved order from localStorage
 			const savedOrder = localStorage.getItem("frameworkOrder");
 			if (savedOrder) {
@@ -82,10 +76,15 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 				newOrder = Object.keys(FRAMEWORKS) as FrameworkId[];
 			}
 		} else {
-			const metric = option.includes("bundleSize")
-				? "bundleSize"
-				: "renderTime";
-			const isAscending = option.includes("Asc");
+			const metric =
+				option === SortOption.BundleSizeAsc ||
+				option === SortOption.BundleSizeDsc
+					? "bundleSize"
+					: "complexityScore";
+
+			const isAscending =
+				option === SortOption.BundleSizeAsc ||
+				option === SortOption.ComplexityAsc;
 
 			newOrder = [...sortedFrameworks]
 				.filter((id): id is FrameworkId => {
@@ -97,26 +96,15 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 						console.warn(`No stats found for framework: ${id}`);
 						return false;
 					}
-					if (!frameworkStats[id][metric]) {
+					if (typeof frameworkStats[id][metric] !== "number") {
 						console.warn(`No ${metric} found for framework: ${id}`);
 						return false;
 					}
 					return true;
 				})
 				.sort((a, b) => {
-					// Strip 'ms' or 'kb' and parse as float
-					const valueA = Number.parseFloat(
-						frameworkStats[a][metric].replace(/[a-z]+$/, ""),
-					);
-					const valueB = Number.parseFloat(
-						frameworkStats[b][metric].replace(/[a-z]+$/, ""),
-					);
-
-					if (Number.isNaN(valueA) || Number.isNaN(valueB)) {
-						console.warn(`Invalid values for sorting: ${valueA}, ${valueB}`);
-						return 0;
-					}
-
+					const valueA = frameworkStats[a][metric];
+					const valueB = frameworkStats[b][metric];
 					return isAscending ? valueA - valueB : valueB - valueA;
 				});
 

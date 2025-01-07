@@ -1,5 +1,6 @@
 ---
 import stats from "../../data/framework-stats.json";
+import type { FrameworkStats, FrameworkStatsRecord } from "../../types/stats";
 import PerformanceBadge from "../shared/PerformanceBadge.astro";
 
 // Define valid frameworks type based on the stats object
@@ -12,8 +13,9 @@ interface Props {
 
 const { framework, title } = Astro.props;
 
-// The type assertion is now safe because Props ensures framework is valid
-const frameworkStats = stats[framework];
+const frameworkStats: FrameworkStats = (stats as FrameworkStatsRecord)[
+	framework
+];
 
 // Optional: Add runtime validation if you want to be extra safe
 if (!frameworkStats) {
@@ -26,6 +28,7 @@ if (!frameworkStats) {
 <div 
 	class="framework-container backdrop-blur-sm bg-white/90 rounded-xl shadow-lg border border-slate-200" 
 	data-framework={framework}
+	style="transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.2s ease-out"
 >
 	<PerformanceBadge stats={frameworkStats} />
 	<div class="opacity-0 transition-opacity duration-300" data-framework-wrapper>

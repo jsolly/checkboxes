@@ -1,50 +1,50 @@
 {
 	"vanillajs": {
-		"renderTime": "943ms",
-		"bundleSize": "0.31kb",
-		"renderTimeZScore": -2.38,
-		"bundleSizeZScore": -0.71
+		"bundleSize": 0.31,
+		"complexityScore": 70,
+		"bundleSizeZScore": -0.5448480957111208,
+		"complexityZScore": 1.1929006011951044
 	},
 	"alpine": {
-		"renderTime": "1025ms",
-		"bundleSize": "0.14kb",
-		"renderTimeZScore": 0.61,
-		"bundleSizeZScore": -1.09
+		"bundleSize": 0.14,
+		"complexityScore": 45,
+		"bundleSizeZScore": -1.3416152034177056,
+		"complexityZScore": -0.4524795383843499
 	},
 	"vue": {
-		"renderTime": "1030ms",
-		"bundleSize": "1.05kb",
-		"renderTimeZScore": 0.79,
-		"bundleSizeZScore": 0.97
+		"bundleSize": 0.73,
+		"complexityScore": 60,
+		"bundleSizeZScore": 1.4236353468580887,
+		"complexityZScore": 0.5347485453633226
 	},
 	"react": {
-		"renderTime": "1021ms",
-		"bundleSize": "1.36kb",
-		"renderTimeZScore": 0.46,
-		"bundleSizeZScore": 1.67
+		"bundleSize": 0.73,
+		"complexityScore": 65,
+		"bundleSizeZScore": 1.4236353468580887,
+		"complexityZScore": 0.8638245732792135
 	},
 	"svelte": {
-		"renderTime": "1027ms",
-		"bundleSize": "1.08kb",
-		"renderTimeZScore": 0.68,
-		"bundleSizeZScore": 1.04
+		"bundleSize": 0.46,
+		"complexityScore": 55,
+		"bundleSizeZScore": 0.15818170520645408,
+		"complexityZScore": 0.20567251744743179
 	},
 	"hyperscript": {
-		"renderTime": "998ms",
-		"bundleSize": "0.45kb",
-		"renderTimeZScore": -0.38,
-		"bundleSizeZScore": -0.39
+		"bundleSize": 0.45,
+		"complexityScore": 40,
+		"bundleSizeZScore": 0.11131305181194906,
+		"complexityZScore": -0.7815555663002408
 	},
 	"cssOnly": {
-		"renderTime": "1025ms",
-		"bundleSize": "0.14kb",
-		"renderTimeZScore": 0.61,
-		"bundleSizeZScore": -1.09
+		"bundleSize": 0.14,
+		"complexityScore": 20,
+		"bundleSizeZScore": -1.3416152034177056,
+		"complexityZScore": -2.0978596779638043
 	},
 	"jquery": {
-		"renderTime": "998ms",
-		"bundleSize": "0.45kb",
-		"renderTimeZScore": -0.38,
-		"bundleSizeZScore": -0.39
+		"bundleSize": 0.45,
+		"complexityScore": 60,
+		"bundleSizeZScore": 0.11131305181194906,
+		"complexityZScore": 0.5347485453633226
 	}
 }

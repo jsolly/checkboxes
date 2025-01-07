@@ -29,6 +29,7 @@ pnpm dev
 pnpm build
 
 # Generate performance metrics
+pnpm preview
 pnpm generate-stats
 ```
 
@@ -67,41 +68,28 @@ src/
 
 ## Notes on Performance Metrics
 
-Each framework implementation is measured using the following methodology:
+Each framework implementation is evaluated on two key metrics:
 
-### Measurement Process
-- **Number of Runs**: 5 iterations per framework
-- **Metrics Collected**:
-  - Render Time: Time until framework is ready (or DOM interactive as fallback)
-  - Bundle Size: Total JavaScript bundle size in KB
+### Bundle Size
+- Measured in kilobytes (KB)
+- Calculated by monitoring network requests during page load
+- Only includes JavaScript resources (`type: "Script"`)
+- Represents the compressed (encoded) size of all JS assets
+- Lower scores are better
 
-### How Metrics are Calculated
-- **Render Time**: 
-  - Primary: Uses `window.frameworkReady` timing when available
-  - Fallback: Uses `domInteractive` timing from Performance API
-  - Final value is the median of 5 measurements
-- **Bundle Size**: 
-  - Measures total size of all JavaScript files
-  - Includes framework code and implementation code
-  - Reports compressed (gzipped) size
+### Complexity Score
+- Scored from 0-100 (whole numbers)
+- Evaluated using AI analysis of the implementation code
+- Weighted based on three criteria:
+  1. **State Management (40%)**: How state is stored and updated
+  2. **Event Handling (35%)**: Parent-child checkbox interactions
+  3. **Code Overhead (25%)**: Boilerplate and framework abstractions
+- Lower scores indicate simpler implementations
 
-### Performance Badge Colors
-Each metric is compared to other frameworks using Z-scores (standard deviations from mean):
-- 🟢 **Dark Green** (-1.5 or lower): Much faster/smaller than average
-- 🟩 **Light Green** (-1.5 to -0.5): Better than average
-- 🟨 **Yellow** (-0.5 to 0.5): Average performance
-- 🟧 **Orange** (0.5 to 1.5): Worse than average
-- 🟥 **Red** (1.5 or higher): Much slower/larger than average
-
-For example, with current measurements:
-- VanillaJS render time (Z=-2.48): 🟢 Much faster than average
-- React bundle size (Z=1.67): 🟥 Much larger than average
-- Alpine render time (Z=0.35): 🟨 Average performance
-
-### Technical Details
-- Measurements use Puppeteer in a controlled environment
-- Navigation timing via `performance.getEntriesByType("navigation")`
-- Bundle sizes tracked via Chrome DevTools Protocol
-- Z-scores automatically calculated during build
-- Results stored in `src/data/framework-stats.json`
+Both metrics are normalized using z-scores to provide relative performance indicators, displayed as colored badges:
+- 🟢 Excellent (z-score < -1.5)
+- 🟢 Good (z-score < -0.5)
+- 🟡 Average (-0.5 ≤ z-score < 0.5)
+- 🟠 Below Average (0.5 ≤ z-score < 1.5)
+- 🔴 Poor (z-score ≥ 1.5)
 
