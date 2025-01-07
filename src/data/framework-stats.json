@@ -1,50 +1,50 @@
 {
 	"vanillajs": {
 		"bundleSize": 0.31,
-		"complexityScore": 70,
-		"bundleSizeZScore": -0.5448480957111208,
-		"complexityZScore": 1.1929006011951044
+		"complexityScore": 65,
+		"bundleSizeZScore": -1.0972732521279107,
+		"complexityZScore": 1.3363062095621219
 	},
 	"alpine": {
-		"bundleSize": 0.14,
-		"complexityScore": 45,
-		"bundleSizeZScore": -1.3416152034177056,
-		"complexityZScore": -0.4524795383843499
+		"bundleSize": 0.31,
+		"complexityScore": 25,
+		"bundleSizeZScore": -1.0972732521279107,
+		"complexityZScore": -0.8017837257372731
 	},
 	"vue": {
-		"bundleSize": 0.73,
-		"complexityScore": 60,
-		"bundleSizeZScore": 1.4236353468580887,
-		"complexityZScore": 0.5347485453633226
+		"bundleSize": 0.9,
+		"complexityScore": 55,
+		"bundleSizeZScore": 1.1351102608219767,
+		"complexityZScore": 0.8017837257372731
 	},
 	"react": {
-		"bundleSize": 0.73,
-		"complexityScore": 65,
-		"bundleSizeZScore": 1.4236353468580887,
-		"complexityZScore": 0.8638245732792135
+		"bundleSize": 0.9,
+		"complexityScore": 60,
+		"bundleSizeZScore": 1.1351102608219767,
+		"complexityZScore": 1.0690449676496976
 	},
 	"svelte": {
-		"bundleSize": 0.46,
-		"complexityScore": 55,
-		"bundleSizeZScore": 0.15818170520645408,
-		"complexityZScore": 0.20567251744743179
+		"bundleSize": 0.94,
+		"complexityScore": 45,
+		"bundleSizeZScore": 1.28645829559824,
+		"complexityZScore": 0.2672612419124244
 	},
 	"hyperscript": {
-		"bundleSize": 0.45,
-		"complexityScore": 40,
-		"bundleSizeZScore": 0.11131305181194906,
-		"complexityZScore": -0.7815555663002408
+		"bundleSize": 0.5,
+		"complexityScore": 20,
+		"bundleSizeZScore": -0.37837008694065877,
+		"complexityZScore": -1.0690449676496976
 	},
 	"cssOnly": {
-		"bundleSize": 0.14,
-		"complexityScore": 20,
-		"bundleSizeZScore": -1.3416152034177056,
-		"complexityZScore": -2.0978596779638043
+		"bundleSize": 0.31,
+		"complexityScore": 10,
+		"bundleSizeZScore": -1.0972732521279107,
+		"complexityZScore": -1.6035674514745462
 	},
 	"jquery": {
-		"bundleSize": 0.45,
-		"complexityScore": 60,
-		"bundleSizeZScore": 0.11131305181194906,
-		"complexityZScore": 0.5347485453633226
+		"bundleSize": 0.63,
+		"complexityScore": 40,
+		"bundleSizeZScore": 0.11351102608219776,
+		"complexityZScore": 0
 	}
 }

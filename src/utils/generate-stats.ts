@@ -16,20 +16,39 @@ interface CDPEvent {
 }
 
 async function measureBundleSize(page: Page, framework: FrameworkId) {
-	const client = await page.createCDPSession();
-	await client.send("Network.enable");
+	const iterations = 5;
+	const measurements: number[] = [];
 
-	let totalJsSize = 0;
-	client.on("Network.responseReceived", (event: CDPEvent) => {
-		if (event.type === "Script") {
-			totalJsSize += event.response.encodedDataLength;
-		}
-	});
+	for (let i = 0; i < iterations; i++) {
+		const client = await page.createCDPSession();
 
-	await page.goto(`http://localhost:4321/test/${framework}`);
-	await client.detach();
+		// Clear browser cache
+		await page.setCacheEnabled(false);
+		await client.send("Network.clearBrowserCache");
+		await client.send("Network.clearBrowserCookies");
 
-	return Number((totalJsSize / 1024).toFixed(2));
+		await client.send("Network.enable");
+
+		let totalJsSize = 0;
+		client.on("Network.responseReceived", (event: CDPEvent) => {
+			if (event.type === "Script") {
+				totalJsSize += event.response.encodedDataLength;
+			}
+		});
+
+		await page.goto(`http://localhost:4321/test/${framework}`);
+		await client.detach();
+
+		measurements.push(Number((totalJsSize / 1024).toFixed(2)));
+		console.log(`    Run ${i + 1}: ${measurements[i]}kb`);
+	}
+
+	// Sort measurements and take the middle value
+	measurements.sort((a, b) => a - b);
+	const median = measurements[Math.floor(iterations / 2)];
+	console.log(`    Median: ${median}kb`);
+
+	return median;
 }
 
 async function generateStats(): Promise<void> {
@@ -37,6 +56,7 @@ async function generateStats(): Promise<void> {
 	const page = await browser.newPage();
 	const stats = {} as Record<FrameworkId, FrameworkStats>;
 	const implementations = {} as Record<FrameworkId, string>;
+	const iterations = 5;
 
 	try {
 		// Gather implementations and measure bundle sizes
@@ -76,10 +96,30 @@ async function generateStats(): Promise<void> {
 			implementations[id] = code.toString();
 		}
 
-		// Evaluate complexity and save results
-		const { scores } = await evaluateFrameworkComplexity(implementations);
-		for (const [id, score] of Object.entries(scores)) {
-			stats[id as FrameworkId].complexityScore = score;
+		// Evaluate complexity multiple times and take median
+		const complexityMeasurements: Record<string, number[]> = {};
+
+		// Initialize arrays for each framework
+		for (const id of Object.keys(implementations)) {
+			complexityMeasurements[id] = [];
+		}
+
+		// Run complexity evaluation iterations times
+		for (let i = 0; i < iterations; i++) {
+			console.log(`📊 Evaluating complexity - Run ${i + 1}...`);
+			const { scores } = await evaluateFrameworkComplexity(implementations);
+
+			for (const [id, score] of Object.entries(scores)) {
+				complexityMeasurements[id].push(score);
+			}
+		}
+
+		// Calculate median scores for each framework
+		for (const id of Object.keys(implementations)) {
+			const measurements = complexityMeasurements[id].sort((a, b) => a - b);
+			const median = measurements[Math.floor(iterations / 2)]; // Use same median calculation as measureBundleSize
+			stats[id as FrameworkId].complexityScore = median;
+			console.log(`    ${id} complexity score: ${median}`);
 		}
 
 		await fs.writeFile(

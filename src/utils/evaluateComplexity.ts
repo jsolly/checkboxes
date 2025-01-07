@@ -14,7 +14,6 @@ const scoreProperties = Object.fromEntries(
 			type: SchemaType.NUMBER,
 			minimum: 0,
 			maximum: 100,
-			multipleOf: 1, // Ensures whole numbers only
 		},
 	]),
 ) as Record<
@@ -23,7 +22,6 @@ const scoreProperties = Object.fromEntries(
 		type: SchemaType.NUMBER;
 		minimum: number;
 		maximum: number;
-		multipleOf: number;
 	}
 >;
 
