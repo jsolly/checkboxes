@@ -35,6 +35,9 @@ importers:
       '@astrojs/vue':
         specifier: ^5.0.3
         version: 5.0.3(@types/node@22.10.5)(astro@5.1.1(@types/node@22.10.5)(jiti@1.21.7)(rollup@4.29.1)(tsx@4.19.2)(typescript@5.7.2)(yaml@2.7.0))(jiti@1.21.7)(rollup@4.29.1)(tsx@4.19.2)(vue@3.5.13(typescript@5.7.2))(yaml@2.7.0)
+      '@google/generative-ai':
+        specifier: ^0.21.0
+        version: 0.21.0
       '@types/alpinejs':
         specifier: ^3.13.11
         version: 3.13.11
@@ -858,6 +861,10 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@google/generative-ai@0.21.0':
+    resolution: {integrity: sha512-7XhUbtnlkSEZK15kN3t+tzIMxsbKm/dSkKBFalj+20NvPKe1kBY7mR2P7vuijEn+f06z5+A8bVGKO0v39cr6Wg==}
+    engines: {node: '>=18.0.0'}
 
   '@img/sharp-darwin-arm64@0.33.5':
     resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
@@ -4386,6 +4393,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.24.2':
     optional: true
+
+  '@google/generative-ai@0.21.0': {}
 
   '@img/sharp-darwin-arm64@0.33.5':
     optionalDependencies:

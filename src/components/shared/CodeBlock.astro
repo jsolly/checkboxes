@@ -2,7 +2,6 @@
 import { Image } from "astro:assets";
 import { Code } from "astro:components";
 import type { BuiltinLanguage } from "shiki";
-import { getCharacterCount } from "../../utils/getCharacterCount";
 
 interface Props {
 	code: string;
@@ -13,7 +12,7 @@ interface Props {
 
 const { code = "", displayName, lang = "javascript", logo } = Astro.props;
 
-const charCount = getCharacterCount(code, lang);
+const lineCount = code.split("\n").length;
 ---
 
 <div class="rounded-b-lg overflow-hidden border-t border-slate-200 mt-2" x-data="{ expanded: false }">
@@ -36,7 +35,7 @@ const charCount = getCharacterCount(code, lang);
 			<div class="text-sm text-slate-500">
 				<span x-text="expanded ? 'Hide' : 'View'"></span>
 				<span> {displayName} code</span>
-				<span class="text-xs text-slate-400 ml-2">({charCount} chars)</span>
+				<span class="text-xs text-slate-400 ml-2">({lineCount} lines)</span>
 			</div>
 		</div>
 		<div class="text-slate-400">

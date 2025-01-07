@@ -1,50 +1,50 @@
 {
 	"vanillajs": {
-		"renderTime": "943ms",
-		"bundleSize": "0.31kb",
-		"renderTimeZScore": -2.38,
-		"bundleSizeZScore": -0.71
+		"bundleSize": 0.31,
+		"complexityScore": 95,
+		"bundleSizeZScore": -0.71,
+		"complexityZScore": 0.84
 	},
 	"alpine": {
-		"renderTime": "1025ms",
-		"bundleSize": "0.14kb",
-		"renderTimeZScore": 0.61,
-		"bundleSizeZScore": -1.09
+		"bundleSize": 0.14,
+		"complexityScore": 85,
+		"bundleSizeZScore": -1.09,
+		"complexityZScore": -0.63
 	},
 	"vue": {
-		"renderTime": "1030ms",
-		"bundleSize": "1.05kb",
-		"renderTimeZScore": 0.79,
-		"bundleSizeZScore": 0.97
+		"bundleSize": 1.05,
+		"complexityScore": 90,
+		"bundleSizeZScore": 0.97,
+		"complexityZScore": 0.11
 	},
 	"react": {
-		"renderTime": "1021ms",
-		"bundleSize": "1.36kb",
-		"renderTimeZScore": 0.46,
-		"bundleSizeZScore": 1.67
+		"bundleSize": 1.36,
+		"complexityScore": 88,
+		"bundleSizeZScore": 1.67,
+		"complexityZScore": -0.26
 	},
 	"svelte": {
-		"renderTime": "1027ms",
-		"bundleSize": "1.08kb",
-		"renderTimeZScore": 0.68,
-		"bundleSizeZScore": 1.04
+		"bundleSize": 1.08,
+		"complexityScore": 92,
+		"bundleSizeZScore": 1.04,
+		"complexityZScore": 0.47
 	},
 	"hyperscript": {
-		"renderTime": "998ms",
-		"bundleSize": "0.45kb",
-		"renderTimeZScore": -0.38,
-		"bundleSizeZScore": -0.39
+		"bundleSize": 0.45,
+		"complexityScore": 82,
+		"bundleSizeZScore": -0.39,
+		"complexityZScore": -1.0
 	},
 	"cssOnly": {
-		"renderTime": "1025ms",
-		"bundleSize": "0.14kb",
-		"renderTimeZScore": 0.61,
-		"bundleSizeZScore": -1.09
+		"bundleSize": 0.14,
+		"complexityScore": 98,
+		"bundleSizeZScore": -1.09,
+		"complexityZScore": 1.21
 	},
 	"jquery": {
-		"renderTime": "998ms",
-		"bundleSize": "0.45kb",
-		"renderTimeZScore": -0.38,
-		"bundleSizeZScore": -0.39
+		"bundleSize": 0.45,
+		"complexityScore": 80,
+		"bundleSizeZScore": -0.39,
+		"complexityZScore": -1.21
 	}
 }

@@ -1,90 +1,42 @@
-interface FrameworkStats {
-	renderTime: string;
-	bundleSize: string;
-}
-
-interface FrameworkStatsWithZScores extends FrameworkStats {
-	renderTimeZScore: number;
-	bundleSizeZScore: number;
-}
-
-type StatsRecord = Record<string, FrameworkStats>;
-type StatsWithZScoresRecord = Record<string, FrameworkStatsWithZScores>;
-
-function parseMetricValue(value: string): number {
-	return Number.parseFloat(value.replace(/(ms|kb)$/, ""));
-}
+import { METRICS, type MetricConfig } from "../config/metrics";
+import type { FrameworkStats } from "../types/stats";
 
 function calculateMean(values: number[]): number {
-	return values.reduce((a, b) => a + b, 0) / values.length;
+	return values.reduce((sum, v) => sum + v, 0) / values.length;
 }
 
 function calculateStdDev(values: number[], mean: number): number {
 	const variance =
-		values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length;
+		values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length;
 	return Math.sqrt(variance);
 }
 
-function calculateZScore(value: number, mean: number, stdDev: number): number {
-	return (value - mean) / stdDev;
-}
-
-export function calculateZScores(
-	frameworkStats: StatsRecord,
-	metric: keyof FrameworkStats,
-): Record<string, number> {
-	const values = Object.values(frameworkStats).map((stats) =>
-		parseMetricValue(stats[metric]),
-	);
+function calculateZScore(values: number[], value: number): number {
 	const mean = calculateMean(values);
 	const stdDev = calculateStdDev(values, mean);
+	return stdDev === 0 ? 0 : (value - mean) / stdDev;
+}
 
-	return Object.entries(frameworkStats).reduce(
-		(zScores, [framework, stats]) => {
-			zScores[framework] = calculateZScore(
-				parseMetricValue(stats[metric]),
-				mean,
-				stdDev,
-			);
-			return zScores;
+function calculateMetricZScores(
+	stats: Record<string, FrameworkStats>,
+	metric: MetricConfig,
+) {
+	const values = Object.values(stats).map((s) => s[metric.rawField]);
+
+	return Object.entries(stats).map(([framework, stat]) => [
+		framework,
+		{
+			...stat,
+			[metric.zScoreField]: calculateZScore(values, stat[metric.rawField]),
 		},
-		{} as Record<string, number>,
-	);
+	]);
 }
 
 export function calculateStatsZScores(
-	stats: StatsRecord,
-): StatsWithZScoresRecord {
-	// Calculate z-scores for render times
-	const renderTimes = Object.values(stats).map((s) =>
-		parseMetricValue(s.renderTime),
+	stats: Record<string, FrameworkStats>,
+): Record<string, FrameworkStats> {
+	return METRICS.reduce(
+		(acc, metric) => Object.fromEntries(calculateMetricZScores(acc, metric)),
+		stats,
 	);
-	const renderTimeMean = calculateMean(renderTimes);
-	const renderTimeStdDev = calculateStdDev(renderTimes, renderTimeMean);
-
-	// Calculate z-scores for bundle sizes
-	const bundleSizes = Object.values(stats).map((s) =>
-		parseMetricValue(s.bundleSize),
-	);
-	const bundleSizeMean = calculateMean(bundleSizes);
-	const bundleSizeStdDev = calculateStdDev(bundleSizes, bundleSizeMean);
-
-	const statsWithZScores: StatsWithZScoresRecord = {};
-	for (const [framework, frameworkStats] of Object.entries(stats)) {
-		statsWithZScores[framework] = {
-			...frameworkStats,
-			renderTimeZScore: calculateZScore(
-				parseMetricValue(frameworkStats.renderTime),
-				renderTimeMean,
-				renderTimeStdDev,
-			),
-			bundleSizeZScore: calculateZScore(
-				parseMetricValue(frameworkStats.bundleSize),
-				bundleSizeMean,
-				bundleSizeStdDev,
-			),
-		};
-	}
-
-	return statsWithZScores;
 }

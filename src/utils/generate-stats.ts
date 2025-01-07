@@ -1,209 +1,96 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import puppeteer, { type Page, type Protocol } from "puppeteer";
+import type { Page, Protocol } from "puppeteer";
+import puppeteer from "puppeteer";
 import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
+import type { FrameworkStats } from "../types/stats";
 import { calculateStatsZScores } from "./calculateZScores";
+import { evaluateFrameworkComplexity } from "./evaluateComplexity";
 
-const frameworkIds = Object.keys(FRAMEWORKS) as FrameworkId[];
-
-interface JsFile {
-	url: string;
-	size: string;
-}
-
-interface FrameworkStats {
-	renderTime: string;
-	bundleSize: string;
-}
-
-interface CDPResponseEvent {
+interface CDPEvent {
 	type: string;
 	response: Protocol.Network.Response & {
 		encodedDataLength: number;
 	};
 }
 
-function formatTime(ms: number): string {
-	return `${Math.round(ms)}ms`;
-}
-
-function getMedian(numbers: number[]): number {
-	const sorted = [...numbers].sort((a, b) => a - b);
-	const middle = Math.floor(sorted.length / 2);
-
-	if (sorted.length % 2 === 0) {
-		return (sorted[middle - 1] + sorted[middle]) / 2;
-	}
-
-	return sorted[middle];
-}
-
-async function measureFrameworkOnce(
-	page: Page,
-	framework: FrameworkId,
-): Promise<{ renderTime: number; bundleSize: number }> {
-	// Enable request interception
+async function measureBundleSize(page: Page, framework: FrameworkId) {
 	const client = await page.createCDPSession();
 	await client.send("Network.enable");
 
 	let totalJsSize = 0;
-	const jsFiles: JsFile[] = [];
+	client.on("Network.responseReceived", (event: CDPEvent) => {
+		if (event.type === "Script") {
+			totalJsSize += event.response.encodedDataLength;
+		}
+	});
 
-	try {
-		client.on("Network.responseReceived", (event: CDPResponseEvent) => {
-			if (event.type === "Script") {
-				const size = event.response.encodedDataLength;
-				totalJsSize += size;
-				jsFiles.push({
-					url: event.response.url,
-					size: `${(size / 1024).toFixed(2)}kb`,
-				});
-			}
-		});
+	await page.goto(`http://localhost:4321/test/${framework}`);
+	await client.detach();
 
-		// Reset performance metrics before navigation
-		await page.evaluate(() => {
-			window.performance.clearResourceTimings();
-		});
-
-		await page.goto(`http://localhost:4321/test/${framework}`, {
-			waitUntil: "networkidle0",
-		});
-
-		// Wait for framework to be ready
-		await page
-			.waitForFunction(() => window.frameworkReady === true, {
-				timeout: 10000,
-			})
-			.catch(() => {
-				console.warn(
-					`⚠️ Framework ${framework} failed to signal ready state within 10s`,
-				);
-			});
-
-		// Get timing measurements
-		const timings = await page.evaluate(() => {
-			const navigationEntry = performance.getEntriesByType(
-				"navigation",
-			)[0] as PerformanceNavigationTiming;
-
-			return navigationEntry
-				? {
-						ttfb: Math.round(
-							navigationEntry.responseStart - navigationEntry.requestStart,
-						),
-						domContentLoaded: Math.round(
-							navigationEntry.domContentLoadedEventEnd -
-								navigationEntry.startTime,
-						),
-						loadComplete: Math.round(
-							navigationEntry.loadEventEnd - navigationEntry.startTime,
-						),
-						interactive: Math.round(
-							navigationEntry.domInteractive - navigationEntry.startTime,
-						),
-						frameworkReady: window.frameworkReady ? performance.now() : null,
-					}
-				: {
-						ttfb: 0,
-						domContentLoaded: 0,
-						loadComplete: 0,
-						interactive: 0,
-						frameworkReady: null,
-					};
-		});
-
-		// Use framework ready time if available, fall back to interactive time
-		const renderTime = Math.round(
-			timings.frameworkReady ?? timings.interactive,
-		);
-
-		return {
-			renderTime,
-			bundleSize: Number((totalJsSize / 1024).toFixed(2)),
-		};
-	} finally {
-		await client.detach();
-	}
-}
-
-// Configuration
-const MEASUREMENT_RUNS = 5;
-
-async function measureFramework(
-	page: Page,
-	framework: FrameworkId,
-): Promise<FrameworkStats> {
-	console.log(
-		`\n📦 Measuring ${framework} (${MEASUREMENT_RUNS} iterations)...`,
-	);
-
-	const measurements: { renderTime: number; bundleSize: number }[] = [];
-
-	// Run measurements based on configuration
-	for (let i = 1; i <= MEASUREMENT_RUNS; i++) {
-		console.log(`\n  📊 Iteration ${i}/${MEASUREMENT_RUNS}...`);
-		const result = await measureFrameworkOnce(page, framework);
-		measurements.push(result);
-		console.log(`    ⏱️  Render time: ${formatTime(result.renderTime)}`);
-	}
-
-	// Calculate median render time
-	const medianRenderTime = getMedian(measurements.map((m) => m.renderTime));
-
-	// Use the bundle size from the first measurement since it shouldn't vary
-	const bundleSize = measurements[0].bundleSize;
-
-	console.log(`\n📈 Results for ${framework}:`);
-	console.log(
-		`  🏃 All render times: ${measurements.map((m) => formatTime(m.renderTime)).join(", ")}`,
-	);
-	console.log(`  📊 Median render time: ${formatTime(medianRenderTime)}`);
-	console.log(`  📦 Bundle size: ${bundleSize}kb`);
-
-	return {
-		renderTime: formatTime(medianRenderTime),
-		bundleSize: `${bundleSize}kb`,
-	};
+	return Number((totalJsSize / 1024).toFixed(2));
 }
 
 async function generateStats(): Promise<void> {
 	const browser = await puppeteer.launch();
 	const page = await browser.newPage();
+	const stats = {} as Record<FrameworkId, FrameworkStats>;
+	const implementations = {} as Record<FrameworkId, string>;
 
-	const stats: Record<FrameworkId, FrameworkStats> = {} as Record<
-		FrameworkId,
-		FrameworkStats
-	>;
+	try {
+		// Gather implementations and measure bundle sizes
+		for (const id of Object.keys(FRAMEWORKS) as FrameworkId[]) {
+			console.log(`📦 Measuring ${id}...`);
 
-	for (const framework of frameworkIds) {
-		console.log(`Measuring ${framework}...`);
-		stats[framework] = await measureFramework(page, framework);
+			// Measure bundle size
+			const size = await measureBundleSize(page, id);
+			console.log(`  Bundle size: ${size}kb`);
+
+			// Read implementation
+			const code = await fs
+				.readFile(
+					path.join(process.cwd(), "src/components", id, `${id}Container.tsx`),
+				)
+				.catch(() =>
+					fs.readFile(
+						path.join(
+							process.cwd(),
+							"src/components",
+							id,
+							`${id}Container.astro`,
+						),
+					),
+				);
+
+			if (!code) {
+				throw new Error(`Could not find implementation for ${id}`);
+			}
+
+			stats[id] = {
+				bundleSize: size,
+				complexityScore: 0,
+				bundleSizeZScore: 0,
+				complexityZScore: 0,
+			};
+			implementations[id] = code.toString();
+		}
+
+		// Evaluate complexity and save results
+		const { scores } = await evaluateFrameworkComplexity(implementations);
+		for (const [id, score] of Object.entries(scores)) {
+			stats[id as FrameworkId].complexityScore = score;
+		}
+
+		await fs.writeFile(
+			path.join(process.cwd(), "src/data/framework-stats.json"),
+			JSON.stringify(calculateStatsZScores(stats), null, 2),
+		);
+
+		console.log("✨ Stats generated successfully!");
+	} finally {
+		await browser.close();
 	}
-
-	await browser.close();
-
-	// Calculate Z-scores
-	const statsWithZScores = calculateStatsZScores(stats);
-
-	// Round Z-scores to 2 decimal places
-	const roundedStats = Object.fromEntries(
-		Object.entries(statsWithZScores).map(([framework, stats]) => [
-			framework,
-			{
-				...stats,
-				renderTimeZScore: Number(stats.renderTimeZScore.toFixed(2)),
-				bundleSizeZScore: Number(stats.bundleSizeZScore.toFixed(2)),
-			},
-		]),
-	);
-
-	// Write to JSON file
-	const statsPath = path.join(process.cwd(), "src/data/framework-stats.json");
-	await fs.writeFile(statsPath, JSON.stringify(roundedStats, null, 2));
-
-	console.log("Stats generated successfully!");
 }
 
 // Only run if called directly

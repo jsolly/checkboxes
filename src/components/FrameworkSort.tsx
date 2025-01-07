@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
 import { useFrameworkSort } from "../contexts/FrameworkSortContext";
-
-type SortOption =
-	| "bundleSizeAsc"
-	| "bundleSizeDsc"
-	| "renderTimeAsc"
-	| "renderTimeDsc"
-	| "none";
+import type { SortOption } from "../types/sort";
 
 export default function FrameworkSort() {
 	const [mounted, setMounted] = useState(false);
@@ -56,9 +50,9 @@ export default function FrameworkSort() {
 						<option value="bundleSizeAsc">Bundle Size (smallest first)</option>
 						<option value="bundleSizeDsc">Bundle Size (largest first)</option>
 					</optgroup>
-					<optgroup label="Render Time">
-						<option value="renderTimeAsc">Render Time (fastest first)</option>
-						<option value="renderTimeDsc">Render Time (slowest first)</option>
+					<optgroup label="Complexity">
+						<option value="complexityAsc">Complexity (lowest first)</option>
+						<option value="complexityDsc">Complexity (highest first)</option>
 					</optgroup>
 				</select>
 			</div>

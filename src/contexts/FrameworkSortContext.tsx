@@ -2,13 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
 import frameworkStats from "../data/framework-stats.json";
-
-type SortOption =
-	| "bundleSizeAsc"
-	| "bundleSizeDsc"
-	| "renderTimeAsc"
-	| "renderTimeDsc"
-	| "none";
+import type { SortOption } from "../types/sort";
 
 interface FrameworkSortContextType {
 	sortBy: SortOption;
@@ -84,7 +78,7 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 		} else {
 			const metric = option.includes("bundleSize")
 				? "bundleSize"
-				: "renderTime";
+				: "complexityScore";
 			const isAscending = option.includes("Asc");
 
 			newOrder = [...sortedFrameworks]
@@ -97,26 +91,15 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 						console.warn(`No stats found for framework: ${id}`);
 						return false;
 					}
-					if (!frameworkStats[id][metric]) {
+					if (typeof frameworkStats[id][metric] !== "number") {
 						console.warn(`No ${metric} found for framework: ${id}`);
 						return false;
 					}
 					return true;
 				})
 				.sort((a, b) => {
-					// Strip 'ms' or 'kb' and parse as float
-					const valueA = Number.parseFloat(
-						frameworkStats[a][metric].replace(/[a-z]+$/, ""),
-					);
-					const valueB = Number.parseFloat(
-						frameworkStats[b][metric].replace(/[a-z]+$/, ""),
-					);
-
-					if (Number.isNaN(valueA) || Number.isNaN(valueB)) {
-						console.warn(`Invalid values for sorting: ${valueA}, ${valueB}`);
-						return 0;
-					}
-
+					const valueA = frameworkStats[a][metric];
+					const valueB = frameworkStats[b][metric];
 					return isAscending ? valueA - valueB : valueB - valueA;
 				});
 

@@ -1,10 +1,5 @@
 ---
-interface FrameworkStats {
-	renderTime: string;
-	bundleSize?: string;
-	renderTimeZScore: number;
-	bundleSizeZScore?: number;
-}
+import type { FrameworkStats } from "../../types/stats";
 
 interface Props {
 	stats: FrameworkStats;
@@ -13,24 +8,22 @@ interface Props {
 const { stats } = Astro.props;
 
 function getColorClass(zScore: number) {
-	// Lower is better, so negative z-scores are good
-	if (zScore <= -1.5) return "bg-green-500"; // Much better than average
-	if (zScore <= -0.5) return "bg-green-400"; // Better than average
-	if (zScore <= 0.5) return "bg-yellow-500"; // Average
-	if (zScore <= 1.5) return "bg-orange-500"; // Worse than average
-	return "bg-red-500"; // Much worse than average
+	// Higher z-scores are worse for both metrics
+	if (zScore >= 1.5) return "bg-red-500";
+	if (zScore >= 0.5) return "bg-orange-500";
+	if (zScore >= -0.5) return "bg-yellow-500";
+	if (zScore >= -1.5) return "bg-green-400";
+	return "bg-green-500";
 }
 ---
 
-<div class="flex gap-2">
-	<div class={`performance-badge ${getColorClass(stats.renderTimeZScore)}`}>
-		<span class="value">Render: {stats.renderTime}</span>
+<div class="badge-container">
+	<div class={`performance-badge ${getColorClass(stats.complexityZScore)}`}>
+		<span class="value">Complexity: {stats.complexityScore}%</span>
 	</div>
-	{stats.bundleSize && (
-		<div class={`performance-badge ${getColorClass(stats.bundleSizeZScore || 0)}`}>
-			<span class="value">JS Bundle: {stats.bundleSize}</span>
-		</div>
-	)}
+	<div class={`performance-badge ${getColorClass(stats.bundleSizeZScore)}`}>
+		<span class="value">JS Bundle: {stats.bundleSize.toFixed(2)}kb</span>
+	</div>
 </div>
 
 <style>
@@ -43,12 +36,20 @@ function getColorClass(zScore: number) {
 		transition: background-color 0.2s;
 	}
 
-	.flex {
+	.badge-container {
 		position: absolute;
 		top: 8px;
 		right: 8px;
 		z-index: 10;
 		display: flex;
 		gap: 0.5rem;
+	}
+
+	/* Stack vertically on mobile */
+	@media (max-width: 640px) {
+		.badge-container {
+			flex-direction: column;
+			gap: 0.25rem; /* Slightly reduce gap for vertical layout */
+		}
 	}
 </style> 
