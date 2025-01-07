@@ -15,7 +15,18 @@ const { code = "", displayName, lang = "javascript", logo } = Astro.props;
 const lineCount = code.split("\n").length;
 ---
 
-<div class="rounded-b-lg overflow-hidden border-t border-slate-200 mt-2" x-data="{ expanded: false }">
+<div class="rounded-b-lg overflow-hidden border-t border-slate-200 mt-2" x-data="{ expanded: false, copyStatus: 'idle', copyCode() {
+	this.copyStatus = 'copying';
+	navigator.clipboard.writeText($refs.codeContent.textContent)
+		.then(() => {
+			this.copyStatus = 'copied';
+			setTimeout(() => this.copyStatus = 'idle', 2000);
+		})
+		.catch(() => {
+			this.copyStatus = 'error';
+			setTimeout(() => this.copyStatus = 'idle', 2000);
+		});
+} }">
 	<button 
 		class="w-full bg-slate-50 px-4 py-2 flex items-center justify-between hover:bg-slate-100 transition-colors"
 		@click="expanded = !expanded"
@@ -61,8 +72,28 @@ const lineCount = code.split("\n").length;
 		aria-label={`${displayName} code example`}
 	>
 		<div class="p-4 overflow-x-auto bg-white">
-			<div class="code-wrapper">
-				<Code code={code} lang={lang} theme="github-light" wrap />
+			<div class="code-wrapper relative">
+				<button
+					class="absolute top-2 right-2 px-3 py-1 text-sm bg-slate-100 hover:bg-slate-200 rounded-md flex items-center gap-2 transition-colors"
+					@click="copyCode"
+					aria-label="Copy code to clipboard"
+					:aria-live="copyStatus !== 'idle' ? 'polite' : 'off'"
+				>
+					<template x-if="copyStatus === 'idle'">
+						<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2M8 8h12a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2v-8a2 2 0 012-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+					</template>
+					<span x-text="
+						copyStatus === 'idle' ? 'Copy code' :
+						copyStatus === 'copying' ? 'Copying...' :
+						copyStatus === 'copied' ? 'Copied!' :
+						'Failed to copy'
+					"></span>
+				</button>
+				<div x-ref="codeContent">
+					<Code code={code} lang={lang} theme="github-light" wrap />
+				</div>
 			</div>
 		</div>
 	</div>
