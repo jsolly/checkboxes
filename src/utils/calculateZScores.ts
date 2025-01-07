@@ -11,10 +11,10 @@ function calculateStdDev(values: number[], mean: number): number {
 	return Math.sqrt(variance);
 }
 
-function calculateZScore(values: number[], value: number): number {
-	const mean = calculateMean(values);
-	const stdDev = calculateStdDev(values, mean);
-	return stdDev === 0 ? 0 : (value - mean) / stdDev;
+function calculateZScore(allValues: number[], currentValue: number): number {
+	const mean = calculateMean(allValues);
+	const stdDev = calculateStdDev(allValues, mean);
+	return stdDev === 0 ? 0 : (currentValue - mean) / stdDev;
 }
 
 function calculateMetricZScores(

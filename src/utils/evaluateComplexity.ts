@@ -25,18 +25,29 @@ The component requirements:
    - Unchecked when all children are unchecked.
    - Indeterminate when some children are checked.
 
-Evaluate each implementation based on its **complexity index**, considering the following criteria:
-1. **State Management Complexity:** How intricate is the handling of state transitions?
-2. **Event Handling Complexity:** How complicated are the interactions between checkboxes?
-3. **Code Overhead:** How much extra code or abstraction is needed to achieve the functionality?
+Evaluate each implementation based on its **complexity index** (0-100), with the following weighted criteria:
 
-Respond with a JSON object containing only scores (0-100) and a summary:
+1. **State Management Complexity** (40% of score):
+   - How is checkbox state stored and updated?
+   - Is state management centralized or distributed?
+   - How many state variables are needed?
+
+2. **Event Handling Complexity** (35% of score):
+   - How are parent-child checkbox interactions managed?
+   - How many event listeners are needed?
+   - How complex is the event propagation logic?
+
+3. **Code Overhead** (25% of score):
+   - Amount of boilerplate code required
+   - Number of helper functions needed
+   - Framework-specific abstractions used
+
+Lower scores indicate simpler implementations. Respond with a JSON object containing only scores:
 {
   "scores": {
     "framework1": 78,
     "framework2": 64
-  },
-  "summary": "Framework1 has a lower complexity index due to simpler state management and event handling, while Framework2 introduces additional abstractions that increase complexity."
+  }
 }
 
 Here are the implementations:

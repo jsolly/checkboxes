@@ -13,10 +13,9 @@ interface Props {
 
 const { framework, title } = Astro.props;
 
-// The type assertion is now safe because Props ensures framework is valid
-const frameworkStats = (stats as FrameworkStatsRecord)[
+const frameworkStats: FrameworkStats = (stats as FrameworkStatsRecord)[
 	framework
-] as FrameworkStats;
+];
 
 // Optional: Add runtime validation if you want to be extra safe
 if (!frameworkStats) {

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
 import frameworkStats from "../data/framework-stats.json";
-import type { SortOption } from "../types/sort";
+import { SortOption } from "../types/sort";
 
 interface FrameworkSortContextType {
 	sortBy: SortOption;
@@ -18,13 +18,13 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 	// Listen for manual sort events
 	useEffect(() => {
 		const handleManualSort = () => {
-			setSortBy("none");
+			setSortBy(SortOption.None);
 		};
 		document.addEventListener("manualSort", handleManualSort);
 		return () => document.removeEventListener("manualSort", handleManualSort);
 	}, []);
 
-	const [sortBy, setSortBy] = useState<SortOption>("none");
+	const [sortBy, setSortBy] = useState<SortOption>(SortOption.None);
 	const [sortedFrameworks, setSortedFrameworks] = useState<FrameworkId[]>(
 		() => {
 			// Get default order from FRAMEWORKS object
@@ -57,7 +57,7 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 		setSortBy(option);
 
 		let newOrder: FrameworkId[];
-		if (option === "none") {
+		if (option === SortOption.None) {
 			// Restore saved order from localStorage
 			const savedOrder = localStorage.getItem("frameworkOrder");
 			if (savedOrder) {
@@ -76,10 +76,15 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 				newOrder = Object.keys(FRAMEWORKS) as FrameworkId[];
 			}
 		} else {
-			const metric = option.includes("bundleSize")
-				? "bundleSize"
-				: "complexityScore";
-			const isAscending = option.includes("Asc");
+			const metric =
+				option === SortOption.BundleSizeAsc ||
+				option === SortOption.BundleSizeDsc
+					? "bundleSize"
+					: "complexityScore";
+
+			const isAscending =
+				option === SortOption.BundleSizeAsc ||
+				option === SortOption.ComplexityAsc;
 
 			newOrder = [...sortedFrameworks]
 				.filter((id): id is FrameworkId => {
