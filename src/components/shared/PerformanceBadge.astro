@@ -15,14 +15,31 @@ function getColorClass(zScore: number) {
 	if (zScore >= -1.5) return "bg-green-400";
 	return "bg-green-500";
 }
+
+const complexityTooltip = `Complexity score is calculated using Gemini 1.5 Pro based on:
+• State Management (40%): How state is stored and updated
+• Event Handling (35%): Parent-child interactions
+• Code Overhead (25%): Boilerplate and helpers needed`;
+
+const bundleTooltip = `JS Bundle size represents:
+• Total size of all JavaScript files
+• Measured after compression
+• Includes framework code
+• Captured during page load`;
 ---
 
 <div class="badge-container">
-	<div class={`performance-badge ${getColorClass(stats.complexityZScore)}`}>
+	<div class={`performance-badge ${getColorClass(stats.complexityZScore)} group relative`}>
 		<span class="value">Complexity: {stats.complexityScore}%</span>
+		<div class="tooltip">
+			{complexityTooltip}
+		</div>
 	</div>
-	<div class={`performance-badge ${getColorClass(stats.bundleSizeZScore)}`}>
+	<div class={`performance-badge ${getColorClass(stats.bundleSizeZScore)} group relative`}>
 		<span class="value">JS Bundle: {stats.bundleSize.toFixed(2)}kb</span>
+		<div class="tooltip">
+			{bundleTooltip}
+		</div>
 	</div>
 </div>
 
@@ -33,23 +50,87 @@ function getColorClass(zScore: number) {
 		padding: 2px 8px;
 		font-size: 0.75rem;
 		font-weight: 500;
+		cursor: help;
+		position: relative;
+	}
+
+	.tooltip {
+		visibility: hidden;
+		position: absolute;
+		top: calc(100% + 5px);
+		left: 50%;
+		transform: translateX(-50%);
+		background-color: #1f2937;
+		color: white;
+		padding: 0.5rem;
+		border-radius: 0.375rem;
+		font-size: 0.75rem;
+		white-space: pre-line;
+		width: max-content;
+		max-width: 200px;
+		z-index: 100;
+		opacity: 0;
+		transition: opacity 0.2s ease-in-out;
+		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+		pointer-events: none;
+	}
+
+	/* Arrow */
+	.tooltip::before {
+		content: '';
+		position: absolute;
+		top: -4px;
+		left: 50%;
+		transform: translateX(-50%) rotate(45deg);
+		width: 8px;
+		height: 8px;
+		background-color: #1f2937;
+	}
+
+	.performance-badge:hover .tooltip {
+		visibility: visible;
+		opacity: 1;
 	}
 
 	.badge-container {
 		position: absolute;
 		top: 8px;
 		right: 8px;
-		z-index: 10;
+		z-index: 20;
 		display: flex;
 		gap: 0.5rem;
 		flex-direction: row;
+	}
+
+	/* Make the right-most tooltip align from the right instead of center */
+	.badge-container > div:last-child .tooltip {
+		left: auto;
+		right: 0;
+		transform: none;
+	}
+
+	.badge-container > div:last-child .tooltip::before {
+		left: auto;
+		right: 16px;
 	}
 
 	/* Stack vertically on mobile */
 	@media (max-width: 640px) {
 		.badge-container {
 			flex-direction: column;
-			gap: 0.25rem; /* Slightly reduce gap for vertical layout */
+			gap: 0.25rem;
+		}
+
+		/* All tooltips align right on mobile */
+		.tooltip {
+			left: auto;
+			right: 0;
+			transform: none;
+		}
+
+		.tooltip::before {
+			left: auto;
+			right: 16px;
 		}
 	}
 </style> 
