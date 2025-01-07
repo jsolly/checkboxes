@@ -10,11 +10,21 @@ interface ComplexityResults {
 const scoreProperties = Object.fromEntries(
 	Object.keys(FRAMEWORKS).map((framework) => [
 		framework,
-		{ type: SchemaType.NUMBER, minimum: 0, maximum: 100 },
+		{
+			type: SchemaType.NUMBER,
+			minimum: 0,
+			maximum: 100,
+			multipleOf: 1, // Ensures whole numbers only
+		},
 	]),
 ) as Record<
 	FrameworkId,
-	{ type: SchemaType.NUMBER; minimum: number; maximum: number }
+	{
+		type: SchemaType.NUMBER;
+		minimum: number;
+		maximum: number;
+		multipleOf: number;
+	}
 >;
 
 export const complexitySchema = {
@@ -66,7 +76,7 @@ Evaluate each implementation based on its **complexity index** (0-100), with the
    - Number of helper functions needed
    - Framework-specific abstractions used
 
-Lower scores indicate simpler implementations. Respond with a JSON object containing only scores:
+Lower scores indicate simpler implementations. Respond with a JSON object containing only scores as whole numbers between 0 and 100:
 {
   "scores": {
     "framework1": 78,
