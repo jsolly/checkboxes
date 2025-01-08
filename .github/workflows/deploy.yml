@@ -18,11 +18,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::730335616323:role/GitHubActionsDeploymentRole
-          aws-region: us-east-1
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: arn:aws:iam::730335616323:role/GitHubActionsDeploymentRole
+      #     aws-region: us-east-1
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -33,14 +33,14 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
       - name: Install dependencies
-        run: pnpm i
+        run: pnpm install
       - name: Lint
         run: pnpm run lint
       - name: Run Astro Check
         run: pnpm run astro check
       - name: Build application
         run: pnpm run build
-      - name: Deploy to S3
-        run: aws s3 sync --delete ./dist/ s3://${{ secrets.BUCKET_ID }}
-      - name: Create CloudFront invalidation
-        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DISTRIBUTION_ID }} --paths "/*"
+      # - name: Deploy to S3
+      #   run: aws s3 sync --delete ./dist/ s3://${{ secrets.BUCKET_ID }}
+      # - name: Create CloudFront invalidation
+      #   run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DISTRIBUTION_ID }} --paths "/*"
