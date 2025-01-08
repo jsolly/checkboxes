@@ -226,17 +226,17 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 	}) as EventListener);
 </script>
 
-<style>
+<style is:global>
 
 	/* Only show grab cursor on desktop devices */
 	@media (min-width: 1024px) {
-		.framework-container {
-			cursor: grab;
-		}
-		
-		.framework-container.dragging {
-			cursor: grabbing;
-		}
-	}
+    [data-framework] {
+      cursor: grab;
+    }
+    
+    [data-framework].dragging {
+      cursor: grabbing;
+    }
+  }
 </style>
 

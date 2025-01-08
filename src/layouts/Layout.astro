@@ -36,16 +36,3 @@ const { title = "checkboxes.xyz" } = Astro.props;
 		</footer>
 	</body>
 </html>
-
-<style>
-  /* Only show grab cursor on desktop devices */
-  @media (min-width: 1024px) {
-    [data-framework] {
-      cursor: grab;
-    }
-    
-    [data-framework].dragging {
-      cursor: grabbing;
-    }
-  }
-</style>
