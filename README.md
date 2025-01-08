@@ -29,13 +29,14 @@ pnpm dev
 pnpm build
 
 # Generate performance metrics
-pnpm preview
-pnpm generate-stats
+touch .env # Create an empty .env file and add your GEMINI_API_KEY
+pnpm preview # Run this in a separate terminal tab (Keep the dev server running)
+pnpm generate-stats # Run this in a separate terminal tab.
 ```
 
 ## Contributing
 
-To add a new implementation, create a new directory in the `src/components` directory with the framework name. Then create a file with the implementation and a container file with the display wrapper.
+To add a new implementation, create a new directory in the `src/components` directory with the framework name. Then create a file with the implementation and a container file with the display wrapper. You will also need to add the framework to the `src/config/frameworks.ts` file.
 
 At this point, you could open a PR, but if you want to add the whole integration, see the [Astro Framework Integration Guide](https://docs.astro.build/en/guides/integrations/). This usually involves modifying the `astro.config.mjs` file to add the framework and its configuration.
 
