@@ -19,6 +19,14 @@ interface CDPEvent {
 	};
 }
 
+function calculateMedian(measurements: number[]): number {
+	const sorted = [...measurements].sort((a, b) => a - b);
+	const mid = Math.floor(sorted.length / 2);
+	return sorted.length % 2 !== 0
+		? sorted[mid] // Odd number of measurements: take middle value
+		: (sorted[mid - 1] + sorted[mid]) / 2; // Even number: average middle two
+}
+
 async function measureBundleSize(page: Page, framework: FrameworkId) {
 	const measurements: number[] = [];
 
@@ -53,11 +61,8 @@ async function measureBundleSize(page: Page, framework: FrameworkId) {
 		console.log(`    Run ${i + 1}: ${measurements[i]}kb`);
 	}
 
-	// Sort measurements and take the middle value
-	measurements.sort((a, b) => a - b);
-	const median =
-		measurements[Math.floor(STATS_CONFIG.BUNDLE_SIZE_ITERATIONS / 2)];
-	console.log(`    Median: ${median}kb`);
+	const median = calculateMedian(measurements);
+	console.log(`    Median bundle size: ${median}kb`);
 
 	return median;
 }
@@ -98,7 +103,6 @@ async function generateStats(): Promise<void> {
 	const implementations = {} as Record<FrameworkId, string>;
 
 	try {
-		// Measure bundle sizes (unchanged)
 		for (const id of Object.keys(FRAMEWORKS) as FrameworkId[]) {
 			console.log(`📦 Measuring ${id}...`);
 			const size = await measureBundleSize(page, id);
@@ -156,15 +160,11 @@ async function generateStats(): Promise<void> {
 				}
 			}
 
-			// Calculate median scores for each framework
+			// Calculate median complexity score for each framework
 			for (const id of Object.keys(implementations) as FrameworkId[]) {
-				const measurements = complexityMeasurements[id].sort((a, b) => a - b);
-				const median =
-					measurements[
-						Math.floor(STATS_CONFIG.COMPLEXITY_SCORE_ITERATIONS / 2)
-					];
+				const median = calculateMedian(complexityMeasurements[id]);
 				stats[id].complexityScore = median;
-				console.log(`    ${id} complexity score: ${median}`);
+				console.log(`    ${id} median complexity score: ${median}`);
 			}
 		}
 
