@@ -1,20 +1,17 @@
 ---
+import type { FrameworkId } from "../../config/frameworks";
 import stats from "../../data/framework-stats.json";
 import type { FrameworkStats, FrameworkStatsRecord } from "../../types/stats";
 import PerformanceBadge from "../shared/PerformanceBadge.astro";
 
-type ValidFrameworks = keyof typeof stats;
-
 interface Props {
-	framework: ValidFrameworks;
+	framework: FrameworkId;
 	title: string;
 }
 
 const { framework, title } = Astro.props;
 
-const frameworkStats: FrameworkStats = (stats as FrameworkStatsRecord)[
-	framework
-];
+const frameworkStats: FrameworkStats = stats.frameworks[framework];
 ---
 
 <div 

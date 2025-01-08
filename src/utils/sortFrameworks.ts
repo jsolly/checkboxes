@@ -1,5 +1,5 @@
 import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
-import frameworkStats from "../data/framework-stats.json";
+import stats from "../data/framework-stats.json";
 import { SortMetric, SortOption } from "../types/sort";
 
 export const getSavedOrder = () => {
@@ -27,8 +27,8 @@ export const sortFrameworks = (
 
 	const [metric, isAscending] = getMetricAndDirection(option);
 	return [...frameworks].sort((a, b) => {
-		const valueA = frameworkStats[a][metric];
-		const valueB = frameworkStats[b][metric];
+		const valueA = stats.frameworks[a][metric];
+		const valueB = stats.frameworks[b][metric];
 		return isAscending ? valueA - valueB : valueB - valueA;
 	});
 };
