@@ -106,7 +106,9 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 
 		const order = Array.from(grid.children)
 			.filter(child => !child.classList.contains('hidden'))
-			.map(child => child.getAttribute('data-framework') as FrameworkId);
+			.map(child => child.getAttribute('data-framework'))
+			.filter((id): id is FrameworkId => id !== null); // Remove null values before saving
+
 		localStorage.setItem('frameworkOrder', JSON.stringify(order));
 	}
 
