@@ -57,7 +57,7 @@ To add a new implementation:
    ```
 4. See the [React implementation](src/components/react/) for a complete example
 
-At this point, you could open a PR. For full framework integration, see the [Astro Framework Integration Guide](https://docs.astro.build/en/guides/integrations/). This usually involves modifying the `astro.config.mjs` file to add the framework and its configuration.
+At this point, you could open a PR. For full framework integration, see the [Astro Framework Integration Guide](https://docs.astro.build/en/guides/integrations-guide/). This usually involves modifying the `astro.config.mjs` file to add the framework and its configuration.
 
 If you want to generate performance metrics for your new implementation, see the [Generate performance metrics](#generate-performance-metrics) section.
 
