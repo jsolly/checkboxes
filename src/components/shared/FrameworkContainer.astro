@@ -3,7 +3,6 @@ import stats from "../../data/framework-stats.json";
 import type { FrameworkStats, FrameworkStatsRecord } from "../../types/stats";
 import PerformanceBadge from "../shared/PerformanceBadge.astro";
 
-// Define valid frameworks type based on the stats object
 type ValidFrameworks = keyof typeof stats;
 
 interface Props {
@@ -16,13 +15,6 @@ const { framework, title } = Astro.props;
 const frameworkStats: FrameworkStats = (stats as FrameworkStatsRecord)[
 	framework
 ];
-
-// Optional: Add runtime validation if you want to be extra safe
-if (!frameworkStats) {
-	throw new Error(
-		`Invalid framework: ${framework}. Valid frameworks are: ${Object.keys(stats).join(", ")}`,
-	);
-}
 ---
 
 <div 

@@ -81,7 +81,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 			delay: 0,
 			delayOnTouchOnly: true,
 			touchStartThreshold: 3,
-			filter: '.code-wrapper, button, [role="region"], input, [data-checkbox-container]',
+			filter: '.code-wrapper, button, [role="region"], input, label',
 			preventOnFilter: true,
 		});
 	}
@@ -227,19 +227,6 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 </script>
 
 <style>
-	.framework-container {
-		transform-origin: top;
-		transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-	}
-
-	.framework-container.hidden {
-		display: none;
-	}
-
-	#framework-grid {
-		display: grid;
-		grid-auto-rows: min-content;
-	}
 
 	/* Only show grab cursor on desktop devices */
 	@media (min-width: 1024px) {
