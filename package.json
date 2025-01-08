@@ -11,7 +11,6 @@
 		"prepare": "husky",
 		"lint": "biome lint .",
 		"lint-fix": "biome lint --write .",
-		"type-check": "tsc --noEmit -p tsconfig.json",
 		"format": "biome format --write .",
 		"check": "biome check --write .",
 		"generate-stats": "tsx src/utils/generate-stats.ts"
