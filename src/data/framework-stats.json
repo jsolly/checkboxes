@@ -1,56 +1,68 @@
 {
-	"vanillajs": {
-		"bundleSize": 0.31,
-		"complexityScore": 65,
-		"bundleSizeZScore": -1.0972732521279107,
-		"complexityZScore": 1.3363062095621219
+	"metadata": {
+		"lastUpdated": "2025-01-08T04:00:48.956Z",
+		"description": "Framework comparison metrics",
+		"metrics": {
+			"bundleSize": "Size in KB",
+			"complexityScore": "Scale of 0-100",
+			"bundleSizeZScore": "Standardized score relative to mean",
+			"complexityZScore": "Standardized score relative to mean"
+		}
 	},
-	"alpine": {
-		"bundleSize": 0.31,
-		"complexityScore": 25,
-		"bundleSizeZScore": -1.0972732521279107,
-		"complexityZScore": -0.8017837257372731
-	},
-	"vue": {
-		"bundleSize": 0.9,
-		"complexityScore": 55,
-		"bundleSizeZScore": 1.1351102608219767,
-		"complexityZScore": 0.8017837257372731
-	},
-	"react": {
-		"bundleSize": 0.9,
-		"complexityScore": 60,
-		"bundleSizeZScore": 1.1351102608219767,
-		"complexityZScore": 1.0690449676496976
-	},
-	"svelte": {
-		"bundleSize": 0.94,
-		"complexityScore": 45,
-		"bundleSizeZScore": 1.28645829559824,
-		"complexityZScore": 0.2672612419124244
-	},
-	"hyperscript": {
-		"bundleSize": 0.5,
-		"complexityScore": 20,
-		"bundleSizeZScore": -0.37837008694065877,
-		"complexityZScore": -1.0690449676496976
-	},
-	"cssOnly": {
-		"bundleSize": 0.31,
-		"complexityScore": 10,
-		"bundleSizeZScore": -1.0972732521279107,
-		"complexityZScore": -1.6035674514745462
-	},
-	"jquery": {
-		"bundleSize": 0.63,
-		"complexityScore": 40,
-		"bundleSizeZScore": 0.11351102608219776,
-		"complexityZScore": 0
-	},
-	"stimulus": {
-		"bundleSize": 0.63,
-		"complexityScore": 40,
-		"bundleSizeZScore": 0.11351102608219776,
-		"complexityZScore": 0
+	"frameworks": {
+		"vanillajs": {
+			"bundleSize": 0.31,
+			"complexityScore": 55,
+			"bundleSizeZScore": -1.0106665944529458,
+			"complexityZScore": 1.043498389499902
+		},
+		"alpine": {
+			"bundleSize": 0.31,
+			"complexityScore": 25,
+			"bundleSizeZScore": -1.0106665944529458,
+			"complexityZScore": -0.7453559924999299
+		},
+		"vue": {
+			"bundleSize": 1.22,
+			"complexityScore": 50,
+			"bundleSizeZScore": 0.9725282323981179,
+			"complexityZScore": 0.7453559924999299
+		},
+		"react": {
+			"bundleSize": 1.53,
+			"complexityScore": 60,
+			"bundleSizeZScore": 1.6481220745122167,
+			"complexityZScore": 1.3416407864998738
+		},
+		"svelte": {
+			"bundleSize": 1.25,
+			"complexityScore": 35,
+			"bundleSizeZScore": 1.0379082816349663,
+			"complexityZScore": -0.14907119849998599
+		},
+		"hyperscript": {
+			"bundleSize": 0.63,
+			"complexityScore": 20,
+			"bundleSizeZScore": -0.3132794025932311,
+			"complexityZScore": -1.043498389499902
+		},
+		"cssOnly": {
+			"bundleSize": 0.31,
+			"complexityScore": 10,
+			"bundleSizeZScore": -1.0106665944529458,
+			"complexityZScore": -1.639783183499846
+		},
+		"jquery": {
+			"bundleSize": 0.63,
+			"complexityScore": 45,
+			"bundleSizeZScore": -0.3132794025932311,
+			"complexityZScore": 0.447213595499958
+		},
+		"stimulus": {
+			"bundleSize": 0.12,
+			"complexityScore": 22,
+			"bundleSizeZScore": -0.3132794025932311,
+			"complexityZScore": 0.447213595499958
+		}
 	}
 }

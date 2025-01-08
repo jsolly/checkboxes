@@ -1,20 +1,30 @@
-<div data-controller="checkbox-group" class="px-3 py-2">
-  <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
-    <div class="flex items-center space-x-3">
-      <input type="checkbox" id="stimulus-parent" data-checkbox-group-target="parent" data-action="checkbox-group#parentToggle" class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" />
-      <label for="stimulus-parent" class="text-slate-700 cursor-pointer text-sm font-medium">Parent</label>
+<style>
+  .stimulus-container { @apply px-3 py-2 }
+  .stimulus-parent { @apply p-2 rounded-lg }
+  .stimulus-children { @apply ml-8 rounded-lg }
+  .stimulus-checkbox { @apply p-1 flex items-center space-x-3 hover:bg-slate-100 transition-colors }
+  .stimulus-checkbox-input { @apply h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 }
+  .stimulus-checkbox-label { @apply text-slate-700 cursor-pointer text-sm font-medium }
+</style>
+
+<fieldset data-controller="checkbox-group" class="stimulus-container" aria-label="Checkbox group">
+  <legend class="sr-only">Parent-child checkbox group</legend>
+
+  <div class="stimulus-parent">
+    <div class="stimulus-checkbox">
+      <input type="checkbox" data-checkbox-group-target="parent" data-action="checkbox-group#parentToggle" class="stimulus-checkbox-input" aria-controls="stimulus-children" />
+      <label for="stimulus-parent" class="stimulus-checkbox-label">Parent</label>
     </div>
   </div>
 
-  <div class="ml-8">
+  <div id="stimulus-children" class="stimulus-children">
     { Array.from([1, 2, 3]).map((i) =>
-      <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
-        <div class="flex items-center space-x-3">
-          <input type="checkbox" id="stimulus-child-{i}" data-checkbox-group-target="child" data-action="checkbox-group#childToggle" class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" />
-          <label for="stimulus-child-{i}" class="text-slate-700 cursor-pointer text-sm font-medium">Child {i}</label>
-        </div>
+      <div class="stimulus-checkbox">
+        <input type="checkbox" data-checkbox-group-target="child" data-action="checkbox-group#childToggle" class="stimulus-checkbox-input" />
+        <label for="stimulus-child-{i}" class="stimulus-checkbox-label">Child {i}</label>
       </div> )}
-</div>
+  </div>
+</fieldset>
 
 <script>
   import { Application, Controller } from "@hotwired/stimulus"
