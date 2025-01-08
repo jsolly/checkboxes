@@ -97,7 +97,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		saveFrameworkOrder();
 		
 		// Dispatch event to reset sort dropdown
-		document.dispatchEvent(new CustomEvent("frameworkManualSort"));
+		document.dispatchEvent(new CustomEvent("frameworkDragSort"));
 	}
 
 	function saveFrameworkOrder() {
@@ -203,8 +203,8 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		}) as EventListener);
 	}
 
-	// Add handler for sort events
-	document.addEventListener('frameworkSort', ((e: FrameworkSortEvent) => {
+	// Listen for metric-based sorting
+	document.addEventListener('frameworkMetricSort', ((e: FrameworkSortEvent) => {
 		const grid = document.getElementById('framework-grid');
 		if (!grid) return;
 

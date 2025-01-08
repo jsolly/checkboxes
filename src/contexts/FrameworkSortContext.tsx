@@ -14,42 +14,40 @@ const FrameworkSortContext = createContext<
 	FrameworkSortContextType | undefined
 >(undefined);
 
+export function useFrameworkSort() {
+	const context = useContext(FrameworkSortContext);
+	if (!context)
+		throw new Error(
+			"useFrameworkSort must be used within a FrameworkSortProvider",
+		);
+	return context;
+}
+
 export function FrameworkSortProvider({ children }: { children: ReactNode }) {
-	// Listen for manual sort events
 	useEffect(() => {
-		const handleManualSort = () => {
-			setSortBy(SortOption.None);
-		};
-		document.addEventListener("manualSort", handleManualSort);
-		return () => document.removeEventListener("manualSort", handleManualSort);
+		const handleManualSort = () => setSortBy(SortOption.None);
+		document.addEventListener("frameworkDragSort", handleManualSort);
+		return () =>
+			document.removeEventListener("frameworkDragSort", handleManualSort);
 	}, []);
 
 	const [sortBy, setSortBy] = useState<SortOption>(SortOption.None);
 	const [sortedFrameworks, setSortedFrameworks] = useState<FrameworkId[]>(
 		() => {
-			// Get default order from FRAMEWORKS object
 			const defaultOrder = Object.keys(FRAMEWORKS) as FrameworkId[];
-
-			// Try to get saved order
 			const savedOrder = localStorage.getItem("frameworkOrder");
+
 			if (!savedOrder) return defaultOrder;
 
-			try {
-				const parsed = JSON.parse(savedOrder);
-				const validOrder = parsed.filter(
-					(id: unknown): id is FrameworkId =>
-						typeof id === "string" && id in FRAMEWORKS,
-				);
+			// Clean up the saved order by removing null values
+			const parsed = JSON.parse(savedOrder);
+			const validFrameworks = parsed.filter(
+				(id: unknown): id is FrameworkId =>
+					id !== null && typeof id === "string",
+			);
 
-				if (!validOrder.length) return defaultOrder;
-
-				const missingFrameworks = defaultOrder.filter(
-					(id) => !validOrder.includes(id),
-				);
-				return [...validOrder, ...missingFrameworks];
-			} catch {
-				return defaultOrder;
-			}
+			// If we have no valid frameworks, return default order
+			return validFrameworks.length ? validFrameworks : defaultOrder;
 		},
 	);
 
@@ -58,23 +56,10 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 
 		let newOrder: FrameworkId[];
 		if (option === SortOption.None) {
-			// Restore saved order from localStorage
 			const savedOrder = localStorage.getItem("frameworkOrder");
-			if (savedOrder) {
-				try {
-					const parsed = JSON.parse(savedOrder);
-					// Filter out null values and validate framework IDs
-					newOrder = parsed.filter(
-						(id: unknown): id is FrameworkId =>
-							id !== null && typeof id === "string" && id in FRAMEWORKS,
-					);
-				} catch (e) {
-					console.error("Error parsing saved framework order:", e);
-					newOrder = Object.keys(FRAMEWORKS) as FrameworkId[];
-				}
-			} else {
-				newOrder = Object.keys(FRAMEWORKS) as FrameworkId[];
-			}
+			newOrder = savedOrder
+				? JSON.parse(savedOrder).filter((id: unknown) => id !== null)
+				: Object.keys(FRAMEWORKS);
 		} else {
 			const metric =
 				option === SortOption.BundleSizeAsc ||
@@ -86,41 +71,30 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 				option === SortOption.BundleSizeAsc ||
 				option === SortOption.ComplexityAsc;
 
+			for (const id of sortedFrameworks) {
+				if (!(id in frameworkStats)) {
+					console.log("Framework missing from stats:", id);
+				}
+			}
+
 			newOrder = [...sortedFrameworks]
-				.filter((id): id is FrameworkId => {
-					if (id === null) {
-						console.warn("Found null framework ID");
-						return false;
-					}
-					if (!frameworkStats[id]) {
-						console.warn(`No stats found for framework: ${id}`);
-						return false;
-					}
-					if (typeof frameworkStats[id][metric] !== "number") {
-						console.warn(`No ${metric} found for framework: ${id}`);
-						return false;
-					}
-					return true;
-				})
+				.filter((id) => id in frameworkStats)
 				.sort((a, b) => {
 					const valueA = frameworkStats[a][metric];
 					const valueB = frameworkStats[b][metric];
 					return isAscending ? valueA - valueB : valueB - valueA;
 				});
 
-			if (newOrder.length === 0) {
-				console.warn(
-					"No valid frameworks found for sorting, using default order",
-				);
-				newOrder = Object.keys(FRAMEWORKS) as FrameworkId[];
-			}
+			const missingFrameworks = sortedFrameworks.filter(
+				(id) => !(id in frameworkStats),
+			);
+			newOrder = [...newOrder, ...missingFrameworks];
 		}
 
 		setSortedFrameworks(newOrder);
 
-		// Dispatch event to update DOM order
 		document.dispatchEvent(
-			new CustomEvent("frameworkSort", {
+			new CustomEvent("frameworkMetricSort", {
 				detail: {
 					type: option,
 					order: newOrder,
@@ -136,14 +110,4 @@ export function FrameworkSortProvider({ children }: { children: ReactNode }) {
 			{children}
 		</FrameworkSortContext.Provider>
 	);
-}
-
-export function useFrameworkSort() {
-	const context = useContext(FrameworkSortContext);
-	if (context === undefined) {
-		throw new Error(
-			"useFrameworkSort must be used within a FrameworkSortProvider",
-		);
-	}
-	return context;
 }
