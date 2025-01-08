@@ -30,7 +30,7 @@
 		"@astrojs/vue": "^5.0.3",
 		"@google/generative-ai": "^0.21.0",
 		"@types/alpinejs": "^3.13.11",
-		"@types/react": "^19.0.2",
+		"@types/react": "^19.0.3",
 		"@types/react-dom": "^19.0.2",
 		"alpinejs": "^3.14.8",
 		"astro": "^5.1.1",
