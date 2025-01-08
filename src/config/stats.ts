@@ -42,5 +42,5 @@ export const STATS_CONFIG = {
 	BUNDLE_SIZE_PRECISION: 2, // Number of decimal places for bundle size
 
 	// Feature flags
-	UPDATE_COMPLEXITY_SCORES: true, // Set to true when you want to update complexity scores
+	UPDATE_COMPLEXITY_SCORES: false, // Set to true when you want to update complexity scores
 } as const;
