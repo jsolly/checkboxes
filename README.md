@@ -16,28 +16,62 @@ A collection of checkbox implementations using different frameworks and approach
   - jQuery
 - Syntax highlighted collapsible code snippets
 - Performance metrics for each implementation
+
 ## Development
 
-```bash
-# Install dependencies
+```shell
 pnpm install
-
-# Start dev server
 pnpm dev
+```
 
-# Build for production
-pnpm build
+## Generate performance metrics
 
-# Generate performance metrics
-pnpm preview
-pnpm generate-stats
+```shell
+touch .env # Create an empty .env file
+# Get your GEMINI_API_KEY from https://makersuite.google.com/app/apikey
+# Add it to .env: GEMINI_API_KEY=your_key_here
+# The API key is used for generating complexity scores
+
+# Run these commands in sequence:
+pnpm build           # Build the project
+pnpm preview         # Start the preview server (in a separate terminal)
+pnpm generate-stats  # Generate performance metrics (in a new terminal)
 ```
 
 ## Contributing
 
-To add a new implementation, create a new directory in the `src/components` directory with the framework name. Then create a file with the implementation and a container file with the display wrapper.
+To add a new implementation:
 
-At this point, you could open a PR, but if you want to add the whole integration, see the [Astro Framework Integration Guide](https://docs.astro.build/en/guides/integrations/). This usually involves modifying the `astro.config.mjs` file to add the framework and its configuration.
+1. Create a new directory in `src/components` with your framework name
+2. Add two required files:
+   - `src/your-framework/your-framework<.tsx/jsx/etc>` - The checkbox implementation
+   - `src/your-framework/your-framework-container.astro` - The display wrapper
+3. Add the framework configuration to `src/config/frameworks.ts`:
+   ```typescript
+   export const FRAMEWORKS = {
+     yourFramework: {
+       displayName: "Your Framework",  // Name shown in the UI
+     },
+     // ... existing frameworks
+   };
+   ```
+4. See the [React implementation](src/components/react/) for a complete example
+
+At this point, you could open a PR. For full framework integration, see the [Astro Framework Integration Guide](https://docs.astro.build/en/guides/integrations/). This usually involves modifying the `astro.config.mjs` file to add the framework and its configuration.
+
+If you want to generate performance metrics for your new implementation, see the [Generate performance metrics](#generate-performance-metrics) section.
+
+### Troubleshooting Setup
+
+- If `generate-stats` fails, ensure:
+  - Your GEMINI_API_KEY is valid and properly set in .env
+  - You've run `pnpm build` before running `pnpm preview`
+  - The preview server is running when you run `generate-stats`
+  - You have Node.js 16+ installed
+- For framework integration issues, check:
+  - Required dependencies are installed
+  - Framework is properly configured in astro.config.mjs
+  - TypeScript types are updated if needed
 
 ## Project Structure
 
@@ -61,10 +95,10 @@ src/
 
 ## Future Enhancements
 
-- Add more frameworks (Angular, Solid.js)
-- Add performance comparisons [x]
-- Create interactive playground [ ]
-- Add more complex checkbox scenarios [ ]
+- [ ] Add more frameworks (Angular, Solid.js)
+- [x] Add performance comparisons
+- [ ] Create interactive playground
+- [ ] Add more complex checkbox scenarios
 
 ## Notes on Performance Metrics
 
@@ -92,4 +126,16 @@ Both metrics are normalized using z-scores to provide relative performance indic
 - 🟡 Average (-0.5 ≤ z-score < 0.5)
 - 🟠 Below Average (0.5 ≤ z-score < 1.5)
 - 🔴 Poor (z-score ≥ 1.5)
+
+## Demo
+Check out the live demo at [checkboxes.xyz](https://checkboxes.xyz)
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Prerequisites
+
+- Node.js 16+
+- pnpm
+- A Google Cloud account (for Gemini API access to generate complexity scores)
 

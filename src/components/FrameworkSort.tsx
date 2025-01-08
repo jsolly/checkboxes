@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useFrameworkSort } from "../contexts/FrameworkSortContext";
+import { useFrameworkSort } from "../contexts/frameworkSort";
 import { SortOption } from "../types/sort";
 
 export default function FrameworkSort() {
@@ -13,10 +13,10 @@ export default function FrameworkSort() {
 			setSortBy(SortOption.None);
 		};
 
-		document.addEventListener("frameworkManualSort", handleManualSort);
+		document.addEventListener("frameworkDragSort", handleManualSort);
 
 		return () => {
-			document.removeEventListener("frameworkManualSort", handleManualSort);
+			document.removeEventListener("frameworkDragSort", handleManualSort);
 		};
 	}, [setSortBy]);
 

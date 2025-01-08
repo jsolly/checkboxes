@@ -81,7 +81,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 			delay: 0,
 			delayOnTouchOnly: true,
 			touchStartThreshold: 3,
-			filter: '.code-wrapper, button, [role="region"], input, [data-checkbox-container]',
+			filter: '.code-wrapper, button, [role="region"], input, label',
 			preventOnFilter: true,
 		});
 	}
@@ -97,7 +97,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		saveFrameworkOrder();
 		
 		// Dispatch event to reset sort dropdown
-		document.dispatchEvent(new CustomEvent("frameworkManualSort"));
+		document.dispatchEvent(new CustomEvent("frameworkDragSort"));
 	}
 
 	function saveFrameworkOrder() {
@@ -106,7 +106,9 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 
 		const order = Array.from(grid.children)
 			.filter(child => !child.classList.contains('hidden'))
-			.map(child => child.getAttribute('data-framework') as FrameworkId);
+			.map(child => child.getAttribute('data-framework'))
+			.filter((id): id is FrameworkId => id !== null); // Remove null values before saving
+
 		localStorage.setItem('frameworkOrder', JSON.stringify(order));
 	}
 
@@ -203,8 +205,8 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		}) as EventListener);
 	}
 
-	// Add handler for sort events
-	document.addEventListener('frameworkSort', ((e: FrameworkSortEvent) => {
+	// Listen for metric-based sorting
+	document.addEventListener('frameworkMetricSort', ((e: FrameworkSortEvent) => {
 		const grid = document.getElementById('framework-grid');
 		if (!grid) return;
 
@@ -226,30 +228,17 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 	}) as EventListener);
 </script>
 
-<style>
-	.framework-container {
-		transform-origin: top;
-		transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-	}
-
-	.framework-container.hidden {
-		display: none;
-	}
-
-	#framework-grid {
-		display: grid;
-		grid-auto-rows: min-content;
-	}
+<style is:global>
 
 	/* Only show grab cursor on desktop devices */
 	@media (min-width: 1024px) {
-		.framework-container {
-			cursor: grab;
-		}
-		
-		.framework-container.dragging {
-			cursor: grabbing;
-		}
-	}
+    [data-framework] {
+      cursor: grab;
+    }
+    
+    [data-framework].dragging {
+      cursor: grabbing;
+    }
+  }
 </style>
 

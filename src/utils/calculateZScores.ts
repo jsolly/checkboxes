@@ -1,5 +1,5 @@
-import { METRICS, type MetricConfig } from "../config/metrics";
-import type { FrameworkStats } from "../types/stats";
+import type { FrameworkId } from "../config/frameworks";
+import type { FrameworkStats } from "../config/stats";
 
 function calculateMean(values: number[]): number {
 	return values.reduce((sum, v) => sum + v, 0) / values.length;
@@ -17,26 +17,23 @@ function calculateZScore(allValues: number[], currentValue: number): number {
 	return stdDev === 0 ? 0 : (currentValue - mean) / stdDev;
 }
 
-function calculateMetricZScores(
-	stats: Record<string, FrameworkStats>,
-	metric: MetricConfig,
-) {
-	const values = Object.values(stats).map((s) => s[metric.rawField]);
-
-	return Object.entries(stats).map(([framework, stat]) => [
-		framework,
-		{
-			...stat,
-			[metric.zScoreField]: calculateZScore(values, stat[metric.rawField]),
-		},
-	]);
-}
-
 export function calculateStatsZScores(
-	stats: Record<string, FrameworkStats>,
-): Record<string, FrameworkStats> {
-	return METRICS.reduce(
-		(acc, metric) => Object.fromEntries(calculateMetricZScores(acc, metric)),
-		stats,
-	);
+	stats: Record<FrameworkId, FrameworkStats>,
+): Record<FrameworkId, FrameworkStats> {
+	const frameworks = Object.keys(stats) as FrameworkId[];
+	const bundleSizes = frameworks.map((id) => stats[id].bundleSize);
+	const complexityScores = frameworks.map((id) => stats[id].complexityScore);
+
+	const result = {} as Record<FrameworkId, FrameworkStats>;
+	for (const id of frameworks) {
+		result[id] = {
+			...stats[id],
+			bundleSizeZScore: calculateZScore(bundleSizes, stats[id].bundleSize),
+			complexityZScore: calculateZScore(
+				complexityScores,
+				stats[id].complexityScore,
+			),
+		};
+	}
+	return result;
 }

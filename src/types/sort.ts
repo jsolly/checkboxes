@@ -1,3 +1,8 @@
+export enum SortMetric {
+	BundleSize = "bundleSize",
+	Complexity = "complexityScore",
+}
+
 export enum SortOption {
 	None = "none",
 	BundleSizeAsc = "bundleSizeAsc",
