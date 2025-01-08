@@ -40,22 +40,73 @@ pnpm generate-stats  # Generate performance metrics (in a new terminal)
 
 ## Contributing
 
-To add a new implementation:
+### Adding a New Framework Implementation
 
-1. Create a new directory in `src/components` with your framework name
-2. Add two required files:
-   - `src/your-framework/your-framework<.tsx/jsx/etc>` - The checkbox implementation
-   - `src/your-framework/your-framework-container.astro` - The display wrapper
-3. Add the framework configuration to `src/config/frameworks.ts`:
-   ```typescript
-   export const FRAMEWORKS = {
-     yourFramework: {
-       displayName: "Your Framework",  // Name shown in the UI
-     },
-     // ... existing frameworks
-   };
-   ```
-4. See the [React implementation](src/components/react/) for a complete example
+1. **Create Framework Files**
+   - Create a new directory in `src/components` with your framework name
+   - Add two required files:
+     - `src/your-framework/your-framework<.tsx/jsx/etc>` - The checkbox implementation
+     - `src/your-framework/your-framework-container.astro` - The display wrapper
+
+2. **Update Framework Configuration**
+   - Add the framework to `src/config/frameworks.ts`:
+     ```typescript
+     export const FRAMEWORKS = {
+       yourFramework: {
+         displayName: "Your Framework",  // Name shown in the UI
+       },
+       // ... existing frameworks
+     };
+     ```
+
+3. **Add Framework Integration**
+   - Install framework dependencies:
+     ```bash
+     pnpm add @astrojs/your-framework your-framework
+     ```
+   - Update `astro.config.mjs` to add the framework integration:
+     ```javascript
+     import yourFramework from '@astrojs/your-framework';
+
+     export default defineConfig({
+       integrations: [
+         // ... existing integrations
+         yourFramework(),
+       ],
+     });
+     ```
+
+4. **Update Test Page**
+   - Modify `src/pages/test/[framework].astro` to include your framework:
+     ```astro
+     ---
+     import YourFramework from "../../components/your-framework/your-framework";
+     // ... existing imports
+     ---
+     
+     <div class="framework-container">
+       {/* Add your framework */}
+       {frameworkId === "yourFramework" && <YourFramework client:only="your-framework" />}
+       {/* ... existing frameworks */}
+     </div>
+     ```
+
+5. **Add Framework Stats**
+   - Update `src/config/stats.ts` if your framework needs special handling:
+     ```typescript
+     SUPPORTED_EXTENSIONS: [
+       ".tsx", 
+       ".jsx", 
+       ".astro", 
+       ".vue", 
+       ".svelte",
+       ".your-extension"  // Add if needed
+     ],
+     ```
+   - Generate framework stats:
+     ```shell
+     pnpm generate-stats
+     ```
 
 At this point, you could open a PR. For full framework integration, see the [Astro Framework Integration Guide](https://docs.astro.build/en/guides/integrations-guide/). This usually involves modifying the `astro.config.mjs` file to add the framework and its configuration.
 
@@ -72,6 +123,7 @@ If you want to generate performance metrics for your new implementation, see the
   - Required dependencies are installed
   - Framework is properly configured in astro.config.mjs
   - TypeScript types are updated if needed
+  - For stats generation issues, verify your implementation file matches the expected extension in `SUPPORTED_EXTENSIONS` within `src/config/stats.ts`
 
 ## Project Structure
 
