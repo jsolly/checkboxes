@@ -12,7 +12,7 @@
 
   <div class="stimulus-parent">
     <div class="stimulus-checkbox">
-      <input type="checkbox" data-checkbox-group-target="parent" data-action="checkbox-group#parentToggle" class="stimulus-checkbox-input" aria-controls="stimulus-children" />
+      <input id="stimulus-parent" type="checkbox" data-checkbox-group-target="parent" data-action="checkbox-group#parentToggle" class="stimulus-checkbox-input" aria-controls="stimulus-children" />
       <label for="stimulus-parent" class="stimulus-checkbox-label">Parent</label>
     </div>
   </div>
@@ -20,7 +20,7 @@
   <div id="stimulus-children" class="stimulus-children">
     { Array.from([1, 2, 3]).map((i) =>
       <div class="stimulus-checkbox">
-        <input type="checkbox" data-checkbox-group-target="child" data-action="checkbox-group#childToggle" class="stimulus-checkbox-input" />
+        <input id="stimulus-child-{i}" type="checkbox" data-checkbox-group-target="child" data-action="checkbox-group#childToggle" class="stimulus-checkbox-input" />
         <label for="stimulus-child-{i}" class="stimulus-checkbox-label">Child {i}</label>
       </div> )}
   </div>
