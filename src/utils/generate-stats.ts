@@ -4,7 +4,11 @@ import { fileURLToPath } from "node:url";
 import type { Page, Protocol } from "puppeteer";
 import puppeteer from "puppeteer";
 import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
-import { type FrameworkStats, STATS_CONFIG } from "../config/stats";
+import {
+	type FrameworkStats,
+	STATS_CONFIG,
+	type StatsFile,
+} from "../config/stats";
 import { calculateStatsZScores } from "./calculateZScores";
 import { evaluateFrameworkComplexity } from "./evaluateComplexity";
 
@@ -120,11 +124,12 @@ async function generateStats(): Promise<void> {
 						path.join(process.cwd(), STATS_CONFIG.STATS_FILE_PATH),
 						"utf-8",
 					),
-				);
+				) as StatsFile;
+
 				// Keep existing complexity scores but use new bundle sizes
-				for (const id of Object.keys(stats)) {
-					stats[id as FrameworkId].complexityScore =
-						existingStats[id]?.complexityScore ?? 0;
+				for (const id of Object.keys(stats) as FrameworkId[]) {
+					stats[id].complexityScore =
+						existingStats.frameworks[id]?.complexityScore ?? 0;
 				}
 				console.log("ℹ️ Using existing complexity scores");
 			} catch (error) {
@@ -137,7 +142,7 @@ async function generateStats(): Promise<void> {
 			const complexityMeasurements: Record<string, number[]> = {};
 
 			// Initialize arrays for each framework
-			for (const id of Object.keys(implementations)) {
+			for (const id of Object.keys(implementations) as FrameworkId[]) {
 				complexityMeasurements[id] = [];
 			}
 
@@ -152,20 +157,34 @@ async function generateStats(): Promise<void> {
 			}
 
 			// Calculate median scores for each framework
-			for (const id of Object.keys(implementations)) {
+			for (const id of Object.keys(implementations) as FrameworkId[]) {
 				const measurements = complexityMeasurements[id].sort((a, b) => a - b);
 				const median =
 					measurements[
 						Math.floor(STATS_CONFIG.COMPLEXITY_SCORE_ITERATIONS / 2)
 					];
-				stats[id as FrameworkId].complexityScore = median;
+				stats[id].complexityScore = median;
 				console.log(`    ${id} complexity score: ${median}`);
 			}
 		}
 
+		const statsWithMetadata = {
+			metadata: {
+				lastUpdated: new Date().toISOString(),
+				description: "Framework comparison metrics",
+				metrics: {
+					bundleSize: "Size in KB",
+					complexityScore: "Scale of 0-100",
+					bundleSizeZScore: "Standardized score relative to mean",
+					complexityZScore: "Standardized score relative to mean",
+				},
+			},
+			frameworks: calculateStatsZScores(stats),
+		};
+
 		await fs.writeFile(
-			path.join(process.cwd(), "src/data/framework-stats.json"),
-			JSON.stringify(calculateStatsZScores(stats), null, 2),
+			path.join(process.cwd(), STATS_CONFIG.STATS_FILE_PATH),
+			JSON.stringify(statsWithMetadata, null, 2),
 		);
 
 		console.log("✨ Stats generated successfully!");

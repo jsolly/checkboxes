@@ -1,50 +1,62 @@
 {
-	"vanillajs": {
-		"bundleSize": 0.31,
-		"complexityScore": 55,
-		"bundleSizeZScore": -1.0106665944529458,
-		"complexityZScore": 1.043498389499902
+	"metadata": {
+		"lastUpdated": "2025-01-08T03:32:49.097Z",
+		"description": "Framework comparison metrics",
+		"metrics": {
+			"bundleSize": "Size in KB",
+			"complexityScore": "Scale of 0-100",
+			"bundleSizeZScore": "Standardized score relative to mean",
+			"complexityZScore": "Standardized score relative to mean"
+		}
 	},
-	"alpine": {
-		"bundleSize": 0.31,
-		"complexityScore": 25,
-		"bundleSizeZScore": -1.0106665944529458,
-		"complexityZScore": -0.7453559924999299
-	},
-	"vue": {
-		"bundleSize": 1.22,
-		"complexityScore": 50,
-		"bundleSizeZScore": 0.9725282323981179,
-		"complexityZScore": 0.7453559924999299
-	},
-	"react": {
-		"bundleSize": 1.53,
-		"complexityScore": 60,
-		"bundleSizeZScore": 1.6481220745122167,
-		"complexityZScore": 1.3416407864998738
-	},
-	"svelte": {
-		"bundleSize": 1.25,
-		"complexityScore": 35,
-		"bundleSizeZScore": 1.0379082816349663,
-		"complexityZScore": -0.14907119849998599
-	},
-	"hyperscript": {
-		"bundleSize": 0.63,
-		"complexityScore": 20,
-		"bundleSizeZScore": -0.3132794025932311,
-		"complexityZScore": -1.043498389499902
-	},
-	"cssOnly": {
-		"bundleSize": 0.31,
-		"complexityScore": 10,
-		"bundleSizeZScore": -1.0106665944529458,
-		"complexityZScore": -1.639783183499846
-	},
-	"jquery": {
-		"bundleSize": 0.63,
-		"complexityScore": 45,
-		"bundleSizeZScore": -0.3132794025932311,
-		"complexityZScore": 0.447213595499958
+	"frameworks": {
+		"vanillajs": {
+			"bundleSize": 0.31,
+			"complexityScore": 35,
+			"bundleSizeZScore": -1.0106665944529458,
+			"complexityZScore": 0
+		},
+		"alpine": {
+			"bundleSize": 0.31,
+			"complexityScore": 25,
+			"bundleSizeZScore": -1.0106665944529458,
+			"complexityZScore": -0.6488856845230502
+		},
+		"vue": {
+			"bundleSize": 1.22,
+			"complexityScore": 50,
+			"bundleSizeZScore": 0.9725282323981179,
+			"complexityZScore": 0.9733285267845753
+		},
+		"react": {
+			"bundleSize": 1.53,
+			"complexityScore": 60,
+			"bundleSizeZScore": 1.6481220745122167,
+			"complexityZScore": 1.6222142113076254
+		},
+		"svelte": {
+			"bundleSize": 1.25,
+			"complexityScore": 35,
+			"bundleSizeZScore": 1.0379082816349663,
+			"complexityZScore": 0
+		},
+		"hyperscript": {
+			"bundleSize": 0.63,
+			"complexityScore": 20,
+			"bundleSizeZScore": -0.3132794025932311,
+			"complexityZScore": -0.9733285267845753
+		},
+		"cssOnly": {
+			"bundleSize": 0.31,
+			"complexityScore": 10,
+			"bundleSizeZScore": -1.0106665944529458,
+			"complexityZScore": -1.6222142113076254
+		},
+		"jquery": {
+			"bundleSize": 0.63,
+			"complexityScore": 45,
+			"bundleSizeZScore": -0.3132794025932311,
+			"complexityZScore": 0.6488856845230502
+		}
 	}
 }
