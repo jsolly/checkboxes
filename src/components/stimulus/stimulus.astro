@@ -18,10 +18,10 @@
   </div>
 
   <div id="stimulus-children" class="stimulus-children">
-    { Array.from([1, 2, 3]).map((i) =>
+    { [1, 2, 3].map((i) =>
       <div class="stimulus-checkbox">
-        <input id="stimulus-child-{i}" type="checkbox" data-checkbox-group-target="child" data-action="checkbox-group#childToggle" class="stimulus-checkbox-input" />
-        <label for="stimulus-child-{i}" class="stimulus-checkbox-label">Child {i}</label>
+        <input id={`stimulus-child-${i}`} type="checkbox" data-checkbox-group-target="child" data-action="checkbox-group#childToggle" class="stimulus-checkbox-input" />
+        <label for={`stimulus-child-${i}`} class="stimulus-checkbox-label">Child {i}</label>
       </div> )}
   </div>
 </fieldset>
@@ -31,8 +31,11 @@
 
   window.Stimulus = Application.start()
 
-  class CheckboxGroupController extends Controller {
+  window.Stimulus.register("checkbox-group", class extends Controller {
     static targets = [ 'parent', 'child' ]
+
+    declare readonly parentTarget: HTMLInputElement
+    declare readonly childTargets: HTMLInputElement[]
 
     parentToggle() {
       const checked = this.parentTarget.checked
@@ -47,7 +50,5 @@
       this.parentTarget.checked = allChecked || someChecked
       this.parentTarget.indeterminate = someChecked && !allChecked
     }
-  }
-
-  Stimulus.register("checkbox-group", CheckboxGroupController)
+  })
 </script>

@@ -61,8 +61,8 @@
 		"stimulus": {
 			"bundleSize": 0.12,
 			"complexityScore": 22,
-			"bundleSizeZScore": -0.3132794025932311,
-			"complexityZScore": 0.447213595499958
+			"bundleSizeZScore": -1.0106665944529458,
+			"complexityZScore": -1.639783183499846
 		}
 	}
 }
