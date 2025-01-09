@@ -1,6 +1,6 @@
 {
 	"metadata": {
-		"lastUpdated": "2025-01-09T20:34:13.038Z",
+		"lastUpdated": "2025-01-09T20:49:42.798Z",
 		"description": "Framework comparison metrics",
 		"metrics": {
 			"bundleSize": "Size in KB",
@@ -13,56 +13,56 @@
 		"vanillajs": {
 			"bundleSize": 0.31,
 			"complexityScore": 50,
-			"bundleSizeZScore": -0.6454338484577041,
+			"bundleSizeZScore": -0.6479743704393692,
 			"complexityZScore": 0.8340576562282992
 		},
 		"alpine": {
 			"bundleSize": 0.31,
 			"complexityScore": 25,
-			"bundleSizeZScore": -0.6454338484577041,
+			"bundleSizeZScore": -0.6479743704393692,
 			"complexityZScore": -0.7298004491997616
 		},
 		"vue": {
 			"bundleSize": 0.31,
 			"complexityScore": 55,
-			"bundleSizeZScore": -0.6454338484577041,
+			"bundleSizeZScore": -0.6479743704393692,
 			"complexityZScore": 1.1468292773139115
 		},
 		"react": {
 			"bundleSize": 1.53,
 			"complexityScore": 60,
-			"bundleSizeZScore": 2.605421039645779,
+			"bundleSizeZScore": 2.600773842996372,
 			"complexityZScore": 1.4596008983995237
 		},
 		"svelte": {
 			"bundleSize": 0.31,
-			"complexityScore": 30,
-			"bundleSizeZScore": -0.6454338484577041,
-			"complexityZScore": -0.4170288281141494
+			"complexityScore": 35,
+			"bundleSizeZScore": -0.6479743704393692,
+			"complexityZScore": -0.10425720702853723
 		},
 		"hyperscript": {
-			"bundleSize": 0.63,
+			"bundleSize": 0.64,
 			"complexityScore": 20,
-			"bundleSizeZScore": 0.20724940088091434,
+			"bundleSizeZScore": 0.23078539221128216,
 			"complexityZScore": -1.0425720702853738
 		},
 		"cssOnly": {
 			"bundleSize": 0.31,
 			"complexityScore": 10,
-			"bundleSizeZScore": -0.6454338484577041,
+			"bundleSizeZScore": -0.6479743704393692,
 			"complexityZScore": -1.668115312456598
 		},
 		"jquery": {
 			"bundleSize": 0.63,
 			"complexityScore": 45,
-			"bundleSizeZScore": 0.20724940088091434,
+			"bundleSizeZScore": 0.20415630849459573,
 			"complexityZScore": 0.5212860351426871
 		},
 		"stimulus": {
 			"bundleSize": 0.63,
-			"complexityScore": 35,
-			"bundleSizeZScore": 0.20724940088091434,
-			"complexityZScore": -0.10425720702853723
+			"complexityScore": 30,
+			"bundleSizeZScore": 0.20415630849459573,
+			"complexityZScore": -0.4170288281141494
 		}
 	}
 }

@@ -1,76 +1,49 @@
----
-const parentCheckbox = {
-	id: "parent",
-	label: "Parent",
-};
-
-const childCheckboxItems = [
-	{
-		id: "child1",
-		label: "Child 1",
-	},
-	{
-		id: "child2",
-		label: "Child 2",
-	},
-	{
-		id: "child3",
-		label: "Child 3",
-	},
-];
----
-<div
-	x-data="{ 
-		parentChecked: false,
-		childStates: {
-			child1: false,
-			child2: false,
-			child3: false
-		},
-		toggleParent() {
-			for (let key in this.childStates) {
-				this.childStates[key] = this.parentChecked;
-			}
-		},
-		areSomeChildrenChecked() {
-			return Object.values(this.childStates).some(v => v) && !this.parentChecked;
-		}
-	}"
-	x-effect="parentChecked = Object.values(childStates).every(v => v)"
->
+<div x-data="{
+	parent: { id: 'parent', label: 'Parent' },
+	checkboxes: [
+		{ id: 'child1', label: 'Child 1', checked: false },
+		{ id: 'child2', label: 'Child 2', checked: false },
+		{ id: 'child3', label: 'Child 3', checked: false }
+	]
+}">
 	<div class="px-3 py-2">
 		<div>
 			<div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
 				<div class="flex items-center space-x-3">
 					<input 
 						type="checkbox" 
-						id="parent" 
-						name="notifications" 
-						value="parent"
+						:id="parent.id" 
 						class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-						x-model="parentChecked"
-						@change="toggleParent"
-						x-effect="$el.indeterminate = areSomeChildrenChecked()"
+						:checked="checkboxes.every(c => c.checked)"
+						@change="checkboxes.forEach(c => c.checked = $event.target.checked)"
+						x-effect="$el.indeterminate = checkboxes.some(c => c.checked) && !checkboxes.every(c => c.checked)"
 					>
-					<label for={parentCheckbox.id} class="text-slate-700 cursor-pointer text-sm font-medium">{parentCheckbox.label}</label>
+					<label 
+						:for="parent.id" 
+						class="text-slate-700 cursor-pointer text-sm font-medium"
+						x-text="parent.label"
+					></label>
 				</div>
 			</div>
+
 			<div class="ml-8">
-				{childCheckboxItems.map(item => (
+				<template x-for="checkbox in checkboxes" :key="checkbox.id">
 					<div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
 						<div class="flex items-center space-x-3">
 							<input 
 								type="checkbox" 
-								id={item.id}
-								name="notifications" 
-								value={item.id}
+								:id="checkbox.id"
 								class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-								x-model={`childStates.${item.id}`}
+								x-model="checkbox.checked"
 							>
-							<label for={item.id} class="text-slate-700 cursor-pointer text-sm font-medium">{item.label}</label>
+							<label 
+								:for="checkbox.id" 
+								class="text-slate-700 cursor-pointer text-sm font-medium"
+								x-text="checkbox.label"
+							></label>
 						</div>
 					</div>
-				))}
+				</template>
 			</div>
 		</div>
 	</div>

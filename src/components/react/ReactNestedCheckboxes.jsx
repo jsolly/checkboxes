@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 function Checkbox({
 	id,
@@ -40,40 +40,30 @@ function Checkbox({
 	);
 }
 
-const CHILD_ITEMS = [
-	{ id: "child1-react", label: "Child 1" },
-	{ id: "child2-react", label: "Child 2" },
-	{ id: "child3-react", label: "Child 3" },
-];
-
 export default function NestedCheckboxes() {
-	const [checkedItems, setCheckedItems] = useState(() =>
-		Object.fromEntries(CHILD_ITEMS.map((item) => [item.id, false])),
-	);
+	const [checkboxes, setCheckboxes] = useState([
+		{ id: "child1-react", label: "Child 1", checked: false },
+		{ id: "child2-react", label: "Child 2", checked: false },
+		{ id: "child3-react", label: "Child 3", checked: false },
+	]);
 
-	const allChecked = useMemo(
-		() => Object.values(checkedItems).every(Boolean),
-		[checkedItems],
-	);
-
-	const someChecked = useMemo(
-		() => Object.values(checkedItems).some(Boolean),
-		[checkedItems],
-	);
+	const allChecked = checkboxes.every((item) => item.checked);
+	const someChecked = checkboxes.some((item) => item.checked);
 
 	const handleParentChange = useCallback((e) => {
 		const newValue = e.target.checked;
-		setCheckedItems(
-			Object.fromEntries(CHILD_ITEMS.map((item) => [item.id, newValue])),
+		setCheckboxes((boxes) =>
+			boxes.map((box) => ({ ...box, checked: newValue })),
 		);
 	}, []);
 
 	const handleChildChange = useCallback(
 		(id) => (e) => {
-			setCheckedItems((prev) => ({
-				...prev,
-				[id]: e.target.checked,
-			}));
+			setCheckboxes((boxes) =>
+				boxes.map((box) =>
+					box.id === id ? { ...box, checked: e.target.checked } : box,
+				),
+			);
 		},
 		[],
 	);
@@ -90,13 +80,11 @@ export default function NestedCheckboxes() {
 			/>
 
 			<div className="ml-8">
-				{CHILD_ITEMS.map(({ id, label }) => (
+				{checkboxes.map((item) => (
 					<Checkbox
-						key={id}
-						id={id}
-						label={label}
-						checked={checkedItems[id]}
-						onChange={handleChildChange(id)}
+						key={item.id}
+						{...item}
+						onChange={handleChildChange(item.id)}
 						className="p-1"
 					/>
 				))}
