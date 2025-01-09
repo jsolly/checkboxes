@@ -1,6 +1,6 @@
 {
 	"metadata": {
-		"lastUpdated": "2025-01-08T04:00:48.956Z",
+		"lastUpdated": "2025-01-09T19:56:51.119Z",
 		"description": "Framework comparison metrics",
 		"metrics": {
 			"bundleSize": "Size in KB",
@@ -13,56 +13,56 @@
 		"vanillajs": {
 			"bundleSize": 0.31,
 			"complexityScore": 55,
-			"bundleSizeZScore": -1.0106665944529458,
-			"complexityZScore": 1.043498389499902
+			"bundleSizeZScore": -0.6454338484577041,
+			"complexityZScore": 1.1468292773139115
 		},
 		"alpine": {
 			"bundleSize": 0.31,
 			"complexityScore": 25,
-			"bundleSizeZScore": -1.0106665944529458,
-			"complexityZScore": -0.7453559924999299
+			"bundleSizeZScore": -0.6454338484577041,
+			"complexityZScore": -0.7298004491997616
 		},
 		"vue": {
-			"bundleSize": 1.22,
+			"bundleSize": 0.31,
 			"complexityScore": 50,
-			"bundleSizeZScore": 0.9725282323981179,
-			"complexityZScore": 0.7453559924999299
+			"bundleSizeZScore": -0.6454338484577041,
+			"complexityZScore": 0.8340576562282992
 		},
 		"react": {
 			"bundleSize": 1.53,
 			"complexityScore": 60,
-			"bundleSizeZScore": 1.6481220745122167,
-			"complexityZScore": 1.3416407864998738
+			"bundleSizeZScore": 2.605421039645779,
+			"complexityZScore": 1.4596008983995237
 		},
 		"svelte": {
-			"bundleSize": 1.25,
-			"complexityScore": 35,
-			"bundleSizeZScore": 1.0379082816349663,
-			"complexityZScore": -0.14907119849998599
+			"bundleSize": 0.31,
+			"complexityScore": 45,
+			"bundleSizeZScore": -0.6454338484577041,
+			"complexityZScore": 0.5212860351426871
 		},
 		"hyperscript": {
 			"bundleSize": 0.63,
 			"complexityScore": 20,
-			"bundleSizeZScore": -0.3132794025932311,
-			"complexityZScore": -1.043498389499902
+			"bundleSizeZScore": 0.20724940088091434,
+			"complexityZScore": -1.0425720702853738
 		},
 		"cssOnly": {
 			"bundleSize": 0.31,
 			"complexityScore": 10,
-			"bundleSizeZScore": -1.0106665944529458,
-			"complexityZScore": -1.639783183499846
+			"bundleSizeZScore": -0.6454338484577041,
+			"complexityZScore": -1.668115312456598
 		},
 		"jquery": {
 			"bundleSize": 0.63,
-			"complexityScore": 45,
-			"bundleSizeZScore": -0.3132794025932311,
-			"complexityZScore": 0.447213595499958
+			"complexityScore": 35,
+			"bundleSizeZScore": 0.20724940088091434,
+			"complexityZScore": -0.10425720702853723
 		},
 		"stimulus": {
-			"bundleSize": 12.67,
-			"complexityScore": 22,
-			"bundleSizeZScore": 0,
-			"complexityZScore": 0
+			"bundleSize": 0.63,
+			"complexityScore": 30,
+			"bundleSizeZScore": 0.20724940088091434,
+			"complexityZScore": -0.4170288281141494
 		}
 	}
 }

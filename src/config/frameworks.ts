@@ -25,7 +25,6 @@ export const FRAMEWORKS = {
 	},
 	stimulus: {
 		displayName: "Stimulus",
-		clientFramework: null,
 	},
 } as const;
 

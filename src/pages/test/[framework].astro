@@ -43,9 +43,9 @@ const frameworkId = framework;
 			data-framework={framework}
 			data-framework-ready={framework}
 		>
-			{frameworkId === "vue" && <VueNestedCheckboxes client:only="vue" />}
+			{frameworkId === "vue" && <VueNestedCheckboxes />}
 			{frameworkId === "react" && <ReactNestedCheckboxes client:only="react" />}
-			{frameworkId === "svelte" && <SvelteNestedCheckboxes client:only="svelte" />}
+			{frameworkId === "svelte" && <SvelteNestedCheckboxes />}
 			{frameworkId === "alpine" && <Alpine />}
 			{frameworkId === "jquery" && <JQuery />}
 			{frameworkId === "vanillajs" && <Vanillajs />}
