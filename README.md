@@ -48,7 +48,18 @@ pnpm generate-stats  # Generate performance metrics (in a new terminal)
      - `src/your-framework/your-framework<.tsx/jsx/etc>` - The checkbox implementation
      - `src/your-framework/your-framework-container.astro` - The display wrapper
 
-2. **Update Framework Configuration**
+2. **Add Framework Logo**
+   - Add your framework's logo as an SVG file to `src/assets/logos/`
+   - Name it consistently (e.g., `your-framework.svg`)
+   - Example logo import in your container:
+     ```astro
+     ---
+     import yourFrameworkLogo from "../../assets/logos/your-framework.svg";
+     // ... other imports
+     ---
+     ```
+
+3. **Update Framework Configuration**
    - Add the framework to `src/config/frameworks.ts`:
      ```typescript
      export const FRAMEWORKS = {
@@ -59,7 +70,7 @@ pnpm generate-stats  # Generate performance metrics (in a new terminal)
      };
      ```
 
-3. **Add Framework Integration**
+4. **Add Framework Integration**
    - Install framework dependencies:
      ```bash
      pnpm add @astrojs/your-framework your-framework
@@ -76,7 +87,7 @@ pnpm generate-stats  # Generate performance metrics (in a new terminal)
      });
      ```
 
-4. **Update Test Page**
+5. **Update Test Page**
    - Modify `src/pages/test/[framework].astro` to include your framework:
      ```astro
      ---
@@ -91,7 +102,7 @@ pnpm generate-stats  # Generate performance metrics (in a new terminal)
      </div>
      ```
 
-5. **Add Framework Stats**
+6. **Add Framework Stats**
    - Update `src/config/stats.ts` if your framework needs special handling:
      ```typescript
      SUPPORTED_EXTENSIONS: [
