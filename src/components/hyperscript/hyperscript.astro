@@ -24,15 +24,8 @@ const childCheckboxItems = [
           _="on click
                 set the checked of <input[type=checkbox]/> in the next <div/> to my checked
               on click from the next <div/>
-                set checked to <input[type=checkbox]:checked/> in the next <div/>
-                set unchecked to <input[type=checkbox]:not(:checked)/> in the next <div/>
-                set my indeterminate to false
-                if unchecked is empty
-                  set my checked to true
-                else if checked is empty
-                  set my checked to false
-                else
-                  set my indeterminate to true"
+                set my checked to no <input:not(:checked)/> in it
+                set my indeterminate to <:checked/> in it exists and <input:not(:checked)/> in it exists"
         />
         <label
           for={parentCheckbox.id}

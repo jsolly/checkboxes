@@ -1,0 +1,14 @@
+version: 2
+updates:
+# Keep dependencies up to date. Even though we use pnpm, Dependabot
+# uses the npm registry to check for updates.
+- package-ecosystem: npm
+  directory: /
+  # Check for updates at 2am UTC
+  schedule:
+    interval: daily
+
+- package-ecosystem: github-actions
+  directory: /.github/workflows
+  schedule:
+    interval: daily
