@@ -1,14 +1,11 @@
 ---
 // @ts-nocheck
-const parentCheckbox = {
-	id: "parent-hyperscript",
-	label: "Parent",
-};
+const parentCheckbox = { id: "parent-hyperscript", label: "Parent" };
 
 const childCheckboxItems = [
-	{ id: "child1-hyperscript", label: "Child 1" },
-	{ id: "child2-hyperscript", label: "Child 2" },
-	{ id: "child3-hyperscript", label: "Child 3" },
+  { id: "child1-hyperscript", label: "Child 1" },
+  { id: "child2-hyperscript", label: "Child 2" },
+  { id: "child3-hyperscript", label: "Child 3" },
 ];
 ---
 <script src="https://unpkg.com/hyperscript.org@0.9.13"></script>
@@ -27,10 +24,7 @@ const childCheckboxItems = [
                 set my checked to no <input:not(:checked)/> in it
                 set my indeterminate to <:checked/> in it exists and <input:not(:checked)/> in it exists"
         />
-        <label
-          for={parentCheckbox.id}
-          class="text-slate-700 cursor-pointer text-sm font-medium"
-        >
+        <label for={parentCheckbox.id} class="text-slate-700 cursor-pointer text-sm font-medium">
           {parentCheckbox.label}
         </label>
       </div>
@@ -44,10 +38,7 @@ const childCheckboxItems = [
               id={item.id}
               class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
             />
-            <label
-              for={item.id}
-              class="text-slate-700 cursor-pointer text-sm font-medium"
-            >
+            <label for={item.id} class="text-slate-700 cursor-pointer text-sm font-medium">
               {item.label}
             </label>
           </div>
@@ -55,4 +46,4 @@ const childCheckboxItems = [
       ))}
     </div>
   </div>
-</div> 
+</div>

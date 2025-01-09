@@ -1,22 +1,10 @@
 ---
-const parentCheckbox = {
-	id: "parent-vanilla",
-	label: "Parent",
-};
+const parentCheckbox = { id: "parent-vanilla", label: "Parent" };
 
 const childCheckboxItems = [
-	{
-		id: "child1-vanilla",
-		label: "Child 1",
-	},
-	{
-		id: "child2-vanilla",
-		label: "Child 2",
-	},
-	{
-		id: "child3-vanilla",
-		label: "Child 3",
-	},
+  { id: "child1-vanilla", label: "Child 1" },
+  { id: "child2-vanilla", label: "Child 2" },
+  { id: "child3-vanilla", label: "Child 3" },
 ];
 ---
 
@@ -25,15 +13,17 @@ const childCheckboxItems = [
     <!-- Parent checkbox -->
     <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
       <div class="flex items-center space-x-3">
-        <input 
-          type="checkbox" 
+        <input
+          type="checkbox"
           id={parentCheckbox.id}
-          name="notifications" 
+          name="notifications"
           value="parent"
           class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
           data-parent-checkbox
         >
-        <label for={parentCheckbox.id} class="text-slate-700 cursor-pointer text-sm font-medium">{parentCheckbox.label}</label>
+        <label for={parentCheckbox.id} class="text-slate-700 cursor-pointer text-sm font-medium">
+          {parentCheckbox.label}
+        </label>
       </div>
     </div>
 
@@ -42,15 +32,17 @@ const childCheckboxItems = [
       {childCheckboxItems.map(item => (
         <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
           <div class="flex items-center space-x-3">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               id={item.id}
-              name="notifications" 
+              name="notifications"
               value={item.id}
               class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
               data-child-checkbox
             >
-            <label for={item.id} class="text-slate-700 cursor-pointer text-sm font-medium">{item.label}</label>
+            <label for={item.id} class="text-slate-700 cursor-pointer text-sm font-medium">
+              {item.label}
+            </label>
           </div>
         </div>
       ))}
@@ -59,31 +51,31 @@ const childCheckboxItems = [
 </div>
 
 <script lang="js" is:inline>
-	function initializeCheckboxes(container) {
-		const parentCheckbox = container.querySelector('[data-parent-checkbox]');
-		const childCheckboxes = container.querySelectorAll('[data-child-checkbox]');
+  function initializeCheckboxes(container) {
+    const parentCheckbox = container.querySelector('[data-parent-checkbox]');
+    const childCheckboxes = container.querySelectorAll('[data-child-checkbox]');
 
-		function updateParentState() {
-			const allChecked = Array.from(childCheckboxes).every(checkbox => checkbox.checked);
-			const someChecked = Array.from(childCheckboxes).some(checkbox => checkbox.checked);
-			parentCheckbox.checked = allChecked;
-			parentCheckbox.indeterminate = someChecked && !allChecked;
-		}
+    function updateParentState() {
+      const allChecked = Array.from(childCheckboxes).every(checkbox => checkbox.checked);
+      const someChecked = Array.from(childCheckboxes).some(checkbox => checkbox.checked);
+      parentCheckbox.checked = allChecked;
+      parentCheckbox.indeterminate = someChecked && !allChecked;
+    }
 
-		function updateChildrenState() {
-			childCheckboxes.forEach(checkbox => {
-				checkbox.checked = parentCheckbox.checked;
-			});
-			parentCheckbox.indeterminate = false;
-		}
+    function updateChildrenState() {
+      childCheckboxes.forEach(checkbox => {
+        checkbox.checked = parentCheckbox.checked;
+      });
+      parentCheckbox.indeterminate = false;
+    }
 
-		parentCheckbox.addEventListener('change', updateChildrenState);
-		childCheckboxes.forEach(checkbox => {
-				checkbox.addEventListener('change', updateParentState);
-		});
-	}
+    parentCheckbox.addEventListener('change', updateChildrenState);
+    childCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateParentState);
+    });
+  }
 
-	document.querySelectorAll('[data-checkbox-container]').forEach(container => {
-			initializeCheckboxes(container);
-	});
-</script> 
+  document.querySelectorAll('[data-checkbox-container]').forEach(container => {
+      initializeCheckboxes(container);
+  });
+</script>
