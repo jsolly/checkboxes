@@ -1,6 +1,6 @@
 {
 	"metadata": {
-		"lastUpdated": "2025-01-09T20:09:08.270Z",
+		"lastUpdated": "2025-01-09T20:34:13.038Z",
 		"description": "Framework comparison metrics",
 		"metrics": {
 			"bundleSize": "Size in KB",
@@ -14,55 +14,55 @@
 			"bundleSize": 0.31,
 			"complexityScore": 50,
 			"bundleSizeZScore": -0.6454338484577041,
-			"complexityZScore": 0.8805874420954335
+			"complexityZScore": 0.8340576562282992
 		},
 		"alpine": {
 			"bundleSize": 0.31,
 			"complexityScore": 25,
 			"bundleSizeZScore": -0.6454338484577041,
-			"complexityZScore": -0.7044699536763471
+			"complexityZScore": -0.7298004491997616
 		},
 		"vue": {
 			"bundleSize": 0.31,
 			"complexityScore": 55,
 			"bundleSizeZScore": -0.6454338484577041,
-			"complexityZScore": 1.1975989212497895
+			"complexityZScore": 1.1468292773139115
 		},
 		"react": {
 			"bundleSize": 1.53,
 			"complexityScore": 60,
 			"bundleSizeZScore": 2.605421039645779,
-			"complexityZScore": 1.5146104004041456
+			"complexityZScore": 1.4596008983995237
 		},
 		"svelte": {
 			"bundleSize": 0.31,
-			"complexityScore": 35,
+			"complexityScore": 30,
 			"bundleSizeZScore": -0.6454338484577041,
-			"complexityZScore": -0.0704469953676349
+			"complexityZScore": -0.4170288281141494
 		},
 		"hyperscript": {
 			"bundleSize": 0.63,
 			"complexityScore": 20,
 			"bundleSizeZScore": 0.20724940088091434,
-			"complexityZScore": -1.0214814328307034
+			"complexityZScore": -1.0425720702853738
 		},
 		"cssOnly": {
 			"bundleSize": 0.31,
 			"complexityScore": 10,
 			"bundleSizeZScore": -0.6454338484577041,
-			"complexityZScore": -1.6555043911394156
+			"complexityZScore": -1.668115312456598
 		},
 		"jquery": {
 			"bundleSize": 0.63,
-			"complexityScore": 40,
+			"complexityScore": 45,
 			"bundleSizeZScore": 0.20724940088091434,
-			"complexityZScore": 0.24656448378672122
+			"complexityZScore": 0.5212860351426871
 		},
 		"stimulus": {
 			"bundleSize": 0.63,
-			"complexityScore": 30,
+			"complexityScore": 35,
 			"bundleSizeZScore": 0.20724940088091434,
-			"complexityZScore": -0.387458474521991
+			"complexityZScore": -0.10425720702853723
 		}
 	}
 }

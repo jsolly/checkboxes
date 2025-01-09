@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 function Checkbox({
 	id,
@@ -47,31 +47,36 @@ const CHILD_ITEMS = [
 ];
 
 export default function NestedCheckboxes() {
-	const [checkedItems, setCheckedItems] = useState({
-		"child1-react": false,
-		"child2-react": false,
-		"child3-react": false,
-	});
+	const [checkedItems, setCheckedItems] = useState(() =>
+		Object.fromEntries(CHILD_ITEMS.map((item) => [item.id, false])),
+	);
 
-	const values = Object.values(checkedItems);
-	const allChecked = values.every(Boolean);
-	const someChecked = values.some(Boolean);
+	const allChecked = useMemo(
+		() => Object.values(checkedItems).every(Boolean),
+		[checkedItems],
+	);
 
-	const handleParentChange = (e) => {
+	const someChecked = useMemo(
+		() => Object.values(checkedItems).some(Boolean),
+		[checkedItems],
+	);
+
+	const handleParentChange = useCallback((e) => {
 		const newValue = e.target.checked;
-		const newItems = {};
-		for (const key of Object.keys(checkedItems)) {
-			newItems[key] = newValue;
-		}
-		setCheckedItems(newItems);
-	};
+		setCheckedItems(
+			Object.fromEntries(CHILD_ITEMS.map((item) => [item.id, newValue])),
+		);
+	}, []);
 
-	const handleChildChange = (id) => (e) => {
-		setCheckedItems((prev) => ({
-			...prev,
-			[id]: e.target.checked,
-		}));
-	};
+	const handleChildChange = useCallback(
+		(id) => (e) => {
+			setCheckedItems((prev) => ({
+				...prev,
+				[id]: e.target.checked,
+			}));
+		},
+		[],
+	);
 
 	return (
 		<div className="px-3 py-2">
