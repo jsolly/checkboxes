@@ -36,7 +36,7 @@ export default function FrameworkSort() {
 		<div className="max-w-6xl mx-auto mb-4 flex justify-end px-4">
 			<div className="flex items-center gap-2">
 				<label htmlFor="framework-sort" className="text-slate-700 text-sm">
-					Sort by:
+					Sort
 				</label>
 				<select
 					id="framework-sort"
