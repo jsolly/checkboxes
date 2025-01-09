@@ -1,0 +1,54 @@
+<style>
+  .stimulus-container { @apply px-3 py-2 }
+  .stimulus-parent { @apply p-2 rounded-lg }
+  .stimulus-children { @apply ml-8 rounded-lg }
+  .stimulus-checkbox { @apply p-1 flex items-center space-x-3 hover:bg-slate-100 transition-colors }
+  .stimulus-checkbox-input { @apply h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 }
+  .stimulus-checkbox-label { @apply text-slate-700 cursor-pointer text-sm font-medium }
+</style>
+
+<fieldset data-controller="checkbox-group" class="stimulus-container" aria-label="Checkbox group">
+  <legend class="sr-only">Parent-child checkbox group</legend>
+
+  <div class="stimulus-parent">
+    <div class="stimulus-checkbox">
+      <input id="stimulus-parent" type="checkbox" data-checkbox-group-target="parent" data-action="checkbox-group#parentToggle" class="stimulus-checkbox-input" aria-controls="stimulus-children" />
+      <label for="stimulus-parent" class="stimulus-checkbox-label">Parent</label>
+    </div>
+  </div>
+
+  <div id="stimulus-children" class="stimulus-children">
+    { [1, 2, 3].map((i) =>
+      <div class="stimulus-checkbox">
+        <input id={`stimulus-child-${i}`} type="checkbox" data-checkbox-group-target="child" data-action="checkbox-group#childToggle" class="stimulus-checkbox-input" />
+        <label for={`stimulus-child-${i}`} class="stimulus-checkbox-label">Child {i}</label>
+      </div> )}
+  </div>
+</fieldset>
+
+<script>
+  import { Application, Controller } from "@hotwired/stimulus"
+
+  window.Stimulus = Application.start()
+
+  window.Stimulus.register("checkbox-group", class extends Controller {
+    static targets = [ 'parent', 'child' ]
+
+    declare readonly parentTarget: HTMLInputElement
+    declare readonly childTargets: HTMLInputElement[]
+
+    parentToggle() {
+      const checked = this.parentTarget.checked
+
+      this.childTargets.forEach(child => child.checked = checked)
+    }
+
+    childToggle() {
+      const allChecked = this.childTargets.every(child => child.checked)
+      const someChecked = this.childTargets.some(child => child.checked)
+
+      this.parentTarget.checked = allChecked || someChecked
+      this.parentTarget.indeterminate = someChecked && !allChecked
+    }
+  })
+</script>

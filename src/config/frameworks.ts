@@ -23,6 +23,10 @@ export const FRAMEWORKS = {
 	jquery: {
 		displayName: "jQuery",
 	},
+	stimulus: {
+		displayName: "Stimulus",
+		clientFramework: null,
+	},
 } as const;
 
 export type FrameworkId = keyof typeof FRAMEWORKS;

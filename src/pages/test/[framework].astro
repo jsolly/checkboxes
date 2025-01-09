@@ -4,6 +4,7 @@ import CssOnly from "../../components/cssOnly/cssOnly.astro";
 import Hyperscript from "../../components/hyperscript/hyperscript.astro";
 import JQuery from "../../components/jquery/jquery.astro";
 import ReactNestedCheckboxes from "../../components/react/ReactNestedCheckboxes";
+import Stimulus from "../../components/stimulus/stimulusContainer.astro";
 import SvelteNestedCheckboxes from "../../components/svelte/SvelteNestedCheckboxes.svelte";
 import Vanillajs from "../../components/vanillajs/vanillajs.astro";
 import VueNestedCheckboxes from "../../components/vue/VueNestedCheckboxes.vue";
@@ -28,7 +29,7 @@ const frameworkId = framework;
 <Layout title={`${FRAMEWORKS[frameworkId].displayName} Test Page`}>
 	<script>
 		// Signal when the page is ready
-		
+
 		window.addEventListener('load', () => {
 			// Give a small delay for frameworks to initialize
 			setTimeout(() => {
@@ -37,8 +38,8 @@ const frameworkId = framework;
 		});
 	</script>
 	<div class="min-h-screen p-8">
-		<div 
-			class="framework-container" 
+		<div
+			class="framework-container"
 			data-framework={framework}
 			data-framework-ready={framework}
 		>
@@ -50,6 +51,7 @@ const frameworkId = framework;
 			{frameworkId === "vanillajs" && <Vanillajs />}
 			{frameworkId === "hyperscript" && <Hyperscript />}
 			{frameworkId === "cssOnly" && <CssOnly />}
+			{frameworkId === "stimulus" && <Stimulus />}
 		</div>
 	</div>
-</Layout> 
+</Layout>

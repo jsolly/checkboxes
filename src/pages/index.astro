@@ -5,6 +5,7 @@ import CssOnlyContainer from "../components/cssOnly/cssOnlyContainer.astro";
 import HyperscriptContainer from "../components/hyperscript/hyperscriptContainer.astro";
 import JQueryContainer from "../components/jquery/jqueryContainer.astro";
 import ReactContainer from "../components/react/ReactContainer.astro";
+import StimulusContainer from "../components/stimulus/stimulusContainer.astro";
 import SvelteContainer from "../components/svelte/SvelteContainer.astro";
 import VanillajsContainer from "../components/vanillajs/vanillajsContainer.astro";
 import VueContainer from "../components/vue/vueContainer.astro";
@@ -20,6 +21,7 @@ const containerMap = {
 	hyperscript: HyperscriptContainer,
 	cssOnly: CssOnlyContainer,
 	jquery: JQueryContainer,
+	stimulus: StimulusContainer,
 } as const;
 
 const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
@@ -39,9 +41,9 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		</div>
 
 		<FrameworkControls client:only="react" />
-		
-		<div 
-			id="framework-grid" 
+
+		<div
+			id="framework-grid"
 			class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto"
 		>
 			{frameworks.map(({ Component }) => (
@@ -52,12 +54,12 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 </Layout>
 
 <script>
-	import { 
-		type SortableEvent, 
-		type FrameworkSelectionEvent, 
-		type FrameworkSortEvent, 
+	import {
+		type SortableEvent,
+		type FrameworkSelectionEvent,
+		type FrameworkSortEvent,
 		type FrameworkId,
-		isValidFramework 
+		isValidFramework
 	} from "../config/frameworks";
 	import Sortable from "sortablejs";
 
@@ -95,7 +97,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		evt.item.classList.remove('dragging');
 		document.body.style.cursor = '';
 		saveFrameworkOrder();
-		
+
 		// Dispatch event to reset sort dropdown
 		document.dispatchEvent(new CustomEvent("frameworkDragSort"));
 	}
@@ -119,7 +121,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		try {
 			const order = JSON.parse(savedOrder);
 			const containers = Array.from(gridElement.children);
-			
+
 			for (const frameworkId of order) {
 				const container = containers.find(
 					c => c.getAttribute('data-framework') === frameworkId
@@ -149,7 +151,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 	function hideFramework(container: HTMLElement) {
 		container.style.transform = 'scale(0.95)';
 		container.style.opacity = '0';
-		
+
 		container.addEventListener('transitionend', function hideContainer(e) {
 			if (e.propertyName === 'opacity') {
 				container.classList.add('hidden');
@@ -182,7 +184,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 	if (grid) {
 		sortableInstance = initializeSortable(grid);
 		restoreFrameworkOrder(grid);
-		
+
 		// Add resize listener
 		window.addEventListener('resize', handleResize);
 
@@ -211,7 +213,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		if (!grid) return;
 
 		const containers = Array.from(grid.children);
-		
+
 		e.detail.order.forEach((frameworkId) => {
 			const container = containers.find(
 				c => c.getAttribute('data-framework') === frameworkId
@@ -235,7 +237,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
     [data-framework] {
       cursor: grab;
     }
-    
+
     [data-framework].dragging {
       cursor: grabbing;
     }
