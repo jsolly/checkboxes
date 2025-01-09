@@ -1,6 +1,6 @@
 {
 	"metadata": {
-		"lastUpdated": "2025-01-08T04:00:48.956Z",
+		"lastUpdated": "2025-01-0-9T04:00:48.956Z",
 		"description": "Framework comparison metrics",
 		"metrics": {
 			"bundleSize": "Size in KB",
@@ -59,10 +59,10 @@
 			"complexityZScore": 0.447213595499958
 		},
 		"stimulus": {
-			"bundleSize": 0.12,
+			"bundleSize": 12.67,
 			"complexityScore": 22,
-			"bundleSizeZScore": -1.0106665944529458,
-			"complexityZScore": -1.639783183499846
+			"bundleSizeZScore": 0,
+			"complexityZScore": 0
 		}
 	}
 }
