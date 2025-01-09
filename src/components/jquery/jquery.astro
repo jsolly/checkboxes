@@ -1,32 +1,19 @@
 ---
-const parentCheckbox = {
-	id: "parent-jquery",
-	label: "Parent",
-};
+const parentCheckbox = { id: "parent-jquery", label: "Parent" };
 
 const childCheckboxItems = [
-	{
-		id: "child1-jquery",
-		label: "Child 1",
-	},
-	{
-		id: "child2-jquery",
-		label: "Child 2",
-	},
-	{
-		id: "child3-jquery",
-		label: "Child 3",
-	},
+  { id: "child1-jquery", label: "Child 1" },
+  { id: "child2-jquery", label: "Child 2" },
+  { id: "child3-jquery", label: "Child 3" },
 ];
 ---
-
 <div class="px-3 py-2" data-jquery-checkbox-container>
   <div>
     <!-- Parent checkbox -->
     <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
       <div class="flex items-center space-x-3">
-        <input 
-          type="checkbox" 
+        <input
+          type="checkbox"
           id={parentCheckbox.id}
           class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
           data-parent-checkbox
@@ -42,8 +29,8 @@ const childCheckboxItems = [
       {childCheckboxItems.map(item => (
         <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
           <div class="flex items-center space-x-3">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               id={item.id}
               class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
               data-child-checkbox
@@ -59,7 +46,7 @@ const childCheckboxItems = [
 </div>
 
 <script>
-	import $ from 'jquery';
+  import $ from 'jquery';
   $(function() {
     function initCheckboxContainer($container: JQuery) {
       const $parentCheckbox = $container.find('[data-parent-checkbox]');
@@ -94,4 +81,4 @@ const childCheckboxItems = [
       initCheckboxContainer($(this));
     });
   });
-</script> 
+</script>

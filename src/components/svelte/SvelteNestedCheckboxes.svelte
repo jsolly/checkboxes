@@ -14,10 +14,7 @@
           }}
           use:setIndeterminate={isIndeterminate}
         />
-        <label
-          for={parentCheckbox.id}
-          class="text-slate-700 cursor-pointer text-sm font-medium"
-        >
+        <label for={parentCheckbox.id} class="text-slate-700 cursor-pointer text-sm font-medium">
           {parentCheckbox.label}
         </label>
       </div>
@@ -32,10 +29,7 @@
               class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
               bind:checked={childStates[item.id]}
             />
-            <label
-              for={item.id}
-              class="text-slate-700 cursor-pointer text-sm font-medium"
-            >
+            <label for={item.id} class="text-slate-700 cursor-pointer text-sm font-medium">
               {item.label}
             </label>
           </div>
@@ -43,35 +37,32 @@
       {/each}
     </div>
   </div>
-</div> 
+</div>
 
 <script>
-const parentCheckbox = {
-	id: "parent-svelte",
-	label: "Parent",
-};
+const parentCheckbox = { id: "parent-svelte", label: "Parent" };
 
 const childCheckboxItems = [
-	{ id: "child1-svelte", label: "Child 1" },
-	{ id: "child2-svelte", label: "Child 2" },
-	{ id: "child3-svelte", label: "Child 3" },
+  { id: "child1-svelte", label: "Child 1" },
+  { id: "child2-svelte", label: "Child 2" },
+  { id: "child3-svelte", label: "Child 3" },
 ];
 
 let childStates = childCheckboxItems.reduce((acc, item) => {
-	acc[item.id] = false;
-	return acc;
+  acc[item.id] = false;
+  return acc;
 }, {});
 
 function setIndeterminate(node, indeterminate) {
-	function update(indeterminate) {
-		node.indeterminate = indeterminate;
-	}
+  function update(indeterminate) {
+    node.indeterminate = indeterminate;
+  }
 
-	update(indeterminate);
-	return {
-		update,
-		destroy() {},
-	};
+  update(indeterminate);
+  return {
+    update,
+    destroy() {},
+  };
 }
 
 $: allChecked = Object.values(childStates).every(Boolean);

@@ -17,9 +17,7 @@ function Checkbox({
 	}, [indeterminate]);
 
 	return (
-		<div
-			className={`rounded-lg hover:bg-slate-100 transition-colors ${className}`}
-		>
+		<div className={`rounded-lg hover:bg-slate-100 transition-colors ${className}`}>
 			<div className="flex items-center space-x-3">
 				<input
 					ref={ref}
@@ -29,10 +27,7 @@ function Checkbox({
 					onChange={onChange}
 					className="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
 				/>
-				<label
-					htmlFor={id}
-					className="text-slate-700 cursor-pointer text-sm font-medium"
-				>
+				<label htmlFor={id} className="text-slate-700 cursor-pointer text-sm font-medium">
 					{label}
 				</label>
 			</div>
