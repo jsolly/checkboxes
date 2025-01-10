@@ -231,16 +231,24 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 </script>
 
 <style is:global>
-
 	/* Only show grab cursor on desktop devices */
 	@media (min-width: 1024px) {
-    [data-framework] {
-      cursor: grab;
-    }
+		[data-framework] {
+			cursor: grab;
+		}
 
-    [data-framework].dragging {
-      cursor: grabbing;
-    }
-  }
+		[data-framework].dragging {
+			cursor: grabbing;
+		}
+
+		/* Add hover effect for draggable cards */
+		.framework-container {
+			transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		.framework-container:hover {
+			border-color: rgb(203 213 225); /* slate-300 */
+		}
+	}
 </style>
 
