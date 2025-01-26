@@ -38,6 +38,9 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 			<p class="text-sm text-slate-500 mt-4 lg:hidden">
 				Switch to desktop view to compare frameworks side by side
 			</p>
+			<p class="text-sm text-slate-500 mt-4 hidden lg:block">
+				Click and drag framework cards to re-order them
+			</p>
 		</div>
 
 		<FrameworkControls client:only="react" />
