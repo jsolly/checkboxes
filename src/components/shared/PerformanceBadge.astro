@@ -16,7 +16,7 @@ function getColorClass(zScore: number) {
 	return "bg-green-500";
 }
 
-const complexityTooltip = `Complexity score is calculated using Gemini 1.5 Pro based on:
+const complexityTooltip = `Complexity score is calculated using Gemini based on:
 • State Management (40%): How state is stored and updated
 • Event Handling (35%): Parent-child interactions
 • Code Overhead (25%): Boilerplate and helpers needed`;
@@ -29,13 +29,17 @@ const bundleTooltip = `JS Bundle size represents:
 ---
 
 <div class="badge-container">
-	<div class={`performance-badge ${getColorClass(stats.complexityZScore)} group relative`}>
+	<div
+		class={`performance-badge ${getColorClass(stats.complexityZScore)} group relative`}
+	>
 		<span class="value">Complexity: {stats.complexityScore}%</span>
 		<div class="tooltip">
 			{complexityTooltip}
 		</div>
 	</div>
-	<div class={`performance-badge ${getColorClass(stats.bundleSizeZScore)} group relative`}>
+	<div
+		class={`performance-badge ${getColorClass(stats.bundleSizeZScore)} group relative`}
+	>
 		<span class="value">JS Bundle: {stats.bundleSize.toFixed(2)}kb</span>
 		<div class="tooltip">
 			{bundleTooltip}
@@ -77,7 +81,7 @@ const bundleTooltip = `JS Bundle size represents:
 
 	/* Arrow */
 	.tooltip::before {
-		content: '';
+		content: "";
 		position: absolute;
 		top: -4px;
 		left: 50%;
@@ -133,4 +137,5 @@ const bundleTooltip = `JS Bundle size represents:
 			right: 16px;
 		}
 	}
-</style> 
+</style>
+

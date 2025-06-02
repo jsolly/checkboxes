@@ -1,5 +1,5 @@
 echo "🚀 Running pre-commit hook..."
-pnpm lint-staged
+pnpm run lint-staged
 lint_status=$?
 
 if [ $lint_status -ne 0 ]; then
