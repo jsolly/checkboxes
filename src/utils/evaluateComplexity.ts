@@ -1,4 +1,3 @@
-import { SchemaType } from "@google/generative-ai";
 import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
 import { getModelResponse } from "./googleAI";
 
@@ -11,7 +10,7 @@ const scoreProperties = Object.fromEntries(
 	Object.keys(FRAMEWORKS).map((framework) => [
 		framework,
 		{
-			type: SchemaType.NUMBER,
+			type: "number",
 			minimum: 0,
 			maximum: 100,
 		},
@@ -19,17 +18,17 @@ const scoreProperties = Object.fromEntries(
 ) as Record<
 	FrameworkId,
 	{
-		type: SchemaType.NUMBER;
+		type: "number";
 		minimum: number;
 		maximum: number;
 	}
 >;
 
 export const complexitySchema = {
-	type: SchemaType.OBJECT,
+	type: "object",
 	properties: {
 		scores: {
-			type: SchemaType.OBJECT,
+			type: "object",
 			description: "Framework complexity scores (0-100)",
 			properties: scoreProperties,
 			required: Object.keys(FRAMEWORKS) as FrameworkId[],
