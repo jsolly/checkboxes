@@ -26,6 +26,9 @@ export const FRAMEWORKS = {
 	stimulus: {
 		displayName: "Stimulus",
 	},
+	datastar: {
+		displayName: "Datastar",
+	},
 } as const;
 
 export type FrameworkId = keyof typeof FRAMEWORKS;
