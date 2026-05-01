@@ -63,6 +63,12 @@
 			"complexityScore": 30,
 			"bundleSizeZScore": 0.20415630849459573,
 			"complexityZScore": -0.4170288281141494
+		},
+		"datastar": {
+			"bundleSize": 0,
+			"complexityScore": 0,
+			"bundleSizeZScore": 0,
+			"complexityZScore": 0
 		}
 	}
 }
