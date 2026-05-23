@@ -14,6 +14,7 @@ A collection of checkbox implementations using different frameworks and approach
   - Hyperscript
   - CSS Only
   - jQuery
+  - Stimulus
 - Syntax highlighted collapsible code snippets
 - Performance metrics for each implementation
 
@@ -27,10 +28,9 @@ pnpm dev
 ## Generate performance metrics
 
 ```shell
-touch .env # Create an empty .env file
-# Get your GEMINI_API_KEY from https://makersuite.google.com/app/apikey
+# Get your GEMINI_API_KEY from https://aistudio.google.com/apikey
 # Add it to .env: GEMINI_API_KEY=your_key_here
-# The API key is used for generating complexity scores
+# The API key is used for generating complexity scores via Gemini 3.5 Flash
 
 # Run these commands in sequence:
 pnpm build           # Build the project
@@ -198,7 +198,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Prerequisites
 
-- Node.js 16+
+- Node.js 20+
 - pnpm
-- A Google Cloud account (for Gemini API access to generate complexity scores)
+- A Gemini API key (for generating complexity scores)
 

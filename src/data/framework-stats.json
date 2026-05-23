@@ -1,6 +1,6 @@
 {
 	"metadata": {
-		"lastUpdated": "2025-01-09T20:49:42.798Z",
+		"lastUpdated": "2026-05-23T17:51:03.399Z",
 		"description": "Framework comparison metrics",
 		"metrics": {
 			"bundleSize": "Size in KB",
@@ -12,57 +12,57 @@
 	"frameworks": {
 		"vanillajs": {
 			"bundleSize": 0.31,
-			"complexityScore": 50,
-			"bundleSizeZScore": -0.6479743704393692,
-			"complexityZScore": 0.8340576562282992
+			"complexityScore": 80,
+			"bundleSizeZScore": -0.7074306914115885,
+			"complexityZScore": 1.0801234497346435
 		},
 		"alpine": {
 			"bundleSize": 0.31,
-			"complexityScore": 25,
-			"bundleSizeZScore": -0.6479743704393692,
-			"complexityZScore": -0.7298004491997616
+			"complexityScore": 35,
+			"bundleSizeZScore": -0.7074306914115885,
+			"complexityZScore": -1.0029717747535973
 		},
 		"vue": {
 			"bundleSize": 0.31,
-			"complexityScore": 55,
-			"bundleSizeZScore": -0.6479743704393692,
-			"complexityZScore": 1.1468292773139115
+			"complexityScore": 40,
+			"bundleSizeZScore": -0.7074306914115885,
+			"complexityZScore": -0.7715167498104595
 		},
 		"react": {
 			"bundleSize": 1.53,
-			"complexityScore": 60,
-			"bundleSizeZScore": 2.600773842996372,
-			"complexityZScore": 1.4596008983995237
+			"complexityScore": 55,
+			"bundleSizeZScore": 2.326783758470928,
+			"complexityZScore": -0.07715167498104585
 		},
 		"svelte": {
 			"bundleSize": 0.31,
-			"complexityScore": 35,
-			"bundleSizeZScore": -0.6479743704393692,
-			"complexityZScore": -0.10425720702853723
+			"complexityScore": 20,
+			"bundleSizeZScore": -0.7074306914115885,
+			"complexityZScore": -1.697336849583011
 		},
 		"hyperscript": {
-			"bundleSize": 0.64,
-			"complexityScore": 20,
-			"bundleSizeZScore": 0.23078539221128216,
-			"complexityZScore": -1.0425720702853738
+			"bundleSize": 1.01,
+			"complexityScore": 50,
+			"bundleSizeZScore": 1.0335120257341177,
+			"complexityZScore": -0.3086066999241837
 		},
 		"cssOnly": {
 			"bundleSize": 0.31,
-			"complexityScore": 10,
-			"bundleSizeZScore": -0.6479743704393692,
-			"complexityZScore": -1.668115312456598
+			"complexityScore": 90,
+			"bundleSizeZScore": -0.7074306914115885,
+			"complexityZScore": 1.5430334996209192
 		},
 		"jquery": {
 			"bundleSize": 0.63,
-			"complexityScore": 45,
-			"bundleSizeZScore": 0.20415630849459573,
-			"complexityZScore": 0.5212860351426871
+			"complexityScore": 75,
+			"bundleSizeZScore": 0.08842883642644858,
+			"complexityZScore": 0.8486684247915056
 		},
 		"stimulus": {
 			"bundleSize": 0.63,
-			"complexityScore": 30,
-			"bundleSizeZScore": 0.20415630849459573,
-			"complexityZScore": -0.4170288281141494
+			"complexityScore": 65,
+			"bundleSizeZScore": 0.08842883642644858,
+			"complexityZScore": 0.3857583749052299
 		}
 	}
 }
