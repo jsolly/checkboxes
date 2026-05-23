@@ -28,14 +28,17 @@ pnpm dev
 ## Generate performance metrics
 
 ```shell
-# Get your GEMINI_API_KEY from https://aistudio.google.com/apikey
-# Add it to .env: GEMINI_API_KEY=your_key_here
-# The API key is used for generating complexity scores via Gemini 3.5 Flash
-
 # Run these commands in sequence:
 pnpm build           # Build the project
 pnpm preview         # Start the preview server (in a separate terminal)
 pnpm generate-stats  # Generate performance metrics (in a new terminal)
+```
+
+Bundle sizes are always measured. Complexity scores require a Gemini API key — without one, existing scores are preserved. To generate new complexity scores, create a `.env` file with your key:
+
+```shell
+# Get your key from https://aistudio.google.com/apikey
+GEMINI_API_KEY=your_key_here
 ```
 
 ## Contributing
