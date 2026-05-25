@@ -1,29 +1,33 @@
 import { GoogleGenAI } from "@google/genai";
 import * as dotenv from "dotenv";
 
+dotenv.config({ path: ".env.local" });
 dotenv.config();
 
-export const genAI = new GoogleGenAI({
-	apiKey: process.env.GEMINI_API_KEY || "",
-});
+let genAI: GoogleGenAI | null = null;
+
+function getClient(): GoogleGenAI {
+	if (!genAI) {
+		genAI = new GoogleGenAI({
+			apiKey: process.env.GEMINI_API_KEY || "",
+		});
+	}
+	return genAI;
+}
 
 export async function getModelResponse(prompt: string, schema?: object) {
-	const model = genAI.models.generateContent({
-		model: "gemini-2.0-flash",
-		contents: [
-			{
-				role: "user",
-				parts: [{ text: prompt }],
-			},
-		],
-		...(schema && {
-			responseMimeType: "application/json",
-			responseSchema: schema,
-		}),
+	const result = await getClient().models.generateContent({
+		model: "gemini-3.5-flash",
+		contents: prompt,
+		config: schema
+			? {
+					responseMimeType: "application/json",
+					responseSchema: schema,
+				}
+			: undefined,
 	});
 
-	const result = await model;
-	const response = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
+	const response = result.text || "";
 	console.log("\n🔍 API Response:", response);
 	return response;
 }

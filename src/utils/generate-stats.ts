@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import * as dotenv from "dotenv";
 import type { Page, Protocol } from "puppeteer";
 import puppeteer from "puppeteer";
 import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
@@ -11,6 +12,9 @@ import {
 } from "../config/stats";
 import { calculateStatsZScores } from "./calculateZScores";
 import { evaluateFrameworkComplexity } from "./evaluateComplexity";
+
+dotenv.config({ path: ".env.local" });
+dotenv.config();
 
 interface CDPEvent {
 	type: string;
@@ -68,21 +72,17 @@ async function measureBundleSize(page: Page, framework: FrameworkId) {
 }
 
 async function readImplementationFile(id: FrameworkId): Promise<string> {
-	for (const ext of STATS_CONFIG.SUPPORTED_EXTENSIONS) {
-		try {
-			const code = await fs.readFile(
-				path.join(
-					process.cwd(),
-					STATS_CONFIG.COMPONENTS_DIR,
-					id,
-					`${id}Container${ext}`,
-				),
-				"utf-8",
-			);
-			return code;
-		} catch {} // Empty catch is sufficient since we'll try next extension
+	const dirPath = path.join(process.cwd(), STATS_CONFIG.COMPONENTS_DIR, id);
+	const files = await fs.readdir(dirPath);
+	const containerFile = files.find(
+		(f) =>
+			f.toLowerCase().includes("container") &&
+			STATS_CONFIG.SUPPORTED_EXTENSIONS.some((ext) => f.endsWith(ext)),
+	);
+	if (!containerFile) {
+		throw new Error(`Could not find implementation for ${id}`);
 	}
-	throw new Error(`Could not find implementation for ${id}`);
+	return fs.readFile(path.join(dirPath, containerFile), "utf-8");
 }
 
 async function generateStats(): Promise<void> {
@@ -120,8 +120,17 @@ async function generateStats(): Promise<void> {
 			implementations[id] = code;
 		}
 
-		// Load existing stats if not updating complexity scores
-		if (!STATS_CONFIG.UPDATE_COMPLEXITY_SCORES) {
+		const hasApiKey = !!process.env.GEMINI_API_KEY;
+		const shouldUpdateComplexity =
+			STATS_CONFIG.UPDATE_COMPLEXITY_SCORES && hasApiKey;
+
+		if (STATS_CONFIG.UPDATE_COMPLEXITY_SCORES && !hasApiKey) {
+			console.warn(
+				"⚠️ GEMINI_API_KEY not set — skipping complexity evaluation, using existing scores",
+			);
+		}
+
+		if (!shouldUpdateComplexity) {
 			try {
 				const existingStats = JSON.parse(
 					await fs.readFile(
@@ -130,7 +139,6 @@ async function generateStats(): Promise<void> {
 					),
 				) as StatsFile;
 
-				// Keep existing complexity scores but use new bundle sizes
 				for (const id of Object.keys(stats) as FrameworkId[]) {
 					stats[id].complexityScore =
 						existingStats.frameworks[id]?.complexityScore ?? 0;
@@ -141,30 +149,44 @@ async function generateStats(): Promise<void> {
 			}
 		}
 
-		// Only run complexity evaluation if flag is true
-		if (STATS_CONFIG.UPDATE_COMPLEXITY_SCORES) {
+		if (shouldUpdateComplexity) {
 			const complexityMeasurements: Record<string, number[]> = {};
 
-			// Initialize arrays for each framework
 			for (const id of Object.keys(implementations) as FrameworkId[]) {
 				complexityMeasurements[id] = [];
 			}
 
-			// Run complexity evaluation iterations times
 			for (let i = 0; i < STATS_CONFIG.COMPLEXITY_SCORE_ITERATIONS; i++) {
 				console.log(`📊 Evaluating complexity - Run ${i + 1}...`);
-				const { scores } = await evaluateFrameworkComplexity(implementations);
+				try {
+					const { scores } = await evaluateFrameworkComplexity(implementations);
 
-				for (const [id, score] of Object.entries(scores)) {
-					complexityMeasurements[id].push(score);
+					for (const [id, score] of Object.entries(scores)) {
+						complexityMeasurements[id].push(score);
+					}
+				} catch (error) {
+					const message =
+						error instanceof Error ? error.message : String(error);
+					if (
+						message.includes("429") ||
+						message.includes("RESOURCE_EXHAUSTED")
+					) {
+						console.warn(
+							"⚠️ Gemini API rate limit hit — using scores collected so far",
+						);
+						break;
+					}
+					throw error;
 				}
 			}
 
-			// Calculate median complexity score for each framework
 			for (const id of Object.keys(implementations) as FrameworkId[]) {
-				const median = calculateMedian(complexityMeasurements[id]);
-				stats[id].complexityScore = median;
-				console.log(`    ${id} median complexity score: ${median}`);
+				const measurements = complexityMeasurements[id];
+				if (measurements.length > 0) {
+					const median = calculateMedian(measurements);
+					stats[id].complexityScore = median;
+					console.log(`    ${id} median complexity score: ${median}`);
+				}
 			}
 		}
 
