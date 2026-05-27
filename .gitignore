@@ -26,3 +26,5 @@ pnpm-debug.log*
 
 # vercel
 .vercel
+# editor (local symlinks to ~/.agents rules — machine-specific)
+.cursor/
