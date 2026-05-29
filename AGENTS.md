@@ -1,5 +1,8 @@
 # AGENTS.md
 
+@.agents/AGENTS.md
+
+
 ## Project Rules
 
 - Add project-specific rules above or below the managed global block.
