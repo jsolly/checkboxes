@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.1/bundles/datastar.js"></script>
+</head>
+
+<body data-signals="{
+    child1: false,
+    child2: false,
+    child3: false
+    }" data-computed:checked="($child1?1:0)+($child2?1:0)+($child3?1:0)" 
+       data-computed:parent="$checked === 3"
+       data-computed:indeterminate="$checked > 0 && $checked < 3">
+  <div class="px-3 py-2">
+    <div>
+
+      <!-- Parent checkbox -->
+      <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+        <div class="flex items-center space-x-3">
+          <input 
+            type="checkbox" 
+            id="parent-datastar" 
+            class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+            data-bind:parent
+            data-on:change="$child1=$child2=$child3=event.target.checked"
+            data-effect="document.getElementById('parent-datastar').indeterminate = $indeterminate;" />
+          <label for="parent-datastar" class="text-slate-700 cursor-pointer text-sm font-medium">
+            Parent
+          </label>
+        </div>
+      </div>
+
+      <!-- Child checkboxes -->
+      <div class="ml-8">
+        <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
+          <div class="flex items-center space-x-3">
+            <input 
+              type="checkbox" 
+              id="child1-datastar" 
+              class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+              data-bind:child1 />
+            <label for="child1-datastar">Child 1</label>
+          </div>
+        </div>
+
+        <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
+          <div class="flex items-center space-x-3">
+            <input 
+              type="checkbox" 
+              id="child2-datastar" 
+              class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500" 
+              data-bind:child2 />
+            <label for="child2-datastar">Child 2</label>
+          </div>
+        </div>
+
+        <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
+          <div class="flex items-center space-x-3">
+            <input 
+              type="checkbox" 
+              id="child3-datastar" 
+              class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500" 
+              data-bind:child3 />
+            <label for="child3-datastar">Child 3</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

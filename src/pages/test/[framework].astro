@@ -1,6 +1,7 @@
 ---
 import Alpine from "../../components/alpine/alpine.astro";
 import CssOnly from "../../components/cssOnly/cssOnly.astro";
+import Datastar from "../../components/datastar/datastar.astro";
 import Hyperscript from "../../components/hyperscript/hyperscript.astro";
 import JQuery from "../../components/jquery/jquery.astro";
 import ReactNestedCheckboxes from "../../components/react/ReactNestedCheckboxes";
@@ -52,6 +53,7 @@ const frameworkId = framework;
 			{frameworkId === "hyperscript" && <Hyperscript />}
 			{frameworkId === "cssOnly" && <CssOnly />}
 			{frameworkId === "stimulus" && <Stimulus />}
+			{frameworkId === "datastar" && <Datastar />}
 		</div>
 	</div>
 </Layout>

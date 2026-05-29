@@ -6,6 +6,7 @@ A collection of checkbox implementations using different frameworks and approach
 ## Features
 
 - Multiple implementation examples:
+  - Datastar
   - React
   - Vue.js
   - Svelte
