@@ -1,9 +1,10 @@
 {
-	"install": "npm ci",
-	"terminals": [
-		{
-			"name": "dev",
-			"command": "npm run dev"
-		}
-	]
+  "install": "npm ci",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "npm run dev"
+    }
+  ],
+  "agentCanUpdateSnapshot": true
 }

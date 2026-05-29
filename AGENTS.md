@@ -3,6 +3,10 @@
 @.agents/AGENTS.md
 
 
+## Cursor Cloud
+
+Cloud agents: see `docs/cloud-agents.md` (fleet layout, subtree updates). After the first successful cloud boot, pin the VM snapshot per **Snapshot bootstrap (agent-run)** in that doc (`./scripts/pin-cloud-snapshot.sh`).
+
 ## Project Rules
 
 - Add project-specific rules above or below the managed global block.
