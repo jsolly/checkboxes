@@ -2,9 +2,8 @@
 
 ## Project Test Rules
 
-- Add project-specific test rules above or below the managed global block.
+Add project-specific test rules below.
 
-<!-- BEGIN GLOBAL TEST RULES (managed by sync-global-agents.sh) -->
 # Test Suite Architecture
 
 This project treats tests as production documentation for real user flows.
@@ -68,4 +67,3 @@ Use shared helpers before creating one-off fixtures:
 - Avoid boundary-time fixtures like `now - cooldown + 1000`; use clearly inside/outside windows (for example, half cooldown for reject-path, multiple cooldown windows for allow-path).
 - Prefer behavioral invariants over fragile counters when testing shared tables. Assert the correct rows remain/delete, not exact global delete counts unless the dataset is fully isolated.
 - Do not add sleeps or longer timeouts as a first fix for flakes. First remove nondeterminism (clock control, unique test IDs, deterministic fixtures).
-<!-- END GLOBAL TEST RULES (managed by sync-global-agents.sh) -->
