@@ -2,6 +2,7 @@
 import FrameworkControls from "../components/FrameworkControls";
 import AlpineContainer from "../components/alpine/alpineContainer.astro";
 import CssOnlyContainer from "../components/cssOnly/cssOnlyContainer.astro";
+import DatastarContainer from "../components/datastar/datastarContainer.astro";
 import HyperscriptContainer from "../components/hyperscript/hyperscriptContainer.astro";
 import JQueryContainer from "../components/jquery/jqueryContainer.astro";
 import ReactContainer from "../components/react/ReactContainer.astro";
@@ -22,6 +23,7 @@ const containerMap = {
 	cssOnly: CssOnlyContainer,
 	jquery: JQueryContainer,
 	stimulus: StimulusContainer,
+	datastar: DatastarContainer,
 } as const;
 
 const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
