@@ -28,8 +28,7 @@ When the family-memory MCP is available, call `recall` (no args) at conversation
 
 ## AWS
 
-- Use `--profile prod-admin` for all production AWS commands.
-- SSO profiles: `prod-admin` (730335616323, production), `general-admin` (541310242108), `amplify-admin`, `jsolly-sandbox`, `jsolly-dev`.
+Cross-repo conventions (credentials, SSO, SAM): `~/.agents/rules/aws.md`. Set `AWS_PROFILE` locally in your shell or gitignored `.env.local` — never commit profile names.
 
 ## Error Logging & alert-hub
 
