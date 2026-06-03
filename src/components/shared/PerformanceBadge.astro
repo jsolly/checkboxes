@@ -16,25 +16,42 @@ function getColorClass(zScore: number) {
 	return "bg-green-500";
 }
 
-const complexityTooltip = `Complexity score is calculated using Gemini based on:
-• State Management (40%): How state is stored and updated
-• Event Handling (35%): Parent-child interactions
-• Code Overhead (25%): Boilerplate and helpers needed`;
+const decisionPointsTooltip = `Decision Points is deterministic and counts:
+* JavaScript control flow
+* Framework template directives
+* Declarative conditional attributes
+* Behavioral CSS selectors`;
+
+const vibeComplexityTooltip = `Vibe Complexity is AI-judged based on:
+* State management clarity
+* Event handling clarity
+* Boilerplate and framework overhead
+* Idiomatic style and surprise factor`;
 
 const bundleTooltip = `JS Bundle size represents:
-• Total size of all JavaScript files
-• Measured after compression
-• Includes framework code
-• Captured during page load`;
+* Total size of all JavaScript files
+* Measured after compression
+* Includes framework code
+* Captured during page load`;
 ---
 
 <div class="badge-container">
 	<div
-		class={`performance-badge ${getColorClass(stats.complexityZScore)} group relative`}
+		class={`performance-badge ${getColorClass(stats.decisionPointZScore)} group relative`}
 	>
-		<span class="value">Complexity: {stats.complexityScore}%</span>
+		<span class="value">
+			Decisions: {stats.decisionPoints} ({stats.decisionPointScore}/100)
+		</span>
 		<div class="tooltip">
-			{complexityTooltip}
+			{decisionPointsTooltip}
+		</div>
+	</div>
+	<div
+		class={`performance-badge ${getColorClass(stats.vibeComplexityZScore)} group relative`}
+	>
+		<span class="value">Vibe: {stats.vibeComplexity}/100</span>
+		<div class="tooltip">
+			{vibeComplexityTooltip}
 		</div>
 	</div>
 	<div
@@ -138,4 +155,3 @@ const bundleTooltip = `JS Bundle size represents:
 		}
 	}
 </style>
-

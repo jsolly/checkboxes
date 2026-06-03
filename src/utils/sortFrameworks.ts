@@ -10,11 +10,13 @@ export const getSavedOrder = () => {
 };
 
 const getMetricAndDirection = (option: SortOption): [SortMetric, boolean] => {
-	const metric = option.includes("bundleSize")
-		? SortMetric.BundleSize
-		: SortMetric.Complexity;
-	const isAscending = option.endsWith("Asc");
-	return [metric, isAscending];
+	if (option.includes("bundleSize")) {
+		return [SortMetric.BundleSize, option.endsWith("Asc")];
+	}
+	if (option.includes("decisionPoints")) {
+		return [SortMetric.DecisionPoints, option.endsWith("Asc")];
+	}
+	return [SortMetric.VibeComplexity, option.endsWith("Asc")];
 };
 
 export const sortFrameworks = (
