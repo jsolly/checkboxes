@@ -7,4 +7,10 @@ if [ $lint_status -ne 0 ]; then
   exit $lint_status
 fi
 
+echo "Running Astro check..."
+pnpm exec astro check
+
+echo "Running production build..."
+pnpm run build
+
 echo "✅ Pre-commit hook completed successfully"
