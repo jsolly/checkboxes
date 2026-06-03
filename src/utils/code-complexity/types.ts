@@ -1,5 +1,4 @@
 import type { FrameworkId } from "../../config/frameworks";
-import type { ImplementationSource } from "../implementationSources";
 
 export const CODE_COMPLEXITY_VERSION = "cc-1.0.0";
 
