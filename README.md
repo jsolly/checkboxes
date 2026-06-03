@@ -35,7 +35,7 @@ pnpm preview         # Start the preview server (in a separate terminal)
 pnpm generate-stats  # Generate performance metrics (in a new terminal)
 ```
 
-Bundle sizes are always measured. Complexity scores require a Gemini API key — without one, existing scores are preserved. To generate new complexity scores, create a `.env` file with your key:
+Bundle sizes and Decision Points are always measured. Vibe Complexity requires a Gemini API key. Without one, existing Vibe Complexity scores are preserved. To refresh Vibe Complexity, create a `.env` file with your key:
 
 ```shell
 # Get your key from https://aistudio.google.com/apikey
@@ -130,7 +130,7 @@ If you want to generate performance metrics for your new implementation, see the
 ### Troubleshooting Setup
 
 - If `generate-stats` fails, ensure:
-  - Your GEMINI_API_KEY is valid and properly set in .env
+  - Your GEMINI_API_KEY is valid and properly set in `.env` (only if refreshing Vibe Complexity)
   - You've run `pnpm build` before running `pnpm preview`
   - The preview server is running when you run `generate-stats`
   - You have Node.js 16+ installed
@@ -178,14 +178,19 @@ Each framework implementation is evaluated on two key metrics:
 - Represents the compressed (encoded) size of all JS assets
 - Lower scores are better
 
-### Complexity Score
-- Scored from 0-100 (whole numbers)
-- Evaluated using AI analysis of the implementation code
-- Weighted based on three criteria:
-  1. **State Management (40%)**: How state is stored and updated
-  2. **Event Handling (35%)**: Parent-child checkbox interactions
-  3. **Code Overhead (25%)**: Boilerplate and framework abstractions
-- Lower scores indicate simpler implementations
+### Decision Points
+- Deterministic count of branch, loop, template directive, declarative attribute, and behavioral selector decisions
+- Calculated from the actual implementation source shown on each card
+- Normalized to a 0-100 display score with a fixed cap of 30
+- Lower scores indicate fewer decisions
+
+### Vibe Complexity
+- AI-judged implementation complexity on a 0-100 scale
+- Uses the same implementation source as Decision Points
+- Requires a Gemini API key to refresh
+- Existing Vibe Complexity scores are preserved when no key is available
+
+See [METHODOLOGY.md](METHODOLOGY.md) for counting rules, normalization, and reproduction steps.
 
 Both metrics are normalized using z-scores to provide relative performance indicators, displayed as colored badges:
 - 🟢 Excellent (z-score < -1.5)
@@ -204,5 +209,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Node.js 20+
 - pnpm
-- A Gemini API key (for generating complexity scores)
+- A Gemini API key (optional; only needed to refresh Vibe Complexity)
 
