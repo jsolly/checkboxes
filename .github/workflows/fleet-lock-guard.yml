@@ -2,7 +2,7 @@ name: Fleet lock guard
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths:
       - ".agents/**"
       - ".github/workflows/fleet-lock-guard.yml"
