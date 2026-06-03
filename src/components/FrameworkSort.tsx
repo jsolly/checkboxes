@@ -62,18 +62,18 @@ export default function FrameworkSort() {
 							Bundle Size (largest first)
 						</option>
 					</optgroup>
-					<optgroup label="Decision Points">
+					<optgroup label="Code Complexity">
 						<option
-							value={SortOption.DecisionPointsAsc}
-							aria-label="Sort by Decision Points, ascending"
+							value={SortOption.CodeComplexityAsc}
+							aria-label="Sort by Code Complexity, ascending"
 						>
-							Decision Points (fewest first)
+							Code Complexity (simplest first)
 						</option>
 						<option
-							value={SortOption.DecisionPointsDsc}
-							aria-label="Sort by Decision Points, descending"
+							value={SortOption.CodeComplexityDsc}
+							aria-label="Sort by Code Complexity, descending"
 						>
-							Decision Points (most first)
+							Code Complexity (most complex first)
 						</option>
 					</optgroup>
 					<optgroup label="Vibe Complexity">

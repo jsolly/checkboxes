@@ -11,8 +11,8 @@ import {
 	type StatsFile,
 } from "../config/stats";
 import { calculateStatsZScores } from "./calculateZScores";
-import { analyzeDecisionPoints } from "./decision-points";
-import { DECISION_POINT_SCORE_CAP } from "./decision-points/types";
+import { analyzeCodeComplexity } from "./code-complexity";
+import { CODE_COMPLEXITY_VERSION } from "./code-complexity/types";
 import { evaluateVibeComplexity } from "./evaluateVibeComplexity";
 import { readImplementationSources } from "./implementationSources";
 
@@ -110,20 +110,20 @@ async function generateStats(): Promise<void> {
 			const size = await measureBundleSize(page, id);
 			console.log(`  Bundle size: ${size}kb`);
 
-			const decisionPointResult = analyzeDecisionPoints(implementations[id]);
+			const codeComplexityResult = analyzeCodeComplexity(implementations[id]);
 			console.log(
-				`  Decision points: ${decisionPointResult.value} (score ${decisionPointResult.normalizedScore}/100)`,
+				`  Code complexity: ${codeComplexityResult.score}/100 (logic decisions ${codeComplexityResult.raw.logicDecisions})`,
 			);
 
 			stats[id] = {
 				bundleSize: size,
-				decisionPoints: decisionPointResult.value,
-				decisionPointScore: decisionPointResult.normalizedScore,
+				codeComplexity: codeComplexityResult.score,
 				vibeComplexity: 0,
 				bundleSizeZScore: 0,
-				decisionPointZScore: 0,
+				codeComplexityZScore: 0,
 				vibeComplexityZScore: 0,
-				decisionPointBreakdown: decisionPointResult.breakdown,
+				codeComplexitySubscores: codeComplexityResult.subscores,
+				codeComplexityRaw: codeComplexityResult.raw,
 			};
 		}
 
@@ -203,16 +203,15 @@ async function generateStats(): Promise<void> {
 			metadata: {
 				lastUpdated: new Date().toISOString(),
 				description: "Framework comparison metrics",
-				decisionPointScoreCap: DECISION_POINT_SCORE_CAP,
+				codeComplexityVersion: CODE_COMPLEXITY_VERSION,
 				metrics: {
 					bundleSize: "Size in KB",
-					decisionPoints:
-						"Deterministic count of branch, loop, template, selector, and declarative decisions",
-					decisionPointScore: "Decision Points normalized to 0-100",
+					codeComplexity:
+						"Deterministic 0-100 composite of size, logic, reactive, nesting, and vocabulary",
 					vibeComplexity:
 						"AI-judged implementation complexity on a 0-100 scale",
 					bundleSizeZScore: "Standardized score relative to mean",
-					decisionPointZScore: "Standardized score relative to mean",
+					codeComplexityZScore: "Standardized score relative to mean",
 					vibeComplexityZScore: "Standardized score relative to mean",
 				},
 			},

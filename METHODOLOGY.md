@@ -4,7 +4,7 @@
 
 Ten implementations of the same nested-checkbox component: React, Vue, Svelte, Alpine, Vanilla JavaScript, jQuery, Stimulus, Datastar, Hyperscript, and CSS-only.
 
-Each implementation is scored with Decision Points and Vibe Complexity.
+Each implementation is scored with Code Complexity and Vibe Complexity.
 
 The component requirements are identical across frameworks:
 
@@ -18,24 +18,46 @@ Both metrics analyze the actual implementation source shown in each card’s cod
 
 McCabe cyclomatic complexity is defined on an executable control-flow graph. It does not apply cleanly to CSS-only, framework template, or declarative attribute implementations. Reporting zero for those implementations would imply simplicity where the metric is actually undefined.
 
-Decision Points is McCabe-inspired but defined for this cross-framework comparison so every implementation receives an auditable deterministic number. It is not cyclomatic complexity.
+Code Complexity is McCabe-inspired but defined for this cross-framework comparison so every implementation receives an auditable deterministic score. It is not cyclomatic complexity.
 
-## 3. Decision Points
+## 3. Code Complexity
 
-Decision Points is a deterministic count of branching, looping, conditional template directives, declarative condition attributes, Hyperscript decision tokens, and behavioral CSS selectors.
+Code Complexity is a deterministic **0–100** score built from five capped **0–20** axes:
 
-The count starts at **0**, not 1, because it counts decision constructs rather than McCabe paths. The raw integer is the durable, auditable value; the 0–100 display score is derived from it (see [Normalization](#5-normalization)).
-
-Results include a breakdown so you can see where decisions came from:
-
-| Breakdown field | What it measures |
+| Axis | What it measures |
 | --- | --- |
-| `jsControlFlow` | Branches, loops, and short-circuit logic in JavaScript/TypeScript (including Astro frontmatter and `<script>` blocks) |
-| `templateDirectives` | Framework template conditionals and loops (Vue, Svelte, Astro client directives) |
-| `declarativeAttrs` | Declarative conditional/loop attributes and Hyperscript decision tokens |
-| `selectors` | Behavioral CSS selectors in `<style>` blocks |
+| `size` | Implementation bulk from structural tokens after stripping presentation attributes |
+| `logic` | Branch/template/selector/declarative decisions (Decision Points) |
+| `reactive` | Event handlers, bindings, directives, state atoms, and behavioral selectors |
+| `nesting` | Max structural depth across JS blocks, template controls, and selector/state constructs |
+| `vocabulary` | Distinct operators, identifiers, directive names, and meaningful values |
 
-### What counts
+Cards display the total score (`Code: 74/100`). Tooltips show the five subscores labeled Size, Logic, Reactive, Nesting, and Vocabulary.
+
+The formula version is stored in stats metadata (`codeComplexityVersion`, currently `cc-1.0.0`).
+
+### Formula
+
+Each axis is log-scaled or depth-scaled, capped at 20, then summed:
+
+```text
+size       = min(20, 6 * log2(1 + astNodes / 24))
+logic      = min(20, 5 * log2(1 + logicDecisions))
+reactive   = min(20, 4 * log2(1 + reactiveSurface))
+nesting    = min(20, 2.5 * depth + 0.5 * depth²)
+vocabulary = min(20, 5 * log2(1 + vocabulary / 8))
+score      = round(size + logic + reactive + nesting + vocabulary)
+```
+
+Presentation-only attributes (`class`, `className`, `style`) are stripped before size and vocabulary counting so Tailwind boilerplate does not dominate.
+
+### Logic axis (Decision Points)
+
+The `logic` axis reuses the Decision Points analyzer. Decision Points is a deterministic count of branching, looping, conditional template directives, declarative condition attributes, Hyperscript decision tokens, and behavioral CSS selectors.
+
+The count starts at **0**, not 1, because it counts decision constructs rather than McCabe paths. The raw integer is stored in JSON as `codeComplexityRaw.logicDecisions`.
+
+#### What counts in Decision Points
 
 **JavaScript control flow** (parsed with an AST where the file is JS/TS/JSX):
 
@@ -63,14 +85,14 @@ Results include a breakdown so you can see where decisions came from:
 - Pseudo-classes: `:has()`, `:is()`, `:not()`, `:where()`, `:checked` (when used for behavior, not mere styling)
 - Attribute selectors targeting behavioral state, e.g. `[data-checked]`, `[data-state]`, `[data-selected]`, `[data-active]`
 
-### What does not count
+#### What does not count in Decision Points
 
 - Function declarations, class declarations, imports, comments, whitespace, or formatting
 - JSX nesting depth (markup structure alone is not a decision)
 - Pure presentation CSS (layout, color, spacing without conditional behavior)
 - Higher-order array methods such as `.map()` or `.every()` **unless** their inline callback contains counted control flow (e.g. an `if` inside the callback)
 
-### Analyzer behavior by file type
+#### Analyzer behavior by file type
 
 - `.js`, `.jsx`, `.ts`, `.tsx`: AST-based JavaScript counting only
 - `.vue`: script blocks via AST; template directives and declarative attrs in markup; behavioral selectors in `<style>`
@@ -78,9 +100,17 @@ Results include a breakdown so you can see where decisions came from:
 - `.astro` / `.html`: frontmatter and `<script>` via AST; template directives and declarative attrs in markup; behavioral selectors in `<style>`
 - Unsupported extensions fail stats generation loudly (no silent zero)
 
+### Raw JSON fields
+
+`codeComplexityRaw` stores auditable counters:
+
+- `astNodes`, `logicDecisions`, `reactiveSurface`, `maxNestingDepth`
+- `distinctOperators`, `distinctOperands`, `cssSelectorParts`
+- `directives`, `eventHandlers`, `bindings`, `stateAtoms`
+
 ## 4. Vibe Complexity
 
-Vibe Complexity is an AI-judged 0–100 score produced from the same implementation source used by Decision Points. It is **not** averaged with Decision Points and must be read as model-judged, not deterministic.
+Vibe Complexity is an AI-judged 0–100 score produced from the same implementation source used by Code Complexity. It is **not** averaged with Code Complexity and must be read as model-judged, not deterministic.
 
 The evaluator (Gemini) scores each implementation on:
 
@@ -95,15 +125,9 @@ When `GEMINI_API_KEY` is set, the generator can refresh Vibe Complexity (median 
 
 ## 5. Normalization
 
-Decision Point score uses:
+Code Complexity is already normalized to 0–100 by the five-axis formula. No separate display score is needed.
 
-```text
-min(100, round((decisionPoints / 30) * 100))
-```
-
-The cap **30** is fixed in metadata (`decisionPointScoreCap`). The raw `decisionPoints` count is the auditable value; the normalized score is only for at-a-glance comparison on cards (`Decisions: 11 (37/100)`).
-
-Z-scores for bundle size, Decision Points, and Vibe Complexity are computed across all frameworks in the dataset so badge colors reflect relative standing, with higher z-scores treated as worse for all three metrics.
+Z-scores for bundle size, Code Complexity, and Vibe Complexity are computed across all frameworks in the dataset so badge colors reflect relative standing, with higher z-scores treated as worse for all three metrics.
 
 ## 6. Reproducing The Numbers
 
@@ -121,6 +145,6 @@ Optional `.env` for Vibe refresh:
 GEMINI_API_KEY=your_key_here
 ```
 
-Bundle sizes and Decision Points are always measured. Vibe Complexity requires a Gemini API key; without one, existing Vibe Complexity scores are preserved.
+Bundle sizes and Code Complexity are always measured. Vibe Complexity requires a Gemini API key; without one, existing Vibe Complexity scores are preserved.
 
 Deterministic analysis fails the command when the configured implementation file is missing, the extension is unsupported, or parsing fails. Vibe Complexity tolerates a missing key by preserving prior values; non-rate-limit Gemini errors still fail generation.

@@ -1,6 +1,6 @@
 export enum SortMetric {
 	BundleSize = "bundleSize",
-	DecisionPoints = "decisionPoints",
+	CodeComplexity = "codeComplexity",
 	VibeComplexity = "vibeComplexity",
 }
 
@@ -8,8 +8,8 @@ export enum SortOption {
 	None = "none",
 	BundleSizeAsc = "bundleSizeAsc",
 	BundleSizeDsc = "bundleSizeDsc",
-	DecisionPointsAsc = "decisionPointsAsc",
-	DecisionPointsDsc = "decisionPointsDsc",
+	CodeComplexityAsc = "codeComplexityAsc",
+	CodeComplexityDsc = "codeComplexityDsc",
 	VibeComplexityAsc = "vibeComplexityAsc",
 	VibeComplexityDsc = "vibeComplexityDsc",
 }

@@ -1,167 +1,306 @@
 {
 	"metadata": {
-		"lastUpdated": "2026-06-03T23:10:47.252Z",
+		"lastUpdated": "2026-06-03T23:55:50.138Z",
 		"description": "Framework comparison metrics",
-		"decisionPointScoreCap": 30,
+		"codeComplexityVersion": "cc-1.0.0",
 		"metrics": {
 			"bundleSize": "Size in KB",
-			"decisionPoints": "Deterministic count of branch, loop, template, selector, and declarative decisions",
-			"decisionPointScore": "Decision Points normalized to 0-100",
+			"codeComplexity": "Deterministic 0-100 composite of size, logic, reactive, nesting, and vocabulary",
 			"vibeComplexity": "AI-judged implementation complexity on a 0-100 scale",
 			"bundleSizeZScore": "Standardized score relative to mean",
-			"decisionPointZScore": "Standardized score relative to mean",
+			"codeComplexityZScore": "Standardized score relative to mean",
 			"vibeComplexityZScore": "Standardized score relative to mean"
 		}
 	},
 	"frameworks": {
 		"vanillajs": {
 			"bundleSize": 0.31,
-			"decisionPoints": 1,
-			"decisionPointScore": 3,
-			"vibeComplexity": 73.5,
-			"bundleSizeZScore": -0.6798771537415685,
-			"decisionPointZScore": -0.4065228849431548,
-			"vibeComplexityZScore": 1.1670828632918324,
-			"decisionPointBreakdown": {
-				"jsControlFlow": 1,
-				"templateDirectives": 0,
-				"selectors": 0,
-				"declarativeAttrs": 0
+			"codeComplexity": 46,
+			"vibeComplexity": 28,
+			"bundleSizeZScore": -0.7471467322952003,
+			"codeComplexityZScore": -0.7202791622735552,
+			"vibeComplexityZScore": -0.6001150509326177,
+			"codeComplexitySubscores": {
+				"size": 20,
+				"logic": 5,
+				"reactive": 0,
+				"nesting": 7,
+				"vocabulary": 13.8
+			},
+			"codeComplexityRaw": {
+				"astNodes": 261,
+				"logicDecisions": 1,
+				"reactiveSurface": 0,
+				"maxNestingDepth": 2,
+				"distinctOperators": 27,
+				"distinctOperands": 37,
+				"cssSelectorParts": 0,
+				"directives": 0,
+				"eventHandlers": 0,
+				"bindings": 0,
+				"stateAtoms": 0,
+				"vocabulary": 46
 			}
 		},
 		"alpine": {
 			"bundleSize": 0.31,
-			"decisionPoints": 1,
-			"decisionPointScore": 3,
-			"vibeComplexity": 33.5,
-			"bundleSizeZScore": -0.6798771537415685,
-			"decisionPointZScore": -0.4065228849431548,
-			"vibeComplexityZScore": -0.8152234862484352,
-			"decisionPointBreakdown": {
-				"jsControlFlow": 0,
-				"templateDirectives": 0,
-				"selectors": 0,
-				"declarativeAttrs": 1
+			"codeComplexity": 57,
+			"vibeComplexity": 16,
+			"bundleSizeZScore": -0.7471467322952003,
+			"codeComplexityZScore": 0.10504071116489333,
+			"vibeComplexityZScore": -1.103708100666283,
+			"codeComplexitySubscores": {
+				"size": 15.2,
+				"logic": 5,
+				"reactive": 8,
+				"nesting": 20,
+				"vocabulary": 9
+			},
+			"codeComplexityRaw": {
+				"astNodes": 115,
+				"logicDecisions": 1,
+				"reactiveSurface": 3,
+				"maxNestingDepth": 6,
+				"distinctOperators": 5,
+				"distinctOperands": 15,
+				"cssSelectorParts": 0,
+				"directives": 1,
+				"eventHandlers": 0,
+				"bindings": 1,
+				"stateAtoms": 1,
+				"vocabulary": 20
 			}
 		},
 		"vue": {
 			"bundleSize": 0.31,
-			"decisionPoints": 2,
-			"decisionPointScore": 7,
-			"vibeComplexity": 25.5,
-			"bundleSizeZScore": -0.6798771537415685,
-			"decisionPointZScore": -0.2297738045330875,
-			"vibeComplexityZScore": -1.2116847561564887,
-			"decisionPointBreakdown": {
-				"jsControlFlow": 1,
-				"templateDirectives": 1,
-				"selectors": 0,
-				"declarativeAttrs": 0
+			"codeComplexity": 72,
+			"vibeComplexity": 20,
+			"bundleSizeZScore": -0.7471467322952003,
+			"codeComplexityZScore": 1.230476902217323,
+			"vibeComplexityZScore": -0.9358437507550612,
+			"codeComplexitySubscores": {
+				"size": 20,
+				"logic": 7.9,
+				"reactive": 10.3,
+				"nesting": 20,
+				"vocabulary": 13.9
+			},
+			"codeComplexityRaw": {
+				"astNodes": 243,
+				"logicDecisions": 2,
+				"reactiveSurface": 5,
+				"maxNestingDepth": 5,
+				"distinctOperators": 22,
+				"distinctOperands": 41,
+				"cssSelectorParts": 0,
+				"directives": 1,
+				"eventHandlers": 0,
+				"bindings": 1,
+				"stateAtoms": 3,
+				"vocabulary": 47
 			}
 		},
 		"react": {
 			"bundleSize": 1.53,
-			"decisionPoints": 3,
-			"decisionPointScore": 10,
-			"vibeComplexity": 48.5,
-			"bundleSizeZScore": 2.4739256126641873,
-			"decisionPointZScore": -0.053024724123020166,
-			"vibeComplexityZScore": -0.07185860517083484,
-			"decisionPointBreakdown": {
-				"jsControlFlow": 3,
-				"templateDirectives": 0,
-				"selectors": 0,
-				"declarativeAttrs": 0
+			"codeComplexity": 60,
+			"vibeComplexity": 65,
+			"bundleSizeZScore": 2.451165595424605,
+			"codeComplexityZScore": 0.33012794937537926,
+			"vibeComplexityZScore": 0.9526301857461836,
+			"codeComplexitySubscores": {
+				"size": 20,
+				"logic": 10,
+				"reactive": 14.8,
+				"nesting": 0,
+				"vocabulary": 15.6
+			},
+			"codeComplexityRaw": {
+				"astNodes": 349,
+				"logicDecisions": 3,
+				"reactiveSurface": 12,
+				"maxNestingDepth": 0,
+				"distinctOperators": 38,
+				"distinctOperands": 51,
+				"cssSelectorParts": 0,
+				"directives": 0,
+				"eventHandlers": 3,
+				"bindings": 0,
+				"stateAtoms": 9,
+				"vocabulary": 62
 			}
 		},
 		"svelte": {
 			"bundleSize": 0.31,
-			"decisionPoints": 3,
-			"decisionPointScore": 10,
-			"vibeComplexity": 20,
-			"bundleSizeZScore": -0.6798771537415685,
-			"decisionPointZScore": -0.053024724123020166,
-			"vibeComplexityZScore": -1.4842518792182755,
-			"decisionPointBreakdown": {
-				"jsControlFlow": 2,
-				"templateDirectives": 1,
-				"selectors": 0,
-				"declarativeAttrs": 0
+			"codeComplexity": 55,
+			"vibeComplexity": 12,
+			"bundleSizeZScore": -0.7471467322952003,
+			"codeComplexityZScore": -0.045017447642097294,
+			"vibeComplexityZScore": -1.2715724505775048,
+			"codeComplexitySubscores": {
+				"size": 19.8,
+				"logic": 10,
+				"reactive": 8,
+				"nesting": 3,
+				"vocabulary": 13.8
+			},
+			"codeComplexityRaw": {
+				"astNodes": 212,
+				"logicDecisions": 3,
+				"reactiveSurface": 3,
+				"maxNestingDepth": 1,
+				"distinctOperators": 24,
+				"distinctOperands": 37,
+				"cssSelectorParts": 0,
+				"directives": 1,
+				"eventHandlers": 0,
+				"bindings": 2,
+				"stateAtoms": 0,
+				"vocabulary": 46
 			}
 		},
 		"hyperscript": {
 			"bundleSize": 1.01,
-			"decisionPoints": 0,
-			"decisionPointScore": 0,
-			"vibeComplexity": 49.5,
-			"bundleSizeZScore": 1.129681810589603,
-			"decisionPointZScore": -0.5832719653532221,
-			"vibeComplexityZScore": -0.02230094643232815,
-			"decisionPointBreakdown": {
-				"jsControlFlow": 0,
-				"templateDirectives": 0,
-				"selectors": 0,
-				"declarativeAttrs": 0
+			"codeComplexity": 35,
+			"vibeComplexity": 72,
+			"bundleSizeZScore": 1.0879505049210814,
+			"codeComplexityZScore": -1.5455990357120035,
+			"vibeComplexityZScore": 1.2463927980908218,
+			"codeComplexitySubscores": {
+				"size": 17.7,
+				"logic": 0,
+				"reactive": 4,
+				"nesting": 3,
+				"vocabulary": 10.6
+			},
+			"codeComplexityRaw": {
+				"astNodes": 162,
+				"logicDecisions": 0,
+				"reactiveSurface": 1,
+				"maxNestingDepth": 1,
+				"distinctOperators": 20,
+				"distinctOperands": 17,
+				"cssSelectorParts": 0,
+				"directives": 0,
+				"eventHandlers": 1,
+				"bindings": 0,
+				"stateAtoms": 0,
+				"vocabulary": 27
 			}
 		},
 		"cssOnly": {
 			"bundleSize": 0.31,
-			"decisionPoints": 20,
-			"decisionPointScore": 67,
-			"vibeComplexity": 86.5,
-			"bundleSizeZScore": -0.6798771537415685,
-			"decisionPointZScore": 2.951709642848124,
-			"vibeComplexityZScore": 1.8113324268924194,
-			"decisionPointBreakdown": {
-				"jsControlFlow": 0,
-				"templateDirectives": 0,
-				"selectors": 20,
-				"declarativeAttrs": 0
+			"codeComplexity": 84,
+			"vibeComplexity": 85,
+			"bundleSizeZScore": -0.7471467322952003,
+			"codeComplexityZScore": 2.1308258550592667,
+			"vibeComplexityZScore": 1.7919519353022926,
+			"codeComplexitySubscores": {
+				"size": 20,
+				"logic": 20,
+				"reactive": 8,
+				"nesting": 20,
+				"vocabulary": 15.8
+			},
+			"codeComplexityRaw": {
+				"astNodes": 416,
+				"logicDecisions": 20,
+				"reactiveSurface": 3,
+				"maxNestingDepth": 6,
+				"distinctOperators": 27,
+				"distinctOperands": 57,
+				"cssSelectorParts": 432,
+				"directives": 0,
+				"eventHandlers": 0,
+				"bindings": 3,
+				"stateAtoms": 0,
+				"vocabulary": 64
 			}
 		},
 		"jquery": {
 			"bundleSize": 0.63,
-			"decisionPoints": 1,
-			"decisionPointScore": 3,
-			"vibeComplexity": 64.5,
-			"bundleSizeZScore": 0.14734980138125267,
-			"decisionPointZScore": -0.4065228849431548,
-			"vibeComplexityZScore": 0.7210639346452722,
-			"decisionPointBreakdown": {
-				"jsControlFlow": 1,
-				"templateDirectives": 0,
-				"selectors": 0,
-				"declarativeAttrs": 0
+			"codeComplexity": 45,
+			"vibeComplexity": 32,
+			"bundleSizeZScore": 0.09175486186081418,
+			"codeComplexityZScore": -0.7953082416770504,
+			"vibeComplexityZScore": -0.43225070102139596,
+			"codeComplexitySubscores": {
+				"size": 20,
+				"logic": 5,
+				"reactive": 0,
+				"nesting": 7,
+				"vocabulary": 13.2
+			},
+			"codeComplexityRaw": {
+				"astNodes": 262,
+				"logicDecisions": 1,
+				"reactiveSurface": 0,
+				"maxNestingDepth": 2,
+				"distinctOperators": 25,
+				"distinctOperands": 33,
+				"cssSelectorParts": 0,
+				"directives": 0,
+				"eventHandlers": 0,
+				"bindings": 0,
+				"stateAtoms": 0,
+				"vocabulary": 42
 			}
 		},
 		"stimulus": {
 			"bundleSize": 0.63,
-			"decisionPoints": 2,
-			"decisionPointScore": 7,
-			"vibeComplexity": 59,
-			"bundleSizeZScore": 0.14734980138125267,
-			"decisionPointZScore": -0.2297738045330875,
-			"vibeComplexityZScore": 0.4484968115834854,
-			"decisionPointBreakdown": {
-				"jsControlFlow": 2,
-				"templateDirectives": 0,
-				"selectors": 0,
-				"declarativeAttrs": 0
+			"codeComplexity": 53,
+			"vibeComplexity": 45,
+			"bundleSizeZScore": 0.09175486186081418,
+			"codeComplexityZScore": -0.19507560644908792,
+			"vibeComplexityZScore": 0.11330843619007482,
+			"codeComplexitySubscores": {
+				"size": 20,
+				"logic": 7.9,
+				"reactive": 0,
+				"nesting": 7,
+				"vocabulary": 18.5
+			},
+			"codeComplexityRaw": {
+				"astNodes": 292,
+				"logicDecisions": 2,
+				"reactiveSurface": 0,
+				"maxNestingDepth": 2,
+				"distinctOperators": 25,
+				"distinctOperands": 87,
+				"cssSelectorParts": 38,
+				"directives": 0,
+				"eventHandlers": 0,
+				"bindings": 0,
+				"stateAtoms": 0,
+				"vocabulary": 96
 			}
 		},
 		"datastar": {
-			"bundleSize": 0.38,
-			"decisionPoints": 0,
-			"decisionPointScore": 0,
-			"vibeComplexity": 39,
-			"bundleSizeZScore": -0.49892125730845144,
-			"decisionPointZScore": -0.5832719653532221,
-			"vibeComplexityZScore": -0.5426563631866484,
-			"decisionPointBreakdown": {
-				"jsControlFlow": 0,
-				"templateDirectives": 0,
-				"selectors": 0,
-				"declarativeAttrs": 0
+			"bundleSize": 0.6,
+			"codeComplexity": 49,
+			"vibeComplexity": 48,
+			"bundleSizeZScore": 0.013107837408687739,
+			"codeComplexityZScore": -0.49519192406306917,
+			"vibeComplexityZScore": 0.23920669862349114,
+			"codeComplexitySubscores": {
+				"size": 20,
+				"logic": 0,
+				"reactive": 16.7,
+				"nesting": 0,
+				"vocabulary": 12.5
+			},
+			"codeComplexityRaw": {
+				"astNodes": 219,
+				"logicDecisions": 0,
+				"reactiveSurface": 17,
+				"maxNestingDepth": 0,
+				"distinctOperators": 9,
+				"distinctOperands": 30,
+				"cssSelectorParts": 0,
+				"directives": 0,
+				"eventHandlers": 0,
+				"bindings": 9,
+				"stateAtoms": 8,
+				"vocabulary": 37
 			}
 		}
 	}

@@ -22,7 +22,7 @@ export function calculateStatsZScores<T extends string = FrameworkId>(
 ): Record<T, FrameworkStats> {
 	const frameworks = Object.keys(stats) as T[];
 	const bundleSizes = frameworks.map((id) => stats[id].bundleSize);
-	const decisionPoints = frameworks.map((id) => stats[id].decisionPoints);
+	const codeComplexities = frameworks.map((id) => stats[id].codeComplexity);
 	const vibeComplexities = frameworks.map((id) => stats[id].vibeComplexity);
 
 	const result = {} as Record<T, FrameworkStats>;
@@ -30,9 +30,9 @@ export function calculateStatsZScores<T extends string = FrameworkId>(
 		result[id] = {
 			...stats[id],
 			bundleSizeZScore: calculateZScore(bundleSizes, stats[id].bundleSize),
-			decisionPointZScore: calculateZScore(
-				decisionPoints,
-				stats[id].decisionPoints,
+			codeComplexityZScore: calculateZScore(
+				codeComplexities,
+				stats[id].codeComplexity,
 			),
 			vibeComplexityZScore: calculateZScore(
 				vibeComplexities,

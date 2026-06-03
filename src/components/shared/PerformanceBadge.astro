@@ -16,11 +16,15 @@ function getColorClass(zScore: number) {
 	return "bg-green-500";
 }
 
-const decisionPointsTooltip = `Decision Points is deterministic and counts:
-* JavaScript control flow
-* Framework template directives
-* Declarative conditional attributes
-* Behavioral CSS selectors`;
+const { size, logic, reactive, nesting, vocabulary } =
+	stats.codeComplexitySubscores;
+
+const codeComplexityTooltip = `Code Complexity is deterministic (0-100) from five axes:
+* Size: ${size} — implementation bulk
+* Logic: ${logic} — branch/template/selector decisions
+* Reactive: ${reactive} — handlers, bindings, state
+* Nesting: ${nesting} — structural depth
+* Vocabulary: ${vocabulary} — distinct operators and identifiers`;
 
 const vibeComplexityTooltip = `Vibe Complexity is AI-judged based on:
 * State management clarity
@@ -37,13 +41,11 @@ const bundleTooltip = `JS Bundle size represents:
 
 <div class="badge-container">
 	<div
-		class={`performance-badge ${getColorClass(stats.decisionPointZScore)} group relative`}
+		class={`performance-badge ${getColorClass(stats.codeComplexityZScore)} group relative`}
 	>
-		<span class="value">
-			Decisions: {stats.decisionPoints} ({stats.decisionPointScore}/100)
-		</span>
+		<span class="value">Code: {stats.codeComplexity}/100</span>
 		<div class="tooltip">
-			{decisionPointsTooltip}
+			{codeComplexityTooltip}
 		</div>
 	</div>
 	<div

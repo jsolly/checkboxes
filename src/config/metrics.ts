@@ -15,8 +15,8 @@ export const METRICS: MetricConfig[] = [
 		type: "number",
 	},
 	{
-		rawField: "decisionPoints",
-		zScoreField: "decisionPointZScore",
+		rawField: "codeComplexity",
+		zScoreField: "codeComplexityZScore",
 		type: "number",
 	},
 	{

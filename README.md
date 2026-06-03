@@ -35,7 +35,7 @@ pnpm preview         # Start the preview server (in a separate terminal)
 pnpm generate-stats  # Generate performance metrics (in a new terminal)
 ```
 
-Bundle sizes and Decision Points are always measured. Vibe Complexity requires a Gemini API key. Without one, existing Vibe Complexity scores are preserved. To refresh Vibe Complexity, create a `.env` file with your key:
+Bundle sizes and Code Complexity are always measured. Vibe Complexity requires a Gemini API key. Without one, existing Vibe Complexity scores are preserved. To refresh Vibe Complexity, create a `.env` file with your key:
 
 ```shell
 # Get your key from https://aistudio.google.com/apikey
@@ -178,15 +178,15 @@ Each framework implementation is evaluated on two key metrics:
 - Represents the compressed (encoded) size of all JS assets
 - Lower scores are better
 
-### Decision Points
-- Deterministic count of branch, loop, template directive, declarative attribute, and behavioral selector decisions
+### Code Complexity
+- Deterministic 0-100 composite of size, logic, reactive, nesting, and vocabulary
 - Calculated from the actual implementation source shown on each card
-- Normalized to a 0-100 display score with a fixed cap of 30
-- Lower scores indicate fewer decisions
+- The `logic` axis reuses Decision Points (branch/template/selector counts)
+- Higher scores indicate more implementation surface area
 
 ### Vibe Complexity
 - AI-judged implementation complexity on a 0-100 scale
-- Uses the same implementation source as Decision Points
+- Uses the same implementation source as Code Complexity
 - Requires a Gemini API key to refresh
 - Existing Vibe Complexity scores are preserved when no key is available
 

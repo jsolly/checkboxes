@@ -1,34 +1,32 @@
+import type {
+	CodeComplexityRaw,
+	CodeComplexitySubscores,
+} from "../utils/code-complexity/types";
 import type { FrameworkId } from "./frameworks";
 
-export interface DecisionPointBreakdown {
-	jsControlFlow: number;
-	templateDirectives: number;
-	selectors: number;
-	declarativeAttrs: number;
-}
+export type { CodeComplexityRaw, CodeComplexitySubscores };
 
 export interface FrameworkStats {
 	bundleSize: number;
-	decisionPoints: number;
-	decisionPointScore: number;
+	codeComplexity: number;
 	vibeComplexity: number;
 	bundleSizeZScore: number;
-	decisionPointZScore: number;
+	codeComplexityZScore: number;
 	vibeComplexityZScore: number;
-	decisionPointBreakdown: DecisionPointBreakdown;
+	codeComplexitySubscores: CodeComplexitySubscores;
+	codeComplexityRaw: CodeComplexityRaw;
 }
 
 export interface StatsMetadata {
 	lastUpdated: string;
 	description: string;
-	decisionPointScoreCap: number;
+	codeComplexityVersion: string;
 	metrics: {
 		bundleSize: string;
-		decisionPoints: string;
-		decisionPointScore: string;
+		codeComplexity: string;
 		vibeComplexity: string;
 		bundleSizeZScore: string;
-		decisionPointZScore: string;
+		codeComplexityZScore: string;
 		vibeComplexityZScore: string;
 	};
 }

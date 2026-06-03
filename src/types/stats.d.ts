@@ -1,19 +1,19 @@
-export interface DecisionPointBreakdown {
-	jsControlFlow: number;
-	templateDirectives: number;
-	selectors: number;
-	declarativeAttrs: number;
-}
+import type {
+	CodeComplexityRaw,
+	CodeComplexitySubscores,
+} from "../utils/code-complexity/types";
+
+export type { CodeComplexityRaw, CodeComplexitySubscores };
 
 export interface FrameworkStats {
 	bundleSize: number;
-	decisionPoints: number;
-	decisionPointScore: number;
+	codeComplexity: number;
 	vibeComplexity: number;
 	bundleSizeZScore: number;
-	decisionPointZScore: number;
+	codeComplexityZScore: number;
 	vibeComplexityZScore: number;
-	decisionPointBreakdown: DecisionPointBreakdown;
+	codeComplexitySubscores: CodeComplexitySubscores;
+	codeComplexityRaw: CodeComplexityRaw;
 }
 
 export type FrameworkStatsRecord = Record<string, FrameworkStats>;
