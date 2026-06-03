@@ -11,7 +11,10 @@ import {
 	type StatsFile,
 } from "../config/stats";
 import { calculateStatsZScores } from "./calculateZScores";
-import { evaluateFrameworkComplexity } from "./evaluateComplexity";
+import { analyzeDecisionPoints } from "./decision-points";
+import { DECISION_POINT_SCORE_CAP } from "./decision-points/types";
+import { evaluateVibeComplexity } from "./evaluateVibeComplexity";
+import { readImplementationSources } from "./implementationSources";
 
 dotenv.config({ path: ".env.local" });
 dotenv.config();
@@ -27,8 +30,19 @@ function calculateMedian(measurements: number[]): number {
 	const sorted = [...measurements].sort((a, b) => a - b);
 	const mid = Math.floor(sorted.length / 2);
 	return sorted.length % 2 !== 0
-		? sorted[mid] // Odd number of measurements: take middle value
-		: (sorted[mid - 1] + sorted[mid]) / 2; // Even number: average middle two
+		? sorted[mid]
+		: (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function getExistingVibeComplexity(
+	existingStats: Partial<StatsFile> | undefined,
+	id: FrameworkId,
+): number {
+	const frameworkStats = existingStats?.frameworks?.[id] as
+		| (Partial<FrameworkStats> & { complexityScore?: number })
+		| undefined;
+
+	return frameworkStats?.vibeComplexity ?? frameworkStats?.complexityScore ?? 0;
 }
 
 async function measureBundleSize(page: Page, framework: FrameworkId) {
@@ -37,7 +51,6 @@ async function measureBundleSize(page: Page, framework: FrameworkId) {
 	for (let i = 0; i < STATS_CONFIG.BUNDLE_SIZE_ITERATIONS; i++) {
 		const client = await page.createCDPSession();
 
-		// Clear browser cache
 		await page.setCacheEnabled(false);
 
 		await client.send("Network.clearBrowserCache");
@@ -52,7 +65,6 @@ async function measureBundleSize(page: Page, framework: FrameworkId) {
 			}
 		});
 
-		// Wait for network idle after navigation
 		await page.goto(`${STATS_CONFIG.PREVIEW_URL}/${framework}`, {
 			waitUntil: "networkidle0",
 		});
@@ -71,36 +83,26 @@ async function measureBundleSize(page: Page, framework: FrameworkId) {
 	return median;
 }
 
-async function readImplementationFile(id: FrameworkId): Promise<string> {
-	const dirPath = path.join(process.cwd(), STATS_CONFIG.COMPONENTS_DIR, id);
-	const files = await fs.readdir(dirPath);
-	const containerFile = files.find(
-		(f) =>
-			f.toLowerCase().includes("container") &&
-			STATS_CONFIG.SUPPORTED_EXTENSIONS.some((ext) => f.endsWith(ext)),
-	);
-	if (!containerFile) {
-		throw new Error(`Could not find implementation for ${id}`);
-	}
-	return fs.readFile(path.join(dirPath, containerFile), "utf-8");
-}
-
 async function generateStats(): Promise<void> {
 	console.log("\n📊 Starting stats generation with config:");
 	console.log(
 		`  • Bundle size iterations: ${STATS_CONFIG.BUNDLE_SIZE_ITERATIONS}`,
 	);
 	console.log(
-		`  • Complexity score iterations: ${STATS_CONFIG.COMPLEXITY_SCORE_ITERATIONS}`,
+		`  • Vibe complexity iterations: ${STATS_CONFIG.VIBE_COMPLEXITY_ITERATIONS}`,
 	);
 	console.log(
-		`  • Update complexity scores: ${STATS_CONFIG.UPDATE_COMPLEXITY_SCORES}\n`,
+		`  • Update vibe complexity: ${STATS_CONFIG.UPDATE_VIBE_COMPLEXITY}\n`,
 	);
+
+	const implementations = await readImplementationSources();
+	const implementationCode = Object.fromEntries(
+		Object.entries(implementations).map(([id, source]) => [id, source.code]),
+	) as Record<FrameworkId, string>;
 
 	const browser = await puppeteer.launch();
 	const page = await browser.newPage();
 	const stats = {} as Record<FrameworkId, FrameworkStats>;
-	const implementations = {} as Record<FrameworkId, string>;
 
 	try {
 		for (const id of Object.keys(FRAMEWORKS) as FrameworkId[]) {
@@ -108,29 +110,34 @@ async function generateStats(): Promise<void> {
 			const size = await measureBundleSize(page, id);
 			console.log(`  Bundle size: ${size}kb`);
 
-			// Use new readImplementationFile function
-			const code = await readImplementationFile(id);
+			const decisionPointResult = analyzeDecisionPoints(implementations[id]);
+			console.log(
+				`  Decision points: ${decisionPointResult.value} (score ${decisionPointResult.normalizedScore}/100)`,
+			);
 
 			stats[id] = {
 				bundleSize: size,
-				complexityScore: 0,
+				decisionPoints: decisionPointResult.value,
+				decisionPointScore: decisionPointResult.normalizedScore,
+				vibeComplexity: 0,
 				bundleSizeZScore: 0,
-				complexityZScore: 0,
+				decisionPointZScore: 0,
+				vibeComplexityZScore: 0,
+				decisionPointBreakdown: decisionPointResult.breakdown,
 			};
-			implementations[id] = code;
 		}
 
 		const hasApiKey = !!process.env.GEMINI_API_KEY;
-		const shouldUpdateComplexity =
-			STATS_CONFIG.UPDATE_COMPLEXITY_SCORES && hasApiKey;
+		const shouldUpdateVibeComplexity =
+			STATS_CONFIG.UPDATE_VIBE_COMPLEXITY && hasApiKey;
 
-		if (STATS_CONFIG.UPDATE_COMPLEXITY_SCORES && !hasApiKey) {
+		if (STATS_CONFIG.UPDATE_VIBE_COMPLEXITY && !hasApiKey) {
 			console.warn(
-				"⚠️ GEMINI_API_KEY not set — skipping complexity evaluation, using existing scores",
+				"⚠️ GEMINI_API_KEY not set — skipping vibe complexity evaluation, using existing scores",
 			);
 		}
 
-		if (!shouldUpdateComplexity) {
+		if (!shouldUpdateVibeComplexity) {
 			try {
 				const existingStats = JSON.parse(
 					await fs.readFile(
@@ -140,29 +147,31 @@ async function generateStats(): Promise<void> {
 				) as StatsFile;
 
 				for (const id of Object.keys(stats) as FrameworkId[]) {
-					stats[id].complexityScore =
-						existingStats.frameworks[id]?.complexityScore ?? 0;
+					stats[id].vibeComplexity = getExistingVibeComplexity(
+						existingStats,
+						id,
+					);
 				}
-				console.log("ℹ️ Using existing complexity scores");
-			} catch (error) {
-				console.warn("⚠️ Could not load existing complexity scores");
+				console.log("ℹ️ Using existing vibe complexity scores");
+			} catch {
+				console.warn("⚠️ Could not load existing vibe complexity scores");
 			}
 		}
 
-		if (shouldUpdateComplexity) {
-			const complexityMeasurements: Record<string, number[]> = {};
+		if (shouldUpdateVibeComplexity) {
+			const vibeMeasurements: Record<string, number[]> = {};
 
-			for (const id of Object.keys(implementations) as FrameworkId[]) {
-				complexityMeasurements[id] = [];
+			for (const id of Object.keys(implementationCode) as FrameworkId[]) {
+				vibeMeasurements[id] = [];
 			}
 
-			for (let i = 0; i < STATS_CONFIG.COMPLEXITY_SCORE_ITERATIONS; i++) {
-				console.log(`📊 Evaluating complexity - Run ${i + 1}...`);
+			for (let i = 0; i < STATS_CONFIG.VIBE_COMPLEXITY_ITERATIONS; i++) {
+				console.log(`📊 Evaluating vibe complexity - Run ${i + 1}...`);
 				try {
-					const { scores } = await evaluateFrameworkComplexity(implementations);
+					const { scores } = await evaluateVibeComplexity(implementationCode);
 
 					for (const [id, score] of Object.entries(scores)) {
-						complexityMeasurements[id].push(score);
+						vibeMeasurements[id].push(score);
 					}
 				} catch (error) {
 					const message =
@@ -180,12 +189,12 @@ async function generateStats(): Promise<void> {
 				}
 			}
 
-			for (const id of Object.keys(implementations) as FrameworkId[]) {
-				const measurements = complexityMeasurements[id];
+			for (const id of Object.keys(implementationCode) as FrameworkId[]) {
+				const measurements = vibeMeasurements[id];
 				if (measurements.length > 0) {
 					const median = calculateMedian(measurements);
-					stats[id].complexityScore = median;
-					console.log(`    ${id} median complexity score: ${median}`);
+					stats[id].vibeComplexity = median;
+					console.log(`    ${id} median vibe complexity: ${median}`);
 				}
 			}
 		}
@@ -194,11 +203,17 @@ async function generateStats(): Promise<void> {
 			metadata: {
 				lastUpdated: new Date().toISOString(),
 				description: "Framework comparison metrics",
+				decisionPointScoreCap: DECISION_POINT_SCORE_CAP,
 				metrics: {
 					bundleSize: "Size in KB",
-					complexityScore: "Scale of 0-100",
+					decisionPoints:
+						"Deterministic count of branch, loop, template, selector, and declarative decisions",
+					decisionPointScore: "Decision Points normalized to 0-100",
+					vibeComplexity:
+						"AI-judged implementation complexity on a 0-100 scale",
 					bundleSizeZScore: "Standardized score relative to mean",
-					complexityZScore: "Standardized score relative to mean",
+					decisionPointZScore: "Standardized score relative to mean",
+					vibeComplexityZScore: "Standardized score relative to mean",
 				},
 			},
 			frameworks: calculateStatsZScores(stats),
@@ -215,7 +230,6 @@ async function generateStats(): Promise<void> {
 	}
 }
 
-// Simplify CLI
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
 	generateStats().catch(console.error);
 }

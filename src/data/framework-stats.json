@@ -1,74 +1,168 @@
 {
 	"metadata": {
-		"lastUpdated": "2026-05-25T15:04:48.077Z",
+		"lastUpdated": "2026-06-03T23:10:47.252Z",
 		"description": "Framework comparison metrics",
+		"decisionPointScoreCap": 30,
 		"metrics": {
 			"bundleSize": "Size in KB",
-			"complexityScore": "Scale of 0-100",
+			"decisionPoints": "Deterministic count of branch, loop, template, selector, and declarative decisions",
+			"decisionPointScore": "Decision Points normalized to 0-100",
+			"vibeComplexity": "AI-judged implementation complexity on a 0-100 scale",
 			"bundleSizeZScore": "Standardized score relative to mean",
-			"complexityZScore": "Standardized score relative to mean"
+			"decisionPointZScore": "Standardized score relative to mean",
+			"vibeComplexityZScore": "Standardized score relative to mean"
 		}
 	},
 	"frameworks": {
 		"vanillajs": {
 			"bundleSize": 0.31,
-			"complexityScore": 73.5,
-			"bundleSizeZScore": -0.634329561012379,
-			"complexityZScore": 1.1670828632918324
+			"decisionPoints": 1,
+			"decisionPointScore": 3,
+			"vibeComplexity": 73.5,
+			"bundleSizeZScore": -0.6798771537415685,
+			"decisionPointZScore": -0.4065228849431548,
+			"vibeComplexityZScore": 1.1670828632918324,
+			"decisionPointBreakdown": {
+				"jsControlFlow": 1,
+				"templateDirectives": 0,
+				"selectors": 0,
+				"declarativeAttrs": 0
+			}
 		},
 		"alpine": {
 			"bundleSize": 0.31,
-			"complexityScore": 33.5,
-			"bundleSizeZScore": -0.634329561012379,
-			"complexityZScore": -0.8152234862484352
+			"decisionPoints": 1,
+			"decisionPointScore": 3,
+			"vibeComplexity": 33.5,
+			"bundleSizeZScore": -0.6798771537415685,
+			"decisionPointZScore": -0.4065228849431548,
+			"vibeComplexityZScore": -0.8152234862484352,
+			"decisionPointBreakdown": {
+				"jsControlFlow": 0,
+				"templateDirectives": 0,
+				"selectors": 0,
+				"declarativeAttrs": 1
+			}
 		},
 		"vue": {
 			"bundleSize": 0.31,
-			"complexityScore": 25.5,
-			"bundleSizeZScore": -0.634329561012379,
-			"complexityZScore": -1.2116847561564887
+			"decisionPoints": 2,
+			"decisionPointScore": 7,
+			"vibeComplexity": 25.5,
+			"bundleSizeZScore": -0.6798771537415685,
+			"decisionPointZScore": -0.2297738045330875,
+			"vibeComplexityZScore": -1.2116847561564887,
+			"decisionPointBreakdown": {
+				"jsControlFlow": 1,
+				"templateDirectives": 1,
+				"selectors": 0,
+				"declarativeAttrs": 0
+			}
 		},
 		"react": {
 			"bundleSize": 1.53,
-			"complexityScore": 48.5,
-			"bundleSizeZScore": 2.745068100276279,
-			"complexityZScore": -0.07185860517083484
+			"decisionPoints": 3,
+			"decisionPointScore": 10,
+			"vibeComplexity": 48.5,
+			"bundleSizeZScore": 2.4739256126641873,
+			"decisionPointZScore": -0.053024724123020166,
+			"vibeComplexityZScore": -0.07185860517083484,
+			"decisionPointBreakdown": {
+				"jsControlFlow": 3,
+				"templateDirectives": 0,
+				"selectors": 0,
+				"declarativeAttrs": 0
+			}
 		},
 		"svelte": {
 			"bundleSize": 0.31,
-			"complexityScore": 20,
-			"bundleSizeZScore": -0.634329561012379,
-			"complexityZScore": -1.4842518792182755
+			"decisionPoints": 3,
+			"decisionPointScore": 10,
+			"vibeComplexity": 20,
+			"bundleSizeZScore": -0.6798771537415685,
+			"decisionPointZScore": -0.053024724123020166,
+			"vibeComplexityZScore": -1.4842518792182755,
+			"decisionPointBreakdown": {
+				"jsControlFlow": 2,
+				"templateDirectives": 1,
+				"selectors": 0,
+				"declarativeAttrs": 0
+			}
 		},
 		"hyperscript": {
-			"bundleSize": 0.67,
-			"complexityScore": 49.5,
-			"bundleSizeZScore": 0.36286974887607754,
-			"complexityZScore": -0.02230094643232815
+			"bundleSize": 1.01,
+			"decisionPoints": 0,
+			"decisionPointScore": 0,
+			"vibeComplexity": 49.5,
+			"bundleSizeZScore": 1.129681810589603,
+			"decisionPointZScore": -0.5832719653532221,
+			"vibeComplexityZScore": -0.02230094643232815,
+			"decisionPointBreakdown": {
+				"jsControlFlow": 0,
+				"templateDirectives": 0,
+				"selectors": 0,
+				"declarativeAttrs": 0
+			}
 		},
 		"cssOnly": {
 			"bundleSize": 0.31,
-			"complexityScore": 86.5,
-			"bundleSizeZScore": -0.634329561012379,
-			"complexityZScore": 1.8113324268924194
+			"decisionPoints": 20,
+			"decisionPointScore": 67,
+			"vibeComplexity": 86.5,
+			"bundleSizeZScore": -0.6798771537415685,
+			"decisionPointZScore": 2.951709642848124,
+			"vibeComplexityZScore": 1.8113324268924194,
+			"decisionPointBreakdown": {
+				"jsControlFlow": 0,
+				"templateDirectives": 0,
+				"selectors": 20,
+				"declarativeAttrs": 0
+			}
 		},
 		"jquery": {
 			"bundleSize": 0.63,
-			"complexityScore": 64.5,
-			"bundleSizeZScore": 0.25206982555513785,
-			"complexityZScore": 0.7210639346452722
+			"decisionPoints": 1,
+			"decisionPointScore": 3,
+			"vibeComplexity": 64.5,
+			"bundleSizeZScore": 0.14734980138125267,
+			"decisionPointZScore": -0.4065228849431548,
+			"vibeComplexityZScore": 0.7210639346452722,
+			"decisionPointBreakdown": {
+				"jsControlFlow": 1,
+				"templateDirectives": 0,
+				"selectors": 0,
+				"declarativeAttrs": 0
+			}
 		},
 		"stimulus": {
 			"bundleSize": 0.63,
-			"complexityScore": 59,
-			"bundleSizeZScore": 0.25206982555513785,
-			"complexityZScore": 0.4484968115834854
+			"decisionPoints": 2,
+			"decisionPointScore": 7,
+			"vibeComplexity": 59,
+			"bundleSizeZScore": 0.14734980138125267,
+			"decisionPointZScore": -0.2297738045330875,
+			"vibeComplexityZScore": 0.4484968115834854,
+			"decisionPointBreakdown": {
+				"jsControlFlow": 2,
+				"templateDirectives": 0,
+				"selectors": 0,
+				"declarativeAttrs": 0
+			}
 		},
 		"datastar": {
 			"bundleSize": 0.38,
-			"complexityScore": 39,
-			"bundleSizeZScore": -0.4404296952007347,
-			"complexityZScore": -0.5426563631866484
+			"decisionPoints": 0,
+			"decisionPointScore": 0,
+			"vibeComplexity": 39,
+			"bundleSizeZScore": -0.49892125730845144,
+			"decisionPointZScore": -0.5832719653532221,
+			"vibeComplexityZScore": -0.5426563631866484,
+			"decisionPointBreakdown": {
+				"jsControlFlow": 0,
+				"templateDirectives": 0,
+				"selectors": 0,
+				"declarativeAttrs": 0
+			}
 		}
 	}
 }
