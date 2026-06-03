@@ -17,6 +17,7 @@
 		"format": "biome format --write .",
 		"check": "biome check --write .",
 		"generate-stats": "tsx src/utils/generate-stats.ts",
+		"test": "tsx --test \"tests/**/*.test.ts\"",
 		"lint-staged": "lint-staged"
 	},
 	"lint-staged": {
@@ -55,6 +56,7 @@
 		"@types/jquery": "^3.5.32",
 		"@types/node": "^22.15.29",
 		"@types/sortablejs": "^1.15.8",
+		"@typescript-eslint/typescript-estree": "^8.60.1",
 		"husky": "^9.1.7",
 		"lint-staged": "^15.3.0",
 		"puppeteer": "^23.11.1",
