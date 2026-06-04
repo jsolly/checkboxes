@@ -18,13 +18,8 @@ const contentJson = JSON.stringify(
 );
 ---
 
-<div id="metric-modal" class="metric-scrim" hidden>
-	<div
-		class="metric-dialog"
-		role="dialog"
-		aria-modal="true"
-		aria-labelledby="metric-modal-title"
-	>
+<dialog id="metric-modal" class="metric-modal" aria-labelledby="metric-modal-title">
+	<div class="metric-modal__content">
 		<span id="metric-modal-tag" class="metric-modal-tag"></span>
 		<h2 id="metric-modal-title" class="metric-modal-title"></h2>
 		<p id="metric-modal-blurb" class="metric-modal-blurb"></p>
@@ -37,106 +32,108 @@ const contentJson = JSON.stringify(
 			</button>
 		</div>
 	</div>
-</div>
+</dialog>
 
 <script is:inline define:vars={{ content: contentJson }}>
 	const data = JSON.parse(content);
-	const scrim = document.getElementById("metric-modal");
+	const dialog = document.getElementById("metric-modal");
 	const tagEl = document.getElementById("metric-modal-tag");
 	const titleEl = document.getElementById("metric-modal-title");
 	const blurbEl = document.getElementById("metric-modal-blurb");
 	const linkEl = document.getElementById("metric-modal-link");
 	const closeBtn = document.getElementById("metric-modal-close");
-	let lastTrigger = null;
 
-	function openModal(metricKey, trigger) {
+	function openModal(metricKey) {
 		const meta = data[metricKey];
 		if (!meta) return;
-		lastTrigger = trigger;
 		tagEl.textContent = meta.tag;
 		tagEl.className = `metric-modal-tag ${meta.kind === "ai" ? "is-ai" : "is-det"}`;
 		titleEl.textContent = meta.name;
 		blurbEl.textContent = meta.blurb;
 		linkEl.setAttribute("href", `/methodology#${meta.anchor}`);
-		scrim.hidden = false;
-		closeBtn.focus();
-	}
-
-	function closeModal() {
-		scrim.hidden = true;
-		if (lastTrigger) lastTrigger.focus();
-		lastTrigger = null;
+		dialog.showModal();
 	}
 
 	document.addEventListener("click", (e) => {
 		const row = e.target.closest(".metric-row");
-		if (row) {
-			openModal(row.getAttribute("data-metric"), row);
-			return;
-		}
-		if (e.target === scrim) closeModal();
+		if (row) openModal(row.getAttribute("data-metric"));
 	});
 
-	closeBtn.addEventListener("click", closeModal);
-	document.addEventListener("keydown", (e) => {
-		if (e.key === "Escape" && !scrim.hidden) closeModal();
+	closeBtn.addEventListener("click", () => dialog.close());
+
+	// Native <dialog>: a click whose target is the dialog element itself lands
+	// on the ::backdrop, so close on that. Clicks inside .metric-modal__content
+	// target inner elements and are left alone.
+	dialog.addEventListener("click", (e) => {
+		if (e.target === dialog) dialog.close();
 	});
 </script>
 
-<style is:global>
-	.metric-scrim {
-		position: fixed;
-		inset: 0;
-		background: rgba(15, 23, 42, 0.45);
-		display: grid;
-		place-items: center;
-		padding: 1.25rem;
-		z-index: 100;
-	}
-	.metric-scrim[hidden] {
-		display: none;
-	}
-	.metric-dialog {
-		background: white;
-		border-radius: 1rem;
+<style>
+	.metric-modal {
 		max-width: 460px;
-		width: 100%;
-		padding: 1.5rem;
+		width: calc(100% - 2.5rem);
+		padding: 0;
+		border: none;
+		border-radius: 1rem;
 		box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
 	}
+
+	.metric-modal::backdrop {
+		background: rgba(15, 23, 42, 0.45);
+	}
+
+	.metric-modal__content {
+		padding: 1.5rem;
+	}
+
 	.metric-modal-tag {
 		font-size: 0.68rem;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		font-weight: 700;
 	}
-	.metric-modal-tag.is-det { color: #16a34a; }
-	.metric-modal-tag.is-ai { color: #d97706; }
+
+	.metric-modal-tag.is-det {
+		color: #16a34a;
+	}
+
+	.metric-modal-tag.is-ai {
+		color: #d97706;
+	}
+
 	.metric-modal-title {
 		margin: 0.25rem 0 0.5rem;
 		font-size: 1.35rem;
 		font-weight: 800;
 		color: #0f172a;
 	}
+
 	.metric-modal-blurb {
 		color: #475569;
 		font-size: 0.92rem;
 		line-height: 1.6;
 		margin: 0;
 	}
+
 	.metric-modal-foot {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		margin-top: 1.25rem;
 	}
+
 	.metric-modal-link {
 		color: #4f46e5;
 		font-weight: 600;
 		text-decoration: none;
 		font-size: 0.9rem;
 	}
-	.metric-modal-link:hover { text-decoration: underline; }
+
+	.metric-modal-link:hover {
+		text-decoration: underline;
+	}
+
 	.metric-modal-close {
 		background: #111827;
 		color: white;
