@@ -1,51 +1,41 @@
----
-const parentCheckbox = {
-	id: "parent-vanilla",
-	label: "Parent",
-};
+<fieldset class=checkbox-container>
+  <legend>
+    <input type=checkbox id=parent-vanilla>
+    <label for=parent-vanilla>Parent</label>
+  </legend>
 
-const childCheckboxItems = [
-	{ id: "child1-vanilla", label: "Child 1" },
-	{ id: "child2-vanilla", label: "Child 2" },
-	{ id: "child3-vanilla", label: "Child 3" },
-];
----
+  <div class=checkbox-children>
+    <div>
+      <input type=checkbox id=child1-vanilla>
+      <label for=child1-vanilla>Child 1</label>
+    </div>
 
-<div class="checkbox-demo" data-checkbox-container>
-  <div>
-    <input type="checkbox" id={parentCheckbox.id}>
-    <label for={parentCheckbox.id}>{parentCheckbox.label}</label>
+    <div>
+      <input type=checkbox id=child2-vanilla>
+      <label for=child2-vanilla>Child 2</label>
+    </div>
+
+    <div>
+      <input type=checkbox id=child3-vanilla>
+      <label for=child3-vanilla>Child 3</label>
+    </div>
   </div>
-
-  <div class="checkbox-children">
-    {childCheckboxItems.map(item => (
-      <div>
-        <input type="checkbox" id={item.id}>
-        <label for={item.id}>{item.label}</label>
-      </div>
-    ))}
-  </div>
-</div>
+</fieldset>
 
 <script is:inline>
-document.querySelectorAll('[data-checkbox-container]').forEach(container => {
-  const parent = container.querySelector('input:first-of-type');
-  const children = container.querySelectorAll('.checkbox-children input');
+  for (const container of document.querySelectorAll('.checkbox-container')) {
+    const parent = container.querySelector('legend > input');
+    const children = [...container.querySelectorAll('.checkbox-children input')];
 
-  function updateParent() {
-    const total = children.length;
-    const checked = [...children].filter(c => c.checked).length;
-    
-    parent.checked = checked === total;
-    parent.indeterminate = checked > 0 && checked < total;
+    parent.addEventListener('change', () => {
+      for (const child of children) child.checked = parent.checked;
+    });
+
+    for (const child of children) {
+      child.addEventListener('change', () => {
+        parent.checked = children.every(c => c.checked);
+        parent.indeterminate = !parent.checked && children.some(c => c.checked);
+      });
+    }
   }
-
-  parent.addEventListener('change', () => {
-    children.forEach(child => child.checked = parent.checked);
-  });
-
-  children.forEach(child => 
-    child.addEventListener('change', updateParent)
-  );
-});
-</script> 
+</script>
