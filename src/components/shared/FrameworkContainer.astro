@@ -21,7 +21,6 @@ const maxBundle = maxBundleSize(stats.frameworks as FrameworkStatsRecord);
 	data-framework={framework}
 	style="transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.2s ease-out"
 >
-	<PerformanceBadge stats={frameworkStats} maxBundle={maxBundle} />
 	<div class="opacity-0 transition-opacity duration-300" data-framework-wrapper>
 		<div class="bg-white/40 rounded-xl border border-white/50 shadow-lg overflow-hidden relative">
 			<div 
@@ -36,6 +35,7 @@ const maxBundle = maxBundleSize(stats.frameworks as FrameworkStatsRecord);
 			</div>
 		</div>
 	</div>
+	<PerformanceBadge stats={frameworkStats} maxBundle={maxBundle} />
 </div>
 
 <script is:inline define:vars={{ framework }}>
