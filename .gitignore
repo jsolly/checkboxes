@@ -28,6 +28,9 @@ pnpm-debug.log*
 .vercel
 # editor (local symlinks to ~/.agents rules — machine-specific)
 
+# Superpowers brainstorm scratch (local server state, not project artifacts)
+.superpowers/
+
 # Cursor: track cloud config and rules; ignore other local editor state
 .cursor/*
 !.cursor/environment.json
