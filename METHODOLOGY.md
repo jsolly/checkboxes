@@ -1,6 +1,6 @@
 # Methodology
 
-## 1. What We Are Comparing
+## What We Are Comparing
 
 Ten implementations of the same nested-checkbox component: React, Vue, Svelte, Alpine, Vanilla JavaScript, jQuery, Stimulus, Datastar, Hyperscript, and CSS-only.
 
@@ -14,13 +14,13 @@ The component requirements are identical across frameworks:
 
 Both metrics analyze the actual implementation source shown in each card’s code block—not display wrapper files such as `*Container.astro`.
 
-## 2. Why We Do Not Display Cyclomatic Complexity
+## Why We Do Not Display Cyclomatic Complexity
 
 McCabe cyclomatic complexity is defined on an executable control-flow graph. It does not apply cleanly to CSS-only, framework template, or declarative attribute implementations. Reporting zero for those implementations would imply simplicity where the metric is actually undefined.
 
 Code Complexity is McCabe-inspired but defined for this cross-framework comparison so every implementation receives an auditable deterministic score. It is not cyclomatic complexity.
 
-## 3. Code Complexity
+## Code Complexity
 
 Code Complexity is a deterministic **0–100** score built from five capped **0–20** axes:
 
@@ -108,7 +108,7 @@ The count starts at **0**, not 1, because it counts decision constructs rather t
 - `distinctOperators`, `distinctOperands`, `cssSelectorParts`
 - `directives`, `eventHandlers`, `bindings`, `stateAtoms`
 
-## 4. Vibe Complexity
+## Vibe Complexity
 
 Vibe Complexity is an AI-judged 0–100 score produced from the same implementation source used by Code Complexity. It is **not** averaged with Code Complexity and must be read as model-judged, not deterministic.
 
@@ -123,13 +123,17 @@ Lower scores indicate implementations that feel simpler to understand and mainta
 
 When `GEMINI_API_KEY` is set, the generator can refresh Vibe Complexity (median over multiple runs). When the key is missing or rate-limited, existing Vibe values in `src/data/framework-stats.json` are preserved.
 
-## 5. Normalization
+## JS Bundle
+
+JS Bundle is the total compressed JavaScript shipped for an implementation, captured from network requests during page load. It is reported in kilobytes and has no 0–100 scale, so its card bar is filled relative to the largest bundle in the comparison. Lower is better.
+
+## Normalization
 
 Code Complexity is already normalized to 0–100 by the five-axis formula. No separate display score is needed.
 
 Z-scores for bundle size, Code Complexity, and Vibe Complexity are computed across all frameworks in the dataset so badge colors reflect relative standing, with higher z-scores treated as worse for all three metrics.
 
-## 6. Reproducing The Numbers
+## Reproducing The Numbers
 
 Run `pnpm build`, `pnpm preview`, and `pnpm generate-stats`. Set `GEMINI_API_KEY` to update Vibe Complexity; leave it unset to preserve existing Vibe values.
 

@@ -1,0 +1,55 @@
+---
+import { Content } from "../../METHODOLOGY.md";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Methodology · checkboxes.xyz">
+	<main class="methodology-prose">
+		<a href="/" class="back-link">← Back to the gallery</a>
+		<Content />
+	</main>
+</Layout>
+
+<style is:global>
+	.methodology-prose {
+		max-width: 760px;
+		margin: 0 auto;
+		padding: 2.5rem 1.25rem 4rem;
+		color: #1f2937;
+		line-height: 1.65;
+	}
+	.methodology-prose .back-link {
+		display: inline-block;
+		margin-bottom: 1.5rem;
+		color: #4f46e5;
+		font-weight: 600;
+		text-decoration: none;
+	}
+	.methodology-prose h1 { font-size: 2rem; font-weight: 800; margin: 0 0 1rem; }
+	.methodology-prose h2 {
+		font-size: 1.3rem;
+		font-weight: 800;
+		margin: 2rem 0 0.5rem;
+		scroll-margin-top: 1.5rem;
+	}
+	.methodology-prose h3 { font-size: 1.05rem; font-weight: 700; margin: 1.25rem 0 0.4rem; }
+	.methodology-prose p { margin: 0.5rem 0; color: #475569; }
+	.methodology-prose ul { margin: 0.5rem 0; padding-left: 1.4rem; color: #475569; }
+	.methodology-prose code {
+		background: #f1f5f9;
+		padding: 0.1rem 0.35rem;
+		border-radius: 4px;
+		font-size: 0.85em;
+	}
+	.methodology-prose pre {
+		background: #0f172a;
+		color: #e2e8f0;
+		padding: 1rem;
+		border-radius: 0.5rem;
+		overflow-x: auto;
+	}
+	.methodology-prose pre code { background: none; padding: 0; }
+	.methodology-prose table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+	.methodology-prose th,
+	.methodology-prose td { border: 1px solid #e2e8f0; padding: 0.4rem 0.6rem; text-align: left; font-size: 0.9rem; }
+</style>

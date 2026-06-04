@@ -15,6 +15,13 @@ const { title = "checkboxes.xyz" } = Astro.props;
 		<meta name="theme-color" content="#f8fafc" />
 	</head>
 	<body>
+		<header class="site-header">
+			<a href="/" class="site-header__brand">checkboxes.xyz</a>
+			<nav class="site-header__nav">
+				<a href="/methodology">Methodology</a>
+				<a href="https://github.com/jsolly/checkboxes" target="_blank" rel="noopener noreferrer">GitHub</a>
+			</nav>
+		</header>
 		<slot />
 		<footer class="group flex justify-center mt-5 mb-16">
 			<a
@@ -36,3 +43,27 @@ const { title = "checkboxes.xyz" } = Astro.props;
 		</footer>
 	</body>
 </html>
+
+<style is:global>
+	.site-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.85rem 1.5rem;
+		border-bottom: 1px solid #eef2f7;
+		background: rgba(255, 255, 255, 0.75);
+		backdrop-filter: blur(6px);
+		position: sticky;
+		top: 0;
+		z-index: 50;
+	}
+	.site-header__brand { font-weight: 700; color: #374151; text-decoration: none; }
+	.site-header__nav a {
+		color: #4f46e5;
+		text-decoration: none;
+		font-size: 0.9rem;
+		font-weight: 600;
+		margin-left: 1.1rem;
+	}
+	.site-header__nav a:hover { text-decoration: underline; }
+</style>
