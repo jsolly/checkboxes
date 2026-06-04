@@ -6,6 +6,7 @@ import DatastarContainer from "../components/datastar/datastarContainer.astro";
 import HyperscriptContainer from "../components/hyperscript/hyperscriptContainer.astro";
 import JQueryContainer from "../components/jquery/jqueryContainer.astro";
 import ReactContainer from "../components/react/ReactContainer.astro";
+import MetricModal from "../components/shared/MetricModal.astro";
 import StimulusContainer from "../components/stimulus/stimulusContainer.astro";
 import SvelteContainer from "../components/svelte/SvelteContainer.astro";
 import VanillajsContainer from "../components/vanillajs/vanillajsContainer.astro";
@@ -56,6 +57,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 			))}
 		</div>
 	</div>
+	<MetricModal />
 </Layout>
 
 <script>
