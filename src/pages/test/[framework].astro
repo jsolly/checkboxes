@@ -5,7 +5,6 @@ import Datastar from "../../components/datastar/datastar.astro";
 import Hyperscript from "../../components/hyperscript/hyperscript.astro";
 import JQuery from "../../components/jquery/jquery.astro";
 import ReactNestedCheckboxes from "../../components/react/ReactNestedCheckboxes";
-import MetricModal from "../../components/shared/MetricModal.astro";
 import Stimulus from "../../components/stimulus/stimulusContainer.astro";
 import SvelteNestedCheckboxes from "../../components/svelte/SvelteNestedCheckboxes.svelte";
 import Vanillajs from "../../components/vanillajs/vanillajs.astro";
@@ -57,5 +56,4 @@ const frameworkId = framework;
 			{frameworkId === "datastar" && <Datastar />}
 		</div>
 	</div>
-	<MetricModal />
 </Layout>

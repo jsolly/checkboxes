@@ -32,7 +32,7 @@ Code Complexity is a deterministic **0–100** score built from five capped **0�
 | `nesting` | Max structural depth across JS blocks, template controls, and selector/state constructs |
 | `vocabulary` | Distinct operators, identifiers, directive names, and meaningful values |
 
-Cards display the total score (`Code: 74/100`). Tooltips show the five subscores labeled Size, Logic, Reactive, Nesting, and Vocabulary.
+Each card's metrics footer shows the total score as a labeled bar (for example, `Code Complexity 60`). Hovering or focusing the bar reveals the five subscores — Size, Logic, Reactive, Nesting, and Vocabulary — and clicking it opens a per-metric details panel.
 
 The formula version is stored in stats metadata (`codeComplexityVersion`, currently `cc-1.0.0`).
 

@@ -17,12 +17,17 @@ const { stats, maxBundle } = Astro.props;
 
 const rows = METRIC_ORDER.map((key) => {
 	const meta = METRIC_DISPLAY[key];
+	let tooltip = meta.tooltip;
+	if (key === "codeComplexity") {
+		const s = stats.codeComplexitySubscores;
+		tooltip = `Size ${s.size} · Logic ${s.logic} · Reactive ${s.reactive} · Nesting ${s.nesting} · Vocab ${s.vocabulary}. ${meta.tooltip}`;
+	}
 	return {
 		key,
 		id: `metric-${key}-${crypto.randomUUID()}`,
 		name: meta.name,
 		anchor: meta.anchor,
-		tooltip: meta.tooltip,
+		tooltip: `${tooltip} Click for details →`,
 		value: formatMetricValue(key, stats),
 		fill: barFillPercent(key, stats, maxBundle),
 		colorClass: zScoreColorClass(stats[meta.zScoreField]),
