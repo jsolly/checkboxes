@@ -1,159 +1,142 @@
 ---
 import type { FrameworkStats } from "../../types/stats";
+import {
+	METRIC_DISPLAY,
+	METRIC_ORDER,
+	barFillPercent,
+	formatMetricValue,
+	zScoreColorClass,
+} from "../../utils/metricDisplay";
 
 interface Props {
 	stats: FrameworkStats;
+	maxBundle: number;
 }
 
-const { stats } = Astro.props;
+const { stats, maxBundle } = Astro.props;
 
-function getColorClass(zScore: number) {
-	// Higher z-scores are worse for both metrics
-	if (zScore >= 1.5) return "bg-red-500";
-	if (zScore >= 0.5) return "bg-orange-500";
-	if (zScore >= -0.5) return "bg-yellow-500";
-	if (zScore >= -1.5) return "bg-green-400";
-	return "bg-green-500";
-}
-
-const { size, logic, reactive, nesting, vocabulary } =
-	stats.codeComplexitySubscores;
-
-const codeComplexityTooltip = `Code Complexity is deterministic (0-100) from five axes:
-* Size: ${size} — implementation bulk
-* Logic: ${logic} — branch/template/selector decisions
-* Reactive: ${reactive} — handlers, bindings, state
-* Nesting: ${nesting} — structural depth
-* Vocabulary: ${vocabulary} — distinct operators and identifiers`;
-
-const vibeComplexityTooltip = `Vibe Complexity is AI-judged based on:
-* State management clarity
-* Event handling clarity
-* Boilerplate and framework overhead
-* Idiomatic style and surprise factor`;
-
-const bundleTooltip = `JS Bundle size represents:
-* Total size of all JavaScript files
-* Measured after compression
-* Includes framework code
-* Captured during page load`;
+const rows = METRIC_ORDER.map((key) => {
+	const meta = METRIC_DISPLAY[key];
+	return {
+		key,
+		name: meta.name,
+		anchor: meta.anchor,
+		tooltip: meta.tooltip,
+		value: formatMetricValue(key, stats),
+		fill: barFillPercent(key, stats, maxBundle),
+		colorClass: zScoreColorClass(stats[meta.zScoreField]),
+	};
+});
 ---
 
-<div class="badge-container">
-	<div
-		class={`performance-badge ${getColorClass(stats.codeComplexityZScore)} group relative`}
-	>
-		<span class="value">Code: {stats.codeComplexity}/100</span>
-		<div class="tooltip">
-			{codeComplexityTooltip}
-		</div>
-	</div>
-	<div
-		class={`performance-badge ${getColorClass(stats.vibeComplexityZScore)} group relative`}
-	>
-		<span class="value">Vibe: {stats.vibeComplexity}/100</span>
-		<div class="tooltip">
-			{vibeComplexityTooltip}
-		</div>
-	</div>
-	<div
-		class={`performance-badge ${getColorClass(stats.bundleSizeZScore)} group relative`}
-	>
-		<span class="value">JS Bundle: {stats.bundleSize.toFixed(2)}kb</span>
-		<div class="tooltip">
-			{bundleTooltip}
-		</div>
-	</div>
+<div class="metric-footer">
+	{
+		rows.map((row) => (
+			<button
+				type="button"
+				class="metric-row group"
+				data-metric={row.key}
+				aria-label={`${row.name}: ${row.value}. Open details.`}
+			>
+				<span class="metric-name">{row.name}</span>
+				<span class="metric-track">
+					<span
+						class={`metric-fill ${row.colorClass}`}
+						style={`width: ${row.fill}%`}
+					/>
+				</span>
+				<span class="metric-value">{row.value}</span>
+				<span class="metric-tooltip" role="tooltip">{row.tooltip}</span>
+			</button>
+		))
+	}
 </div>
 
 <style>
-	.performance-badge {
-		color: white;
-		border-radius: 9999px;
-		padding: 2px 8px;
-		font-size: 0.75rem;
-		font-weight: 500;
-		cursor: help;
-		position: relative;
+	.metric-footer {
+		display: grid;
+		gap: 0.4rem;
+		padding: 0.85rem 1rem 1rem;
+		border-top: 1px solid rgb(241 245 249);
 	}
 
-	.tooltip {
+	.metric-row {
+		position: relative;
+		display: grid;
+		grid-template-columns: 128px 1fr 56px;
+		align-items: center;
+		gap: 0.6rem;
+		width: 100%;
+		background: none;
+		border: none;
+		padding: 0.15rem 0;
+		cursor: pointer;
+		text-align: left;
+		font: inherit;
+	}
+
+	.metric-row:focus-visible {
+		outline: 2px solid #4f46e5;
+		outline-offset: 2px;
+		border-radius: 6px;
+	}
+
+	.metric-name {
+		font-size: 0.78rem;
+		font-weight: 600;
+		color: rgb(71 85 105);
+	}
+
+	.metric-track {
+		height: 8px;
+		border-radius: 5px;
+		background: rgb(238 242 247);
+		overflow: hidden;
+	}
+
+	.metric-fill {
+		display: block;
+		height: 100%;
+		border-radius: 5px;
+		transition: width 0.3s ease;
+	}
+
+	.metric-value {
+		text-align: right;
+		font-size: 0.82rem;
+		font-weight: 800;
+		color: rgb(15 23 42);
+	}
+
+	.metric-tooltip {
 		visibility: hidden;
+		opacity: 0;
 		position: absolute;
-		top: calc(100% + 5px);
-		left: 50%;
-		transform: translateX(-50%);
+		bottom: calc(100% + 6px);
+		left: 0;
+		z-index: 30;
+		max-width: 240px;
 		background-color: #1f2937;
 		color: white;
-		padding: 0.5rem;
+		padding: 0.5rem 0.6rem;
 		border-radius: 0.375rem;
-		font-size: 0.75rem;
-		white-space: pre-line;
-		width: max-content;
-		max-width: 200px;
-		z-index: 100;
-		opacity: 0;
-		transition: opacity 0.2s ease-in-out;
-		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+		font-size: 0.72rem;
+		line-height: 1.4;
+		white-space: normal;
+		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2);
+		transition: opacity 0.15s ease-in-out;
 		pointer-events: none;
 	}
 
-	/* Arrow */
-	.tooltip::before {
-		content: "";
-		position: absolute;
-		top: -4px;
-		left: 50%;
-		transform: translateX(-50%) rotate(45deg);
-		width: 8px;
-		height: 8px;
-		background-color: #1f2937;
-	}
-
-	.performance-badge:hover .tooltip {
+	.metric-row:hover .metric-tooltip,
+	.metric-row:focus-visible .metric-tooltip {
 		visibility: visible;
 		opacity: 1;
 	}
 
-	.badge-container {
-		position: absolute;
-		top: 8px;
-		right: 8px;
-		z-index: 20;
-		display: flex;
-		gap: 0.5rem;
-		flex-direction: row;
-	}
-
-	/* Make the right-most tooltip align from the right instead of center */
-	.badge-container > div:last-child .tooltip {
-		left: auto;
-		right: 0;
-		transform: none;
-	}
-
-	.badge-container > div:last-child .tooltip::before {
-		left: auto;
-		right: 16px;
-	}
-
-	/* Stack vertically on mobile */
-	@media (max-width: 640px) {
-		.badge-container {
-			flex-direction: column;
-			gap: 0.25rem;
-		}
-
-		/* All tooltips align right on mobile */
-		.tooltip {
-			left: auto;
-			right: 0;
-			transform: none;
-		}
-
-		.tooltip::before {
-			left: auto;
-			right: 16px;
+	@media (max-width: 480px) {
+		.metric-row {
+			grid-template-columns: 108px 1fr 52px;
 		}
 	}
 </style>

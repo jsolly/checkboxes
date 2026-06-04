@@ -1,7 +1,8 @@
 ---
 import type { FrameworkId } from "../../config/frameworks";
 import stats from "../../data/framework-stats.json";
-import type { FrameworkStats } from "../../types/stats";
+import type { FrameworkStats, FrameworkStatsRecord } from "../../types/stats";
+import { maxBundleSize } from "../../utils/metricDisplay";
 import PerformanceBadge from "../shared/PerformanceBadge.astro";
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 const { framework, title } = Astro.props;
 
 const frameworkStats: FrameworkStats = stats.frameworks[framework];
+const maxBundle = maxBundleSize(stats.frameworks as FrameworkStatsRecord);
 ---
 
 <div 
@@ -19,7 +21,7 @@ const frameworkStats: FrameworkStats = stats.frameworks[framework];
 	data-framework={framework}
 	style="transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.2s ease-out"
 >
-	<PerformanceBadge stats={frameworkStats} />
+	<PerformanceBadge stats={frameworkStats} maxBundle={maxBundle} />
 	<div class="opacity-0 transition-opacity duration-300" data-framework-wrapper>
 		<div class="bg-white/40 rounded-xl border border-white/50 shadow-lg overflow-hidden relative">
 			<div 
