@@ -1,5 +1,5 @@
 import type { FrameworkId } from "../config/frameworks";
-import type { FrameworkStats } from "../config/stats";
+import type { FrameworkStats } from "../types/stats";
 
 function calculateMean(values: number[]): number {
 	return values.reduce((sum, value) => sum + value, 0) / values.length;

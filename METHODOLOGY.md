@@ -125,55 +125,60 @@ When `GEMINI_API_KEY` is set, the generator can refresh Vibe Complexity (median 
 
 ## JS Bundle
 
-JS Bundle is the **implementation JavaScript payload** above a shared baseline test route (`/test/baseline`). It is measured on isolated `/test/{framework}` pages — not the gallery index, which loads every framework at once.
+JS Bundle is the **normalized implementation JavaScript payload** above a shared baseline test route (`/test/baseline`). It is measured from the built isolated `/test/{framework}` artifacts — not the gallery index, which loads every framework at once, and not browser transfer behavior.
 
-The formula version is stored in stats metadata (`bundleMeasurementVersion`, currently `bm-1.0.0`).
+The formula version is stored in stats metadata (`bundleMeasurementVersion`, currently `bm-2.0.0`).
 
 ### What gets measured
 
 | Value | Meaning |
 | --- | --- |
-| **Displayed `bundleSize`** | Median implementation JS in KiB: external JS transfer above baseline plus inline JS bytes above baseline |
-| **`jsTransferTotalKiB`** | All counted JS requests on the framework test route |
-| **`baselineJsTransferKiB`** | Same count on `/test/baseline` (layout shell, no checkbox implementation) |
-| **`inlineJsBytes`** | Uncompressed UTF-8 size of inline `<script>` blocks on the framework test route |
-| **`inlineJsImplementationBytes`** | Inline script bytes above the baseline route |
-| **`jsImplementationTotalKiB`** | The displayed value stored explicitly in the audit trail |
-| **`jsRequests`** | Per-URL audit of completed transfer bytes |
+| **Displayed `bundleSize`** | Normalized gzip-compressed implementation JS in KiB: built route JS above `/test/baseline` |
+| **`jsNormalizedBytes`** | Fixed-gzip total for all counted JavaScript required by the test route |
+| **`baselineNormalizedBytes`** | Same normalized count on `/test/baseline` (layout shell, no checkbox implementation) |
+| **`jsImplementationNormalizedKiB`** | The displayed value stored explicitly in the audit trail |
+| **`jsRawBytes`** | Decoded JavaScript bytes before normalization |
+| **`inlineJsBytes`** | Raw UTF-8 size of inline `<script>` blocks on the framework test route |
+| **`inlineJsImplementationBytes`** | Inline script bytes above the baseline route, kept as audit detail |
+| **`jsSources`** | Per-source audit of first-party chunks, external runtime scripts, and inline scripts |
 
 ### Measurement target
 
 Each framework has a dedicated test page at `/test/{framework}` that renders only that implementation — no card chrome, no code blocks, no sort controls. React, Vue, and Svelte use `client:only` on the test routes, matching how they hydrate on the gallery cards. Alpine is loaded only by the Alpine implementation, not globally, so its runtime is not hidden in the baseline.
 
-The baseline page (`/test/baseline`) uses the same Astro layout and measurement shell but renders no checkbox implementation. Its external JS transfer and inline script bytes are subtracted from every framework total so shared page overhead does not dominate the comparison.
+The baseline page (`/test/baseline`) uses the same Astro layout and measurement shell but renders no checkbox implementation. Its normalized JavaScript payload is subtracted from every framework total so shared page overhead does not dominate the comparison.
 
-### How transfer bytes are captured
+### How payload bytes are captured
 
-Measurement uses Puppeteer with Chrome DevTools Protocol:
+Measurement reads the built Astro output:
 
-1. Disable cache (`page.setCacheEnabled(false)` and `Network.setCacheDisabled`).
-2. Track each request by `requestId` from `Network.requestWillBeSent` through `Network.responseReceived` (MIME type, cache status) to **`Network.loadingFinished`** (authoritative completed transfer size via `encodedDataLength`).
-3. Do **not** use `Network.responseReceived.response.encodedDataLength` — that value reflects bytes received so far when headers arrive, not the completed body.
-4. Filter to JavaScript requests only, deduplicate by URL (so Vite `modulepreload` and module execution share one count).
-5. Navigate with `waitUntil: "networkidle0"`, then measure inline scripts from the rendered DOM.
-6. Measure the baseline and each framework three times.
-7. Store the median run's audit trail and display its `jsImplementationTotalKiB`.
+1. Parse `dist/test/baseline/index.html` and each `dist/test/{framework}/index.html`.
+2. Collect required JavaScript references: first-party `/_astro/*.js` chunks, Astro island `component-url` / `renderer-url` chunks, allowed external runtime scripts, and inline JavaScript `<script>` blocks.
+3. Read first-party chunks directly from `dist/_astro`.
+4. Fetch allowed external runtime scripts as decoded bytes.
+5. Follow first-party module imports so tiny wrapper chunks that import a runtime still count the imported JavaScript.
+6. Compress every counted JavaScript source with the same local gzip settings.
+7. Subtract the baseline normalized bytes from each framework route.
+8. Store the audit trail and display `jsImplementationNormalizedKiB`.
 
-### Which requests count
+### Which sources count
 
-Only these URLs are included in the network total:
+Only these sources are included in the normalized total:
 
 - First-party built chunks: `/_astro/*.js`
-- Implementation CDN scripts: `unpkg.com` (Hyperscript), `cdn.jsdelivr.net` (Datastar)
+- Astro island component and renderer chunks referenced by `component-url` / `renderer-url`
+- First-party module imports discovered from counted chunks
+- Implementation CDN scripts: only `unpkg.com` (Hyperscript) and `cdn.jsdelivr.net` (Datastar) are allowlisted. Unknown external JavaScript hosts fail stats generation loudly.
+- Inline JavaScript scripts from the built test route
 
-Excluded: dev-server artifacts (`@vite/client`, `@fs/`, `node_modules/`, source files), CSS mislabeled as Script, failed requests, and cache hits.
+Excluded: CSS, JSON data scripts, dev-server artifacts (`@vite/client`, `@fs/`, `node_modules/`, source files), and non-JavaScript resources. Unknown external JavaScript hosts fail stats generation loudly so a new CDN cannot silently report as zero.
 
-**Important:** stats must be generated against **`pnpm preview`** (built static output). If a dev server is already bound to port `4321`, preview may start on another port — set `STATS_PREVIEW_URL` (for example `http://localhost:4322/test`) so measurements hit the preview server, not Vite dev mode.
+**Important:** run `pnpm build` before `pnpm generate-stats`. Bundle measurement reads the built `dist/` artifacts directly.
 
 ### Environment caveats
 
-- Browser transfer bytes depend on the server's compression behavior. `astro preview` served gzip-compressed JS in local verification; production CDNs may use gzip, brotli, or different headers.
-- Inline scripts are measured as uncompressed UTF-8 bytes because they are delivered inside the HTML document rather than as separate JS requests. This makes inline-only implementations such as Vanilla JS visible in the displayed total.
+- The displayed metric is not a browser transfer measurement. It normalizes decoded JavaScript with a fixed local gzip compressor (level 9) so preview-server and CDN compression differences do not introduce variance.
+- External runtime scripts are fetched during stats generation. If the CDN content changes without a version change, regenerated stats can change.
 - CSS-only should show 0 KiB implementation JS when no implementation script is shipped.
 
 Each framework entry in `src/data/framework-stats.json` stores a full `bundleMeasurement` audit trail. The card bar is filled relative to the largest incremental bundle in the comparison. Lower is better.
@@ -186,18 +191,11 @@ Z-scores for bundle size, Code Complexity, and Vibe Complexity are computed acro
 
 ## Reproducing The Numbers
 
-Run `pnpm build`, `pnpm preview`, and `pnpm generate-stats`. Set `GEMINI_API_KEY` to update Vibe Complexity; leave it unset to preserve existing Vibe values.
+Run `pnpm build`, then `pnpm generate-stats`. Set `GEMINI_API_KEY` to update Vibe Complexity; leave it unset to preserve existing Vibe values.
 
 ```shell
 pnpm build
-pnpm preview          # separate terminal — must serve built dist/, not dev mode
-pnpm generate-stats   # new terminal; preview must be running for bundle sizes
-```
-
-If preview binds a port other than `4321`:
-
-```shell
-STATS_PREVIEW_URL=http://localhost:4322/test pnpm generate-stats
+pnpm generate-stats
 ```
 
 Optional `.env` for Vibe refresh:

@@ -18,8 +18,9 @@ interface Props {
 
 const { framework, title, contributor } = Astro.props;
 
-const frameworkStats: FrameworkStats = stats.frameworks[framework];
-const maxBundle = maxBundleSize(stats.frameworks as FrameworkStatsRecord);
+const typedStats = stats as unknown as { frameworks: FrameworkStatsRecord };
+const frameworkStats: FrameworkStats = typedStats.frameworks[framework];
+const maxBundle = maxBundleSize(typedStats.frameworks);
 ---
 
 <div 

@@ -31,8 +31,7 @@ pnpm dev
 ```shell
 # Run these commands in sequence:
 pnpm build           # Build the project
-pnpm preview         # Start the preview server (in a separate terminal)
-pnpm generate-stats  # Generate performance metrics (in a new terminal)
+pnpm generate-stats  # Generate performance metrics from dist/
 ```
 
 Bundle sizes and Code Complexity are always measured. Vibe Complexity requires a Gemini API key. Without one, existing Vibe Complexity scores are preserved. To refresh Vibe Complexity, create a `.env` file with your key:
@@ -131,9 +130,9 @@ If you want to generate performance metrics for your new implementation, see the
 
 - If `generate-stats` fails, ensure:
   - Your GEMINI_API_KEY is valid and properly set in `.env` (only if refreshing Vibe Complexity)
-  - You've run `pnpm build` before running `pnpm preview`
-  - The preview server is running when you run `generate-stats`
-  - You have Node.js 16+ installed
+  - You've run `pnpm build` before running `pnpm generate-stats`
+  - Any external JavaScript runtime host used by the implementation must be explicitly allowlisted
+  - You have Node.js 24+ installed
 - For framework integration issues, check:
   - Required dependencies are installed
   - Framework is properly configured in astro.config.mjs
@@ -169,13 +168,13 @@ src/
 
 ## Notes on Performance Metrics
 
-Each framework implementation is evaluated on two key metrics:
+Each framework implementation is evaluated on three metrics:
 
 ### Bundle Size
-- Measured in kilobytes (KB)
-- Calculated by monitoring network requests during page load
-- Only includes JavaScript resources (`type: "Script"`)
-- Represents the compressed (encoded) size of all JS assets
+- Measured in kibibytes (KiB)
+- Calculated from built isolated `/test/{framework}` artifacts after `pnpm build`
+- Includes first-party chunks, allowed external runtime scripts, and inline JavaScript
+- Represents normalized gzip-compressed implementation JavaScript above `/test/baseline`
 - Lower scores are better
 
 ### Code Complexity
@@ -192,7 +191,7 @@ Each framework implementation is evaluated on two key metrics:
 
 See [METHODOLOGY.md](METHODOLOGY.md) for counting rules, normalization, and reproduction steps.
 
-Both metrics are normalized using z-scores to provide relative performance indicators, displayed as colored badges:
+The metrics are normalized using z-scores to provide relative performance indicators, displayed as colored badges:
 - 🟢 Excellent (z-score < -1.5)
 - 🟢 Good (z-score < -0.5)
 - 🟡 Average (-0.5 ≤ z-score < 0.5)

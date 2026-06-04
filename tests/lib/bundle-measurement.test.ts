@@ -1,150 +1,18 @@
 import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { describe, it } from "node:test";
 import {
-	type TrackedRequest,
 	buildBundleMeasurementAudit,
 	bytesToKiB,
-	dedupeJsRequestsByUrl,
-	isJavaScriptMime,
-	isJsRequest,
-	shouldCountJsRequest,
+	measureBuiltJsPayload,
+	normalizeJsBytes,
+	parseBuiltJsReferences,
 	sumInlineJsBytes,
-	sumJsTransferBytes,
 } from "../../src/utils/bundleMeasurement";
 
-function makeRequest(
-	overrides: Partial<TrackedRequest> & Pick<TrackedRequest, "url">,
-): TrackedRequest {
-	return {
-		resourceType: "Script",
-		mimeType: "application/javascript",
-		fromCache: false,
-		status: 200,
-		encodedDataLength: 0,
-		failed: false,
-		...overrides,
-	};
-}
-
-describe("Bundle measurement aggregates completed JS transfer bytes", () => {
-	it("uses loadingFinished totals and ignores cache hits and non-JS requests", () => {
-		const requests = [
-			makeRequest({
-				url: "http://localhost:4321/_astro/react.js",
-				encodedDataLength: 2048,
-			}),
-			makeRequest({
-				url: "http://localhost:4321/_astro/styles.css",
-				resourceType: "Stylesheet",
-				mimeType: "text/css",
-				encodedDataLength: 512,
-			}),
-			makeRequest({
-				url: "http://localhost:4321/@vite/client",
-				encodedDataLength: 280845,
-			}),
-			makeRequest({
-				url: "http://localhost:4321/_astro/cached.js",
-				fromCache: true,
-				encodedDataLength: 0,
-			}),
-			makeRequest({
-				url: "http://localhost:4321/_astro/failed.js",
-				failed: true,
-				encodedDataLength: 1024,
-			}),
-		];
-
-		const jsRequests = dedupeJsRequestsByUrl(requests, "http://localhost:4321");
-		assert.equal(jsRequests.length, 1);
-		assert.equal(sumJsTransferBytes(jsRequests), 2048);
-	});
-
-	it("deduplicates modulepreload and import requests by URL", () => {
-		const requests = [
-			makeRequest({
-				url: "http://localhost:4321/_astro/vendor.js",
-				encodedDataLength: 100,
-			}),
-			makeRequest({
-				url: "http://localhost:4321/_astro/vendor.js",
-				encodedDataLength: 1500,
-			}),
-		];
-
-		const jsRequests = dedupeJsRequestsByUrl(requests, "http://localhost:4321");
-		assert.equal(jsRequests.length, 1);
-		assert.equal(jsRequests[0]?.encodedDataLength, 1500);
-	});
-
-	it("accepts JavaScript MIME types when resource type is missing", () => {
-		const request = makeRequest({
-			url: "http://localhost:4321/_astro/legacy.js",
-			resourceType: "Other",
-			mimeType: "text/javascript",
-			encodedDataLength: 900,
-		});
-
-		assert.equal(isJsRequest(request, "http://localhost:4321"), true);
-		assert.equal(isJavaScriptMime("application/ecmascript"), true);
-	});
-
-	it("counts only built _astro scripts and implementation CDNs", () => {
-		assert.equal(
-			shouldCountJsRequest(
-				"http://localhost:4321/_astro/client.js",
-				"http://localhost:4321",
-			),
-			true,
-		);
-		assert.equal(
-			shouldCountJsRequest(
-				"http://localhost:4321/@vite/client",
-				"http://localhost:4321",
-			),
-			false,
-		);
-		assert.equal(
-			shouldCountJsRequest(
-				"https://unpkg.com/hyperscript.org@0.9.13",
-				"http://localhost:4321",
-			),
-			true,
-		);
-		assert.equal(
-			shouldCountJsRequest(
-				"https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js",
-				"http://localhost:4321",
-			),
-			true,
-		);
-		assert.equal(
-			shouldCountJsRequest("https://esm.sh/react@19", "http://localhost:4321"),
-			false,
-		);
-		assert.equal(
-			shouldCountJsRequest(
-				"http://localhost:4321/_astro/client.ts",
-				"http://localhost:4321",
-			),
-			false,
-		);
-		assert.equal(
-			shouldCountJsRequest("not-a-url", "http://localhost:4321"),
-			false,
-		);
-	});
-
-	it("ignores failed HTTP responses and cache hits", () => {
-		const notFound = makeRequest({
-			url: "http://localhost:4321/_astro/missing.js",
-			status: 404,
-			failed: false,
-			encodedDataLength: 512,
-		});
-		assert.equal(isJsRequest(notFound, "http://localhost:4321"), false);
-	});
-
+describe("A stats generation run measures normalized JS payloads from built artifacts", () => {
 	it("counts inline script bytes separately from network transfer", () => {
 		const scripts = [
 			"console.log('vanilla');",
@@ -158,63 +26,204 @@ describe("Bundle measurement aggregates completed JS transfer bytes", () => {
 		);
 	});
 
-	it("subtracts baseline transfer to produce incremental implementation JS", () => {
+	it("normalizes decoded JavaScript with one fixed gzip compressor", () => {
+		const source = "const checked = new Set(['parent', 'child']);";
+
+		assert.equal(normalizeJsBytes(source), 65);
+		assert.equal(normalizeJsBytes(""), 0);
+	});
+
+	it("discovers first-party, external, and inline scripts from built HTML", () => {
+		const references = parseBuiltJsReferences(
+			`
+				<!doctype html>
+				<link rel="modulepreload" href="/_astro/vendor.abc123.js">
+				<script type="module" src="/_astro/vendor.abc123.js"></script>
+				<link rel="stylesheet" href="/_astro/styles.css">
+				<script type="module" src="/_astro/page.def456.js"></script>
+				<script src="https://cdn.jsdelivr.net/npm/example@1/index.js"></script>
+				<astro-island component-url="/_astro/Component.ghi789.js" renderer-url="/_astro/client.jkl012.js"></astro-island>
+				<script data-cmp="3 > 2" type="application/json">{"not":"js"}</script>
+				<script>window.inline = true;</script>
+				<script type="application/json">{"not":"js"}</script>
+			`,
+			"http://localhost:4321",
+		);
+
+		assert.deepEqual(
+			references.map((reference) => reference.kind),
+			[
+				"first-party",
+				"first-party",
+				"external",
+				"first-party",
+				"first-party",
+				"inline",
+			],
+		);
+		assert.equal(references[0]?.url, "/_astro/vendor.abc123.js");
+		assert.equal(references[1]?.url, "/_astro/page.def456.js");
+		assert.equal(
+			references[2]?.url,
+			"https://cdn.jsdelivr.net/npm/example@1/index.js",
+		);
+		assert.equal(references[3]?.url, "/_astro/Component.ghi789.js");
+		assert.equal(references[4]?.url, "/_astro/client.jkl012.js");
+		assert.equal(references[5]?.content, "window.inline = true;");
+	});
+
+	it("fails loudly when built HTML includes an uncounted external script host", () => {
+		assert.throws(
+			() =>
+				parseBuiltJsReferences(
+					`<script src="https://esm.sh/react@19"></script>`,
+					"http://localhost:4321",
+				),
+			/Uncounted external JavaScript host: esm\.sh/,
+		);
+		assert.throws(
+			() =>
+				parseBuiltJsReferences(
+					`<astro-island component-url="https://esm.sh/react@19"></astro-island>`,
+					"http://localhost:4321",
+				),
+			/Uncounted external JavaScript host: esm\.sh/,
+		);
+	});
+
+	it("follows first-party module imports from built chunks", async () => {
+		const dist = await fs.mkdtemp(path.join(os.tmpdir(), "checkboxes-dist-"));
+		try {
+			await fs.mkdir(path.join(dist, "test", "sample"), { recursive: true });
+			await fs.mkdir(path.join(dist, "_astro"), { recursive: true });
+			await fs.writeFile(
+				path.join(dist, "test", "sample", "index.html"),
+				`<script type="module" src="/_astro/entry.js"></script>`,
+			);
+			await fs.writeFile(
+				path.join(dist, "_astro", "entry.js"),
+				[
+					`import "./child.js";`,
+					`import{createApp}from"./runtime.js";`,
+					`await import("./lazy.js");`,
+					`export{value}from"./barrel.js";`,
+					`// import nope from "https://esm.sh/react@19";`,
+					`const text = "import nope from 'https://esm.sh/vue@3'";`,
+				].join("\n"),
+			);
+			await fs.writeFile(
+				path.join(dist, "_astro", "child.js"),
+				`console.log("child");`,
+			);
+			await fs.writeFile(
+				path.join(dist, "_astro", "runtime.js"),
+				`console.log("runtime");`,
+			);
+			await fs.writeFile(
+				path.join(dist, "_astro", "lazy.js"),
+				`console.log("lazy");`,
+			);
+			await fs.writeFile(
+				path.join(dist, "_astro", "barrel.js"),
+				`console.log("barrel");`,
+			);
+
+			const measurement = await measureBuiltJsPayload(dist, "/test/sample");
+
+			assert.deepEqual(
+				measurement.jsSources.map((source) => source.url),
+				[
+					"/_astro/entry.js",
+					"/_astro/child.js",
+					"/_astro/runtime.js",
+					"/_astro/lazy.js",
+					"/_astro/barrel.js",
+				],
+			);
+		} finally {
+			await fs.rm(dist, { recursive: true, force: true });
+		}
+	});
+
+	it("fails loudly when first-party chunks import an uncounted external host", async () => {
+		const dist = await fs.mkdtemp(path.join(os.tmpdir(), "checkboxes-dist-"));
+		try {
+			await fs.mkdir(path.join(dist, "test", "sample"), { recursive: true });
+			await fs.mkdir(path.join(dist, "_astro"), { recursive: true });
+			await fs.writeFile(
+				path.join(dist, "test", "sample", "index.html"),
+				`<script type="module" src="/_astro/entry.js"></script>`,
+			);
+			await fs.writeFile(
+				path.join(dist, "_astro", "entry.js"),
+				`import"https://esm.sh/react@19";`,
+			);
+
+			await assert.rejects(
+				() => measureBuiltJsPayload(dist, "/test/sample"),
+				/Uncounted external JavaScript host: esm\.sh/,
+			);
+		} finally {
+			await fs.rm(dist, { recursive: true, force: true });
+		}
+	});
+
+	it("subtracts baseline normalized payload to produce incremental implementation JS", () => {
 		const audit = buildBundleMeasurementAudit(
 			{
 				measuredRoute: "/test/react",
-				jsTransferTotalBytes: 5000,
 				inlineJsBytes: 120,
 				jsRequestCount: 2,
-				jsRequests: [],
+				jsRawBytes: 7000,
+				jsNormalizedBytes: 2400,
+				jsSources: [],
 			},
-			3000,
 			40,
+			900,
 		);
 
-		assert.equal(audit.jsImplementationDeltaBytes, 2000);
 		assert.equal(audit.baselineInlineJsBytes, 40);
 		assert.equal(audit.inlineJsImplementationBytes, 80);
-		assert.equal(audit.jsImplementationTotalBytes, 2080);
-		assert.equal(audit.jsTransferTotalKiB, bytesToKiB(5000));
-		assert.equal(audit.baselineJsTransferKiB, bytesToKiB(3000));
-		assert.equal(audit.jsImplementationDeltaKiB, bytesToKiB(2000));
-		assert.equal(audit.jsImplementationTotalKiB, bytesToKiB(2080));
-		assert.match(audit.compressionNote, /transfer bytes/i);
+		assert.equal(audit.baselineNormalizedBytes, 900);
+		assert.equal(audit.jsImplementationNormalizedBytes, 1500);
+		assert.equal(audit.jsImplementationNormalizedKiB, bytesToKiB(1500));
+		assert.match(audit.compressionNote, /normalized gzip/i);
 	});
 
 	it("keeps inline-only implementations from reporting as zero JavaScript", () => {
 		const audit = buildBundleMeasurementAudit(
 			{
 				measuredRoute: "/test/vanillajs",
-				jsTransferTotalBytes: 16371,
 				inlineJsBytes: 744,
 				jsRequestCount: 1,
-				jsRequests: [],
+				jsRawBytes: 744,
+				jsNormalizedBytes: 360,
+				jsSources: [],
 			},
-			16371,
 			84,
+			100,
 		);
 
-		assert.equal(audit.jsImplementationDeltaBytes, 0);
 		assert.equal(audit.inlineJsImplementationBytes, 660);
-		assert.equal(audit.jsImplementationTotalBytes, 660);
-		assert.equal(audit.jsImplementationTotalKiB, bytesToKiB(660));
+		assert.equal(audit.jsImplementationNormalizedBytes, 260);
+		assert.equal(audit.jsImplementationNormalizedKiB, bytesToKiB(260));
 	});
 
 	it("clamps inline implementation bytes when inline is below baseline", () => {
 		const audit = buildBundleMeasurementAudit(
 			{
 				measuredRoute: "/test/cssOnly",
-				jsTransferTotalBytes: 1000,
 				inlineJsBytes: 20,
 				jsRequestCount: 0,
-				jsRequests: [],
+				jsRawBytes: 20,
+				jsNormalizedBytes: 50,
+				jsSources: [],
 			},
-			1000,
 			84,
+			90,
 		);
 
 		assert.equal(audit.inlineJsImplementationBytes, 0);
-		assert.equal(audit.jsImplementationTotalBytes, 0);
+		assert.equal(audit.jsImplementationNormalizedBytes, 0);
 	});
 });

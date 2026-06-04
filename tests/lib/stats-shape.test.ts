@@ -1,27 +1,23 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import type { FrameworkStats } from "../../src/config/stats";
 import stats from "../../src/data/framework-stats.json";
+import type { FrameworkStats } from "../../src/types/stats";
 import { calculateStatsZScores } from "../../src/utils/calculateZScores";
 
 function makeBundleMeasurement() {
 	return {
 		measuredRoute: "/test/react",
-		jsTransferTotalBytes: 2048,
 		inlineJsBytes: 0,
 		jsRequestCount: 1,
-		jsRequests: [],
-		baselineJsTransferBytes: 1024,
 		baselineInlineJsBytes: 0,
-		jsImplementationDeltaBytes: 1024,
 		inlineJsImplementationBytes: 0,
-		jsImplementationTotalBytes: 1024,
-		jsTransferTotalKiB: 2,
-		baselineJsTransferKiB: 1,
-		jsImplementationDeltaKiB: 1,
-		jsImplementationTotalKiB: 1,
-		compressionNote:
-			"Measured as browser transfer bytes, with compression negotiated by the server.",
+		jsRawBytes: 4096,
+		jsNormalizedBytes: 1536,
+		baselineNormalizedBytes: 512,
+		jsImplementationNormalizedBytes: 1024,
+		jsImplementationNormalizedKiB: 1,
+		jsSources: [],
+		compressionNote: "Ranked by normalized gzip-compressed JavaScript payload.",
 	};
 }
 
@@ -108,7 +104,7 @@ describe("A stats generation run emits explicit complexity metrics", () => {
 			);
 			assert.equal(
 				frameworkStats.bundleSize,
-				frameworkStats.bundleMeasurement.jsImplementationTotalKiB,
+				frameworkStats.bundleMeasurement.jsImplementationNormalizedKiB,
 				`${id} bundleSize/audit mismatch`,
 			);
 			assert.ok(

@@ -18,21 +18,17 @@ function makeBundleMeasurement(
 ): BundleMeasurementAudit {
 	return {
 		measuredRoute: "/test/react",
-		jsTransferTotalBytes: 1566,
 		inlineJsBytes: 0,
 		jsRequestCount: 1,
-		jsRequests: [],
-		baselineJsTransferBytes: 0,
 		baselineInlineJsBytes: 0,
-		jsImplementationDeltaBytes: 1566,
 		inlineJsImplementationBytes: 0,
-		jsImplementationTotalBytes: 1566,
-		jsTransferTotalKiB: 1.53,
-		baselineJsTransferKiB: 0,
-		jsImplementationDeltaKiB: 1.53,
-		jsImplementationTotalKiB: 1.53,
-		compressionNote:
-			"Measured as browser transfer bytes, with compression negotiated by the server.",
+		jsRawBytes: 4096,
+		jsNormalizedBytes: 1566,
+		baselineNormalizedBytes: 0,
+		jsImplementationNormalizedBytes: 1566,
+		jsImplementationNormalizedKiB: 1.53,
+		jsSources: [],
+		compressionNote: "Ranked by normalized gzip-compressed JavaScript payload.",
 		...overrides,
 	};
 }

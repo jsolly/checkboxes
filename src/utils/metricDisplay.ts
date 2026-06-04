@@ -46,10 +46,10 @@ export const METRIC_DISPLAY: Record<MetricKey, MetricDisplay> = {
 		kind: "deterministic",
 		zScoreField: "bundleSizeZScore",
 		anchor: "js-bundle",
-		tooltip: "Implementation JS payload above baseline (KiB).",
+		tooltip: "Normalized implementation JS payload above baseline (KiB).",
 		tag: "Measured",
 		blurb:
-			"JavaScript payload for this implementation above a shared baseline test route: external transfer bytes plus inline script bytes, measured on isolated /test pages. Lower is better.",
+			"JavaScript required by this implementation above a shared baseline test route, normalized with one local gzip compressor across built chunks, external runtime scripts, and inline scripts. Lower is better.",
 	},
 };
 

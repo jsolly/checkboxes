@@ -1,11 +1,11 @@
 {
 	"metadata": {
-		"lastUpdated": "2026-06-04T02:52:00.196Z",
+		"lastUpdated": "2026-06-04T03:54:14.800Z",
 		"description": "Framework comparison metrics",
 		"codeComplexityVersion": "cc-1.0.0",
-		"bundleMeasurementVersion": "bm-1.0.0",
+		"bundleMeasurementVersion": "bm-2.0.0",
 		"metrics": {
-			"bundleSize": "Implementation JavaScript payload (KiB): external transfer above baseline plus inline JS above baseline",
+			"bundleSize": "Normalized implementation JavaScript payload (KiB): built chunks, external runtimes, and inline JS above baseline",
 			"codeComplexity": "Deterministic 0-100 composite of size, logic, reactive, nesting, and vocabulary",
 			"vibeComplexity": "AI-judged implementation complexity on a 0-100 scale",
 			"bundleSizeZScore": "Standardized score relative to mean",
@@ -15,27 +15,30 @@
 	},
 	"frameworks": {
 		"vanillajs": {
-			"bundleSize": 0.64,
+			"bundleSize": 0.31,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/vanillajs",
-				"jsTransferTotalBytes": 0,
-				"inlineJsBytes": 744,
+				"inlineJsBytes": 660,
 				"jsRequestCount": 0,
-				"jsRequests": [],
-				"baselineJsTransferBytes": 0,
-				"baselineInlineJsBytes": 84,
-				"jsImplementationDeltaBytes": 0,
+				"jsRawBytes": 660,
+				"jsNormalizedBytes": 313,
+				"jsSources": [
+					{
+						"kind": "inline",
+						"rawBytes": 660,
+						"normalizedBytes": 313
+					}
+				],
+				"baselineInlineJsBytes": 0,
+				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 660,
-				"jsImplementationTotalBytes": 660,
-				"jsTransferTotalKiB": 0,
-				"baselineJsTransferKiB": 0,
-				"jsImplementationDeltaKiB": 0,
-				"jsImplementationTotalKiB": 0.64,
-				"compressionNote": "Measured as browser transfer bytes, with compression negotiated by the server."
+				"jsImplementationNormalizedBytes": 313,
+				"jsImplementationNormalizedKiB": 0.31,
+				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
 			"codeComplexity": 46,
 			"vibeComplexity": 35,
-			"bundleSizeZScore": -1.1315427345720852,
+			"bundleSizeZScore": -1.1363908468918906,
 			"codeComplexityZScore": -0.7172506779181377,
 			"vibeComplexityZScore": -0.3718883287087489,
 			"codeComplexitySubscores": {
@@ -61,34 +64,31 @@
 			}
 		},
 		"alpine": {
-			"bundleSize": 16.06,
+			"bundleSize": 15.73,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/alpine",
-				"jsTransferTotalBytes": 16449,
-				"inlineJsBytes": 84,
+				"inlineJsBytes": 0,
 				"jsRequestCount": 1,
-				"jsRequests": [
+				"jsRawBytes": 44461,
+				"jsNormalizedBytes": 16105,
+				"jsSources": [
 					{
-						"url": "http://localhost:4322/_astro/alpine.astro_astro_type_script_index_0_lang.CAgXQxpe.js",
-						"encodedDataLength": 16449,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "first-party",
+						"url": "/_astro/alpine.astro_astro_type_script_index_0_lang.CAgXQxpe.js",
+						"rawBytes": 44461,
+						"normalizedBytes": 16105
 					}
 				],
-				"baselineJsTransferBytes": 0,
-				"baselineInlineJsBytes": 84,
-				"jsImplementationDeltaBytes": 16449,
+				"baselineInlineJsBytes": 0,
+				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 0,
-				"jsImplementationTotalBytes": 16449,
-				"jsTransferTotalKiB": 16.06,
-				"baselineJsTransferKiB": 0,
-				"jsImplementationDeltaKiB": 16.06,
-				"jsImplementationTotalKiB": 16.06,
-				"compressionNote": "Measured as browser transfer bytes, with compression negotiated by the server."
+				"jsImplementationNormalizedBytes": 16105,
+				"jsImplementationNormalizedKiB": 15.73,
+				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
 			"codeComplexity": 70,
 			"vibeComplexity": 18,
-			"bundleSizeZScore": -0.27180442626454365,
+			"bundleSizeZScore": -0.22991177912131716,
 			"codeComplexityZScore": 0.987107368620011,
 			"vibeComplexityZScore": -1.203743800820424,
 			"codeComplexitySubscores": {
@@ -114,46 +114,48 @@
 			}
 		},
 		"vue": {
-			"bundleSize": 33.3,
+			"bundleSize": 29.91,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/vue",
-				"jsTransferTotalBytes": 30511,
-				"inlineJsBytes": 3677,
+				"inlineJsBytes": 3593,
 				"jsRequestCount": 3,
-				"jsRequests": [
+				"jsRawBytes": 76138,
+				"jsNormalizedBytes": 30623,
+				"jsSources": [
 					{
-						"url": "http://localhost:4322/_astro/VueNestedCheckboxes.DnH9c0In.js",
-						"encodedDataLength": 1080,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "inline",
+						"rawBytes": 3593,
+						"normalizedBytes": 1473
 					},
 					{
-						"url": "http://localhost:4322/_astro/client.BONbsUMg.js",
-						"encodedDataLength": 1269,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "first-party",
+						"url": "/_astro/VueNestedCheckboxes.DnH9c0In.js",
+						"rawBytes": 1422,
+						"normalizedBytes": 744
 					},
 					{
-						"url": "http://localhost:4322/_astro/runtime-dom.esm-bundler.BmAL9YkP.js",
-						"encodedDataLength": 28162,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "first-party",
+						"url": "/_astro/client.BONbsUMg.js",
+						"rawBytes": 982,
+						"normalizedBytes": 608
+					},
+					{
+						"kind": "first-party",
+						"url": "/_astro/runtime-dom.esm-bundler.BmAL9YkP.js",
+						"rawBytes": 70141,
+						"normalizedBytes": 27798
 					}
 				],
-				"baselineJsTransferBytes": 0,
-				"baselineInlineJsBytes": 84,
-				"jsImplementationDeltaBytes": 30511,
+				"baselineInlineJsBytes": 0,
+				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 3593,
-				"jsImplementationTotalBytes": 34104,
-				"jsTransferTotalKiB": 29.8,
-				"baselineJsTransferKiB": 0,
-				"jsImplementationDeltaKiB": 29.8,
-				"jsImplementationTotalKiB": 33.3,
-				"compressionNote": "Measured as browser transfer bytes, with compression negotiated by the server."
+				"jsImplementationNormalizedBytes": 30623,
+				"jsImplementationNormalizedKiB": 29.91,
+				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
 			"codeComplexity": 70,
 			"vibeComplexity": 22,
-			"bundleSizeZScore": 0.6894075345150944,
+			"bundleSizeZScore": 0.6036727332643333,
 			"codeComplexityZScore": 0.987107368620011,
 			"vibeComplexityZScore": -1.0080131015000298,
 			"codeComplexitySubscores": {
@@ -179,52 +181,54 @@
 			}
 		},
 		"react": {
-			"bundleSize": 64.06,
+			"bundleSize": 60.33,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/react",
-				"jsTransferTotalBytes": 62009,
-				"inlineJsBytes": 3677,
+				"inlineJsBytes": 3593,
 				"jsRequestCount": 4,
-				"jsRequests": [
+				"jsRawBytes": 191047,
+				"jsNormalizedBytes": 61775,
+				"jsSources": [
 					{
-						"url": "http://localhost:4322/_astro/ReactNestedCheckboxes.Dg05yt27.js",
-						"encodedDataLength": 838,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "inline",
+						"rawBytes": 3593,
+						"normalizedBytes": 1473
 					},
 					{
-						"url": "http://localhost:4322/_astro/client.BA2GgrTr.js",
-						"encodedDataLength": 56823,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "first-party",
+						"url": "/_astro/ReactNestedCheckboxes.Dg05yt27.js",
+						"rawBytes": 1035,
+						"normalizedBytes": 502
 					},
 					{
-						"url": "http://localhost:4322/_astro/jsx-runtime.D_zvdyIk.js",
-						"encodedDataLength": 1012,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "first-party",
+						"url": "/_astro/client.BA2GgrTr.js",
+						"rawBytes": 177920,
+						"normalizedBytes": 56338
 					},
 					{
-						"url": "http://localhost:4322/_astro/index.Dy6lLLXr.js",
-						"encodedDataLength": 3336,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "first-party",
+						"url": "/_astro/jsx-runtime.D_zvdyIk.js",
+						"rawBytes": 725,
+						"normalizedBytes": 460
+					},
+					{
+						"kind": "first-party",
+						"url": "/_astro/index.Dy6lLLXr.js",
+						"rawBytes": 7774,
+						"normalizedBytes": 3002
 					}
 				],
-				"baselineJsTransferBytes": 0,
-				"baselineInlineJsBytes": 84,
-				"jsImplementationDeltaBytes": 62009,
+				"baselineInlineJsBytes": 0,
+				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 3593,
-				"jsImplementationTotalBytes": 65602,
-				"jsTransferTotalKiB": 60.56,
-				"baselineJsTransferKiB": 0,
-				"jsImplementationDeltaKiB": 60.56,
-				"jsImplementationTotalKiB": 64.06,
-				"compressionNote": "Measured as browser transfer bytes, with compression negotiated by the server."
+				"jsImplementationNormalizedBytes": 61775,
+				"jsImplementationNormalizedKiB": 60.33,
+				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
 			"codeComplexity": 60,
 			"vibeComplexity": 58,
-			"bundleSizeZScore": 2.4044237708017344,
+			"bundleSizeZScore": 2.3919407774654258,
 			"codeComplexityZScore": 0.27695818256244903,
 			"vibeComplexityZScore": 0.7535631923835173,
 			"codeComplexitySubscores": {
@@ -250,46 +254,48 @@
 			}
 		},
 		"svelte": {
-			"bundleSize": 13.57,
+			"bundleSize": 10.52,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/svelte",
-				"jsTransferTotalBytes": 10305,
-				"inlineJsBytes": 3677,
+				"inlineJsBytes": 3593,
 				"jsRequestCount": 3,
-				"jsRequests": [
+				"jsRawBytes": 24769,
+				"jsNormalizedBytes": 10768,
+				"jsSources": [
 					{
-						"url": "http://localhost:4322/_astro/SvelteNestedCheckboxes.DBSLBwQH.js",
-						"encodedDataLength": 2976,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "inline",
+						"rawBytes": 3593,
+						"normalizedBytes": 1473
 					},
 					{
-						"url": "http://localhost:4322/_astro/client.svelte.D0j4OYH2.js",
-						"encodedDataLength": 936,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "first-party",
+						"url": "/_astro/SvelteNestedCheckboxes.DBSLBwQH.js",
+						"rawBytes": 5372,
+						"normalizedBytes": 2640
 					},
 					{
-						"url": "http://localhost:4322/_astro/render.s08-GxjB.js",
-						"encodedDataLength": 6393,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "first-party",
+						"url": "/_astro/client.svelte.D0j4OYH2.js",
+						"rawBytes": 1093,
+						"normalizedBytes": 600
+					},
+					{
+						"kind": "first-party",
+						"url": "/_astro/render.s08-GxjB.js",
+						"rawBytes": 14711,
+						"normalizedBytes": 6055
 					}
 				],
-				"baselineJsTransferBytes": 0,
-				"baselineInlineJsBytes": 84,
-				"jsImplementationDeltaBytes": 10305,
+				"baselineInlineJsBytes": 0,
+				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 3593,
-				"jsImplementationTotalBytes": 13898,
-				"jsTransferTotalKiB": 10.06,
-				"baselineJsTransferKiB": 0,
-				"jsImplementationDeltaKiB": 10.06,
-				"jsImplementationTotalKiB": 13.57,
-				"compressionNote": "Measured as browser transfer bytes, with compression negotiated by the server."
+				"jsImplementationNormalizedBytes": 10768,
+				"jsImplementationNormalizedKiB": 10.52,
+				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
 			"codeComplexity": 54,
 			"vibeComplexity": 15,
-			"bundleSizeZScore": -0.4106337639873567,
+			"bundleSizeZScore": -0.5361864836015174,
 			"codeComplexityZScore": -0.14913132907208812,
 			"vibeComplexityZScore": -1.3505418253107195,
 			"codeComplexitySubscores": {
@@ -315,40 +321,37 @@
 			}
 		},
 		"hyperscript": {
-			"bundleSize": 25.65,
+			"bundleSize": 24.94,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/hyperscript",
-				"jsTransferTotalBytes": 26267,
-				"inlineJsBytes": 84,
+				"inlineJsBytes": 0,
 				"jsRequestCount": 2,
-				"jsRequests": [
+				"jsRawBytes": 100869,
+				"jsNormalizedBytes": 25542,
+				"jsSources": [
 					{
-						"url": "http://localhost:4322/_astro/hyperscript.astro_astro_type_script_index_0_lang.D8yl2yzw.js",
-						"encodedDataLength": 335,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "first-party",
+						"url": "/_astro/hyperscript.astro_astro_type_script_index_0_lang.D8yl2yzw.js",
+						"rawBytes": 50,
+						"normalizedBytes": 70
 					},
 					{
-						"url": "https://unpkg.com/hyperscript.org@0.9.13/dist/_hyperscript.min.js",
-						"encodedDataLength": 25932,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "external",
+						"url": "https://unpkg.com/hyperscript.org@0.9.13",
+						"rawBytes": 100819,
+						"normalizedBytes": 25472
 					}
 				],
-				"baselineJsTransferBytes": 0,
-				"baselineInlineJsBytes": 84,
-				"jsImplementationDeltaBytes": 26267,
+				"baselineInlineJsBytes": 0,
+				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 0,
-				"jsImplementationTotalBytes": 26267,
-				"jsTransferTotalKiB": 25.65,
-				"baselineJsTransferKiB": 0,
-				"jsImplementationDeltaKiB": 25.65,
-				"jsImplementationTotalKiB": 25.65,
-				"compressionNote": "Measured as browser transfer bytes, with compression negotiated by the server."
+				"jsImplementationNormalizedBytes": 25542,
+				"jsImplementationNormalizedKiB": 24.94,
+				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
 			"codeComplexity": 35,
 			"vibeComplexity": 55,
-			"bundleSizeZScore": 0.2628836656076564,
+			"bundleSizeZScore": 0.31150665240702147,
 			"codeComplexityZScore": -1.4984147825814558,
 			"vibeComplexityZScore": 0.6067651678932218,
 			"codeComplexitySubscores": {
@@ -377,24 +380,21 @@
 			"bundleSize": 0,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/cssOnly",
-				"jsTransferTotalBytes": 0,
-				"inlineJsBytes": 84,
+				"inlineJsBytes": 0,
 				"jsRequestCount": 0,
-				"jsRequests": [],
-				"baselineJsTransferBytes": 0,
-				"baselineInlineJsBytes": 84,
-				"jsImplementationDeltaBytes": 0,
+				"jsRawBytes": 0,
+				"jsNormalizedBytes": 0,
+				"jsSources": [],
+				"baselineInlineJsBytes": 0,
+				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 0,
-				"jsImplementationTotalBytes": 0,
-				"jsTransferTotalKiB": 0,
-				"baselineJsTransferKiB": 0,
-				"jsImplementationDeltaKiB": 0,
-				"jsImplementationTotalKiB": 0,
-				"compressionNote": "Measured as browser transfer bytes, with compression negotiated by the server."
+				"jsImplementationNormalizedBytes": 0,
+				"jsImplementationNormalizedKiB": 0,
+				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
 			"codeComplexity": 84,
 			"vibeComplexity": 85,
-			"bundleSizeZScore": -1.1672257771996357,
+			"bundleSizeZScore": -1.1546144857381213,
 			"codeComplexityZScore": 1.9813162291005977,
 			"vibeComplexityZScore": 2.0747454127961777,
 			"codeComplexitySubscores": {
@@ -420,34 +420,31 @@
 			}
 		},
 		"jquery": {
-			"bundleSize": 31.23,
+			"bundleSize": 30.83,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/jquery",
-				"jsTransferTotalBytes": 31981,
-				"inlineJsBytes": 84,
+				"inlineJsBytes": 0,
 				"jsRequestCount": 1,
-				"jsRequests": [
+				"jsRawBytes": 88080,
+				"jsNormalizedBytes": 31567,
+				"jsSources": [
 					{
-						"url": "http://localhost:4322/_astro/jquery.astro_astro_type_script_index_0_lang.CaMxhEIh.js",
-						"encodedDataLength": 31981,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "first-party",
+						"url": "/_astro/jquery.astro_astro_type_script_index_0_lang.CaMxhEIh.js",
+						"rawBytes": 88080,
+						"normalizedBytes": 31567
 					}
 				],
-				"baselineJsTransferBytes": 0,
-				"baselineInlineJsBytes": 84,
-				"jsImplementationDeltaBytes": 31981,
+				"baselineInlineJsBytes": 0,
+				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 0,
-				"jsImplementationTotalBytes": 31981,
-				"jsTransferTotalKiB": 31.23,
-				"baselineJsTransferKiB": 0,
-				"jsImplementationDeltaKiB": 31.23,
-				"jsImplementationTotalKiB": 31.23,
-				"compressionNote": "Measured as browser transfer bytes, with compression negotiated by the server."
+				"jsImplementationNormalizedBytes": 31567,
+				"jsImplementationNormalizedKiB": 30.83,
+				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
 			"codeComplexity": 46,
 			"vibeComplexity": 38,
-			"bundleSizeZScore": 0.5739951935166113,
+			"bundleSizeZScore": 0.6577557904854051,
 			"codeComplexityZScore": -0.7172506779181377,
 			"vibeComplexityZScore": -0.2250903042184533,
 			"codeComplexitySubscores": {
@@ -473,34 +470,31 @@
 			}
 		},
 		"stimulus": {
-			"bundleSize": 11.23,
+			"bundleSize": 10.87,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/stimulus",
-				"jsTransferTotalBytes": 11500,
-				"inlineJsBytes": 84,
+				"inlineJsBytes": 0,
 				"jsRequestCount": 1,
-				"jsRequests": [
+				"jsRawBytes": 45459,
+				"jsNormalizedBytes": 11129,
+				"jsSources": [
 					{
-						"url": "http://localhost:4322/_astro/stimulus.astro_astro_type_script_index_0_lang.BQs1VWcS.js",
-						"encodedDataLength": 11500,
-						"mimeType": "text/javascript",
-						"resourceType": "Script"
+						"kind": "first-party",
+						"url": "/_astro/stimulus.astro_astro_type_script_index_0_lang.BQs1VWcS.js",
+						"rawBytes": 45459,
+						"normalizedBytes": 11129
 					}
 				],
-				"baselineJsTransferBytes": 0,
-				"baselineInlineJsBytes": 84,
-				"jsImplementationDeltaBytes": 11500,
+				"baselineInlineJsBytes": 0,
+				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 0,
-				"jsImplementationTotalBytes": 11500,
-				"jsTransferTotalKiB": 11.23,
-				"baselineJsTransferKiB": 0,
-				"jsImplementationDeltaKiB": 11.23,
-				"jsImplementationTotalKiB": 11.23,
-				"compressionNote": "Measured as browser transfer bytes, with compression negotiated by the server."
+				"jsImplementationNormalizedBytes": 11129,
+				"jsImplementationNormalizedKiB": 10.87,
+				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
 			"codeComplexity": 51,
 			"vibeComplexity": 48,
-			"bundleSizeZScore": -0.5410998885943378,
+			"bundleSizeZScore": -0.5156114074848054,
 			"codeComplexityZScore": -0.3621760848893567,
 			"vibeComplexityZScore": 0.264236444082532,
 			"codeComplexitySubscores": {
@@ -526,34 +520,31 @@
 			}
 		},
 		"datastar": {
-			"bundleSize": 13.61,
+			"bundleSize": 12.97,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/datastar",
-				"jsTransferTotalBytes": 13934,
-				"inlineJsBytes": 84,
+				"inlineJsBytes": 0,
 				"jsRequestCount": 1,
-				"jsRequests": [
+				"jsRawBytes": 34137,
+				"jsNormalizedBytes": 13278,
+				"jsSources": [
 					{
+						"kind": "external",
 						"url": "https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.1/bundles/datastar.js",
-						"encodedDataLength": 13934,
-						"mimeType": "application/javascript",
-						"resourceType": "Script"
+						"rawBytes": 34137,
+						"normalizedBytes": 13278
 					}
 				],
-				"baselineJsTransferBytes": 0,
-				"baselineInlineJsBytes": 84,
-				"jsImplementationDeltaBytes": 13934,
+				"baselineInlineJsBytes": 0,
+				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 0,
-				"jsImplementationTotalBytes": 13934,
-				"jsTransferTotalKiB": 13.61,
-				"baselineJsTransferKiB": 0,
-				"jsImplementationDeltaKiB": 13.61,
-				"jsImplementationTotalKiB": 13.61,
-				"compressionNote": "Measured as browser transfer bytes, with compression negotiated by the server."
+				"jsImplementationNormalizedBytes": 13278,
+				"jsImplementationNormalizedKiB": 12.97,
+				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
 			"codeComplexity": 45,
 			"vibeComplexity": 52,
-			"bundleSizeZScore": -0.40840357382313486,
+			"bundleSizeZScore": -0.3921609507845326,
 			"codeComplexityZScore": -0.7882655965238938,
 			"vibeComplexityZScore": 0.4599671434029261,
 			"codeComplexitySubscores": {

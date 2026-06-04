@@ -1,11 +1,9 @@
+import type { FrameworkId } from "../config/frameworks";
 import type { BundleMeasurementAudit } from "../utils/bundleMeasurement";
 import type {
 	CodeComplexityRaw,
 	CodeComplexitySubscores,
 } from "../utils/code-complexity/types";
-
-export type { CodeComplexityRaw, CodeComplexitySubscores };
-export type { BundleMeasurementAudit };
 
 export interface FrameworkStats {
 	bundleSize: number;
@@ -17,6 +15,26 @@ export interface FrameworkStats {
 	vibeComplexityZScore: number;
 	codeComplexitySubscores: CodeComplexitySubscores;
 	codeComplexityRaw: CodeComplexityRaw;
+}
+
+export interface StatsMetadata {
+	lastUpdated: string;
+	description: string;
+	codeComplexityVersion: string;
+	bundleMeasurementVersion: string;
+	metrics: {
+		bundleSize: string;
+		codeComplexity: string;
+		vibeComplexity: string;
+		bundleSizeZScore: string;
+		codeComplexityZScore: string;
+		vibeComplexityZScore: string;
+	};
+}
+
+export interface StatsFile {
+	metadata: StatsMetadata;
+	frameworks: Record<FrameworkId, FrameworkStats>;
 }
 
 export type FrameworkStatsRecord = Record<string, FrameworkStats>;
