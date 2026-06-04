@@ -50,7 +50,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 
 		<div
 			id="framework-grid"
-			class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto"
+			class="grid grid-cols-1 lg:grid-cols-2 items-start gap-8 max-w-6xl mx-auto"
 		>
 			{frameworks.map(({ Component }) => (
 				<Component />

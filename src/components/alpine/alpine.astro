@@ -1,3 +1,26 @@
+<script>
+	import Alpine from "alpinejs";
+
+	const globalWindow = window as Window & {
+		Alpine?: typeof Alpine;
+		__checkboxesAlpineStarted?: boolean;
+	};
+
+	globalWindow.Alpine = Alpine;
+
+	function startAlpine() {
+		if (globalWindow.__checkboxesAlpineStarted) return;
+		globalWindow.__checkboxesAlpineStarted = true;
+		Alpine.start();
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", startAlpine, { once: true });
+	} else {
+		startAlpine();
+	}
+</script>
+
 <div x-data="{
 	parent: { id: 'parent', label: 'Parent' },
 	checkboxes: [
@@ -6,45 +29,29 @@
 		{ id: 'child3', label: 'Child 3', checked: false }
 	]
 }">
-	<div class="px-3 py-2">
+	<div class="checkbox-demo">
 		<div>
-			<div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
-				<div class="flex items-center space-x-3">
+			<input 
+				type="checkbox" 
+				:id="parent.id" 
+				:checked="checkboxes.every(c => c.checked)"
+				@change="checkboxes.forEach(c => c.checked = $event.target.checked)"
+				x-effect="$el.indeterminate = checkboxes.some(c => c.checked) && !checkboxes.every(c => c.checked)"
+			>
+			<label :for="parent.id" x-text="parent.label"></label>
+		</div>
+
+		<div class="checkbox-children">
+			<template x-for="checkbox in checkboxes" :key="checkbox.id">
+				<div>
 					<input 
 						type="checkbox" 
-						:id="parent.id" 
-						class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-						:checked="checkboxes.every(c => c.checked)"
-						@change="checkboxes.forEach(c => c.checked = $event.target.checked)"
-						x-effect="$el.indeterminate = checkboxes.some(c => c.checked) && !checkboxes.every(c => c.checked)"
+						:id="checkbox.id"
+						x-model="checkbox.checked"
 					>
-					<label 
-						:for="parent.id" 
-						class="text-slate-700 cursor-pointer text-sm font-medium"
-						x-text="parent.label"
-					></label>
+					<label :for="checkbox.id" x-text="checkbox.label"></label>
 				</div>
-			</div>
-
-			<div class="ml-8">
-				<template x-for="checkbox in checkboxes" :key="checkbox.id">
-					<div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
-						<div class="flex items-center space-x-3">
-							<input 
-								type="checkbox" 
-								:id="checkbox.id"
-								class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-								x-model="checkbox.checked"
-							>
-							<label 
-								:for="checkbox.id" 
-								class="text-slate-700 cursor-pointer text-sm font-medium"
-								x-text="checkbox.label"
-							></label>
-						</div>
-					</div>
-				</template>
-			</div>
+			</template>
 		</div>
 	</div>
 </div>

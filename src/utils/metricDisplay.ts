@@ -46,10 +46,10 @@ export const METRIC_DISPLAY: Record<MetricKey, MetricDisplay> = {
 		kind: "deterministic",
 		zScoreField: "bundleSizeZScore",
 		anchor: "js-bundle",
-		tooltip: "Compressed JS shipped, captured during page load.",
+		tooltip: "Implementation JS payload above baseline (KiB).",
 		tag: "Measured",
 		blurb:
-			"Total compressed JavaScript shipped for this implementation, captured from network requests during page load. Lower is better.",
+			"JavaScript payload for this implementation above a shared baseline test route: external transfer bytes plus inline script bytes, measured on isolated /test pages. Lower is better.",
 	},
 };
 
@@ -91,6 +91,6 @@ export function formatMetricValue(
 	key: MetricKey,
 	stats: FrameworkStats,
 ): string {
-	if (key === "bundleSize") return `${stats.bundleSize.toFixed(2)}kb`;
+	if (key === "bundleSize") return `${stats.bundleSize.toFixed(2)} KiB`;
 	return `${stats[key]}`;
 }

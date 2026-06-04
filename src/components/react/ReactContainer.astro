@@ -12,5 +12,5 @@ const { default: code } = await import("./ReactNestedCheckboxes.jsx?raw");
   title="React"
 >
   <ReactNestedCheckboxes client:only="react" />
-  <CodeBlock code={code} displayName="React" lang="jsx" logo={reactLogo} />
+  <CodeBlock slot="code" code={code} displayName="React" lang="jsx" logo={reactLogo} />
 </FrameworkContainer> 

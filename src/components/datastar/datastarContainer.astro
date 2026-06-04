@@ -7,7 +7,11 @@ import Datastar from "./datastar.astro";
 const { default: code } = await import("./datastar.astro?raw");
 ---
 
-<FrameworkContainer framework="datastar" title="Datastar">
+<FrameworkContainer
+  framework="datastar"
+  title="Datastar"
+  contributor={{ name: "Karthikeyan B", github: "Karthikeyan2k3" }}
+>
   <Datastar />
-  <CodeBlock code={code} displayName="Datastar" lang="html" logo={datastarLogo} />
+  <CodeBlock slot="code" code={code} displayName="Datastar" lang="html" logo={datastarLogo} />
 </FrameworkContainer>

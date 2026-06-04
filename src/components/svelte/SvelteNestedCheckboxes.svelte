@@ -1,43 +1,25 @@
-<div class="px-3 py-2">
+<div class="checkbox-demo">
   <div>
-    <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
-      <div class="flex items-center space-x-3">
+    <input
+      type="checkbox"
+      id="parent-checkbox"
+      checked={allChecked}
+      indeterminate={isIndeterminate}
+      onchange={toggleAll}
+    />
+    <label for="parent-checkbox">Parent</label>
+  </div>
+  <div class="checkbox-children">
+    {#each checkboxes as checkbox, i}
+      <div>
         <input
           type="checkbox"
-          id="parent-checkbox"
-          class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-          checked={allChecked}
-          indeterminate={isIndeterminate}
-          onchange={toggleAll}
+          id="child-{i}"
+          bind:checked={checkbox.value}
         />
-        <label
-          for="parent-checkbox"
-          class="text-slate-700 cursor-pointer text-sm font-medium"
-        >
-          Parent
-        </label>
+        <label for="child-{i}">{checkbox.label}</label>
       </div>
-    </div>
-    <div class="ml-8">
-      {#each checkboxes as checkbox, i}
-        <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
-          <div class="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id="child-{i}"
-              class="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-              bind:checked={checkbox.value}
-            />
-            <label
-              for="child-{i}"
-              class="text-slate-700 cursor-pointer text-sm font-medium"
-            >
-              {checkbox.label}
-            </label>
-          </div>
-        </div>
-      {/each}
-    </div>
+    {/each}
   </div>
 </div>
 

@@ -1,13 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-function Checkbox({
-	id,
-	label,
-	checked,
-	indeterminate,
-	onChange,
-	className = "",
-}) {
+function Checkbox({ id, label, checked, indeterminate, onChange }) {
 	const ref = useRef();
 
 	useEffect(() => {
@@ -17,25 +10,15 @@ function Checkbox({
 	}, [indeterminate]);
 
 	return (
-		<div
-			className={`rounded-lg hover:bg-slate-100 transition-colors ${className}`}
-		>
-			<div className="flex items-center space-x-3">
-				<input
-					ref={ref}
-					type="checkbox"
-					id={id}
-					checked={checked}
-					onChange={onChange}
-					className="h-4 w-4 mt-0.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-				/>
-				<label
-					htmlFor={id}
-					className="text-slate-700 cursor-pointer text-sm font-medium"
-				>
-					{label}
-				</label>
-			</div>
+		<div>
+			<input
+				ref={ref}
+				type="checkbox"
+				id={id}
+				checked={checked}
+				onChange={onChange}
+			/>
+			<label htmlFor={id}>{label}</label>
 		</div>
 	);
 }
@@ -69,23 +52,21 @@ export default function NestedCheckboxes() {
 	);
 
 	return (
-		<div className="px-3 py-2">
+		<div className="checkbox-demo">
 			<Checkbox
 				id="parent-react"
 				label="Parent"
 				checked={allChecked}
 				indeterminate={someChecked && !allChecked}
 				onChange={handleParentChange}
-				className="p-2"
 			/>
 
-			<div className="ml-8">
+			<div className="checkbox-children">
 				{checkboxes.map((item) => (
 					<Checkbox
 						key={item.id}
 						{...item}
 						onChange={handleChildChange(item.id)}
-						className="p-1"
 					/>
 				))}
 			</div>

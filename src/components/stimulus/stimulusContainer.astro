@@ -10,7 +10,8 @@ const { default: code } = await import("./stimulus.astro?raw");
 <FrameworkContainer
   framework="stimulus"
   title="Stimulus"
+  contributor={{ name: "Eduardo Bohrer", github: "nbluis" }}
 >
   <Stimulus />
-  <CodeBlock code={code} displayName="Stimulus" lang="html" logo={stimulusLogo} />
+  <CodeBlock slot="code" code={code} displayName="Stimulus" lang="html" logo={stimulusLogo} />
 </FrameworkContainer>

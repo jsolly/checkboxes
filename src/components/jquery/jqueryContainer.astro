@@ -13,6 +13,7 @@ const { default: code } = await import("./jquery.astro?raw");
 >
   <JQuery />
   <CodeBlock 
+    slot="code"
     code={code} 
     displayName="jQuery" 
     lang="javascript" 

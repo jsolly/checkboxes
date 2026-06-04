@@ -13,6 +13,7 @@ const { default: code } = await import("./VueNestedCheckboxes.vue?raw");
 >
   <VueNestedCheckboxes client:only="vue" />
   <CodeBlock 
+    slot="code"
     code={code} 
     displayName="Vue" 
     lang="vue" 

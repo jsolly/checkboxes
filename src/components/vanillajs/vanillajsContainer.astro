@@ -9,5 +9,5 @@ const { default: code } = await import("./vanillajs.astro?raw");
 
 <FrameworkContainer framework="vanillajs" title="Vanilla JavaScript">
 	<VanillaJS />
-	<CodeBlock code={code} displayName="Vanilla JS" lang="javascript" logo={vanillaLogo} />
+	<CodeBlock slot="code" code={code} displayName="Vanilla JS" lang="javascript" logo={vanillaLogo} />
 </FrameworkContainer> 

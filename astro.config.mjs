@@ -5,8 +5,6 @@ import tailwind from "@astrojs/tailwind";
 
 import sitemap from "@astrojs/sitemap";
 
-import alpinejs from "@astrojs/alpinejs";
-
 import vue from "@astrojs/vue";
 
 import react from "@astrojs/react";
@@ -18,6 +16,6 @@ import vercel from "@astrojs/vercel";
 // https://astro.build/config
 export default defineConfig({
 	site: "https://www.checkboxes.xyz",
-	integrations: [tailwind(), sitemap(), alpinejs(), vue(), react(), svelte()],
+	integrations: [tailwind(), sitemap(), vue(), react(), svelte()],
 	adapter: vercel(),
 });

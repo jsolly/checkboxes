@@ -24,7 +24,6 @@
 		"*": ["biome check --no-errors-on-unmatched --write"]
 	},
 	"dependencies": {
-		"@astrojs/alpinejs": "^0.4.1",
 		"@astrojs/check": "^0.9.4",
 		"@astrojs/prism": "^3.2.0",
 		"@astrojs/react": "^4.1.2",

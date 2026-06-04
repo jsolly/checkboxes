@@ -4,11 +4,33 @@ import type { FrameworkStats } from "../../src/config/stats";
 import stats from "../../src/data/framework-stats.json";
 import { calculateStatsZScores } from "../../src/utils/calculateZScores";
 
+function makeBundleMeasurement() {
+	return {
+		measuredRoute: "/test/react",
+		jsTransferTotalBytes: 2048,
+		inlineJsBytes: 0,
+		jsRequestCount: 1,
+		jsRequests: [],
+		baselineJsTransferBytes: 1024,
+		baselineInlineJsBytes: 0,
+		jsImplementationDeltaBytes: 1024,
+		inlineJsImplementationBytes: 0,
+		jsImplementationTotalBytes: 1024,
+		jsTransferTotalKiB: 2,
+		baselineJsTransferKiB: 1,
+		jsImplementationDeltaKiB: 1,
+		jsImplementationTotalKiB: 1,
+		compressionNote:
+			"Measured as browser transfer bytes, with compression negotiated by the server.",
+	};
+}
+
 describe("A stats generation run emits explicit complexity metrics", () => {
 	it("calculates z-scores for bundle size, Code Complexity, and Vibe Complexity", () => {
 		const sample: Record<"react" | "vue", FrameworkStats> = {
 			react: {
 				bundleSize: 2,
+				bundleMeasurement: makeBundleMeasurement(),
 				codeComplexity: 74,
 				vibeComplexity: 60,
 				bundleSizeZScore: 0,
@@ -38,6 +60,7 @@ describe("A stats generation run emits explicit complexity metrics", () => {
 			},
 			vue: {
 				bundleSize: 1,
+				bundleMeasurement: makeBundleMeasurement(),
 				codeComplexity: 60,
 				vibeComplexity: 30,
 				bundleSizeZScore: 0,
@@ -80,6 +103,15 @@ describe("A stats generation run emits explicit complexity metrics", () => {
 	it("stores Code Complexity fields and no public Decision Point score fields", () => {
 		for (const [id, frameworkStats] of Object.entries(stats.frameworks)) {
 			assert.ok(
+				"bundleMeasurement" in frameworkStats,
+				`${id} missing bundleMeasurement`,
+			);
+			assert.equal(
+				frameworkStats.bundleSize,
+				frameworkStats.bundleMeasurement.jsImplementationTotalKiB,
+				`${id} bundleSize/audit mismatch`,
+			);
+			assert.ok(
 				"codeComplexity" in frameworkStats,
 				`${id} missing codeComplexity`,
 			);
@@ -115,6 +147,10 @@ describe("A stats generation run emits explicit complexity metrics", () => {
 		assert.ok(
 			"codeComplexityVersion" in stats.metadata,
 			"metadata missing codeComplexityVersion",
+		);
+		assert.ok(
+			"bundleMeasurementVersion" in stats.metadata,
+			"metadata missing bundleMeasurementVersion",
 		);
 	});
 });

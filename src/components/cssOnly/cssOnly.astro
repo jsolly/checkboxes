@@ -1,41 +1,23 @@
-<div class="px-3 py-2">
-  <div class="checkbox-group">
-    <!-- Parent checkbox -->
-    <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
-      <div class="flex items-center space-x-3">
-        <input type="checkbox" class="parent-checkbox" id="parent-css" />
-        <label for="parent-css" class="text-slate-700 cursor-pointer text-sm font-medium">
-          Parent
-        </label>
-      </div>
-    </div>
+<div class="checkbox-demo checkbox-group">
+  <!-- Parent checkbox -->
+  <div>
+    <input type="checkbox" class="parent-checkbox" id="parent-css" />
+    <label for="parent-css">Parent</label>
+  </div>
 
-    <!-- Child checkboxes -->
-    <div class="ml-8">
-      <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
-        <div class="flex items-center space-x-3">
-          <input type="checkbox" class="child-checkbox" id="child1-css" />
-          <label for="child1-css" class="text-slate-700 cursor-pointer text-sm font-medium">
-            Child 1
-          </label>
-        </div>
-      </div>
-      <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
-        <div class="flex items-center space-x-3">
-          <input type="checkbox" class="child-checkbox" id="child2-css" />
-          <label for="child2-css" class="text-slate-700 cursor-pointer text-sm font-medium">
-            Child 2
-          </label>
-        </div>
-      </div>
-      <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
-        <div class="flex items-center space-x-3">
-          <input type="checkbox" class="child-checkbox" id="child3-css" />
-          <label for="child3-css" class="text-slate-700 cursor-pointer text-sm font-medium">
-            Child 3
-          </label>
-        </div>
-      </div>
+  <!-- Child checkboxes -->
+  <div class="checkbox-children">
+    <div>
+      <input type="checkbox" class="child-checkbox" id="child1-css" />
+      <label for="child1-css">Child 1</label>
+    </div>
+    <div>
+      <input type="checkbox" class="child-checkbox" id="child2-css" />
+      <label for="child2-css">Child 2</label>
+    </div>
+    <div>
+      <input type="checkbox" class="child-checkbox" id="child3-css" />
+      <label for="child3-css">Child 3</label>
     </div>
   </div>
 </div>

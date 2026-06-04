@@ -13,6 +13,7 @@ const { default: code } = await import("./SvelteNestedCheckboxes.svelte?raw");
 >
   <NestedCheckboxes client:only="svelte" />
   <CodeBlock 
+    slot="code"
     code={code} 
     displayName="Svelte" 
     lang="svelte" 

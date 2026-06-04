@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type {
+	BundleMeasurementAudit,
 	FrameworkStats,
 	FrameworkStatsRecord,
 } from "../../src/types/stats";
@@ -12,9 +13,34 @@ import {
 	zScoreColorClass,
 } from "../../src/utils/metricDisplay";
 
+function makeBundleMeasurement(
+	overrides: Partial<BundleMeasurementAudit> = {},
+): BundleMeasurementAudit {
+	return {
+		measuredRoute: "/test/react",
+		jsTransferTotalBytes: 1566,
+		inlineJsBytes: 0,
+		jsRequestCount: 1,
+		jsRequests: [],
+		baselineJsTransferBytes: 0,
+		baselineInlineJsBytes: 0,
+		jsImplementationDeltaBytes: 1566,
+		inlineJsImplementationBytes: 0,
+		jsImplementationTotalBytes: 1566,
+		jsTransferTotalKiB: 1.53,
+		baselineJsTransferKiB: 0,
+		jsImplementationDeltaKiB: 1.53,
+		jsImplementationTotalKiB: 1.53,
+		compressionNote:
+			"Measured as browser transfer bytes, with compression negotiated by the server.",
+		...overrides,
+	};
+}
+
 function makeStats(overrides: Partial<FrameworkStats>): FrameworkStats {
 	return {
 		bundleSize: 1.53,
+		bundleMeasurement: makeBundleMeasurement(),
 		codeComplexity: 60,
 		vibeComplexity: 65,
 		bundleSizeZScore: 0,
@@ -107,7 +133,7 @@ describe("A visitor reads the metric footer on a framework card", () => {
 		});
 		assert.equal(formatMetricValue("codeComplexity", react), "60");
 		assert.equal(formatMetricValue("vibeComplexity", react), "65");
-		assert.equal(formatMetricValue("bundleSize", react), "1.53kb");
+		assert.equal(formatMetricValue("bundleSize", react), "1.53 KiB");
 	});
 
 	it("labels Code Complexity and JS Bundle deterministic, Vibe Complexity AI-judged", () => {

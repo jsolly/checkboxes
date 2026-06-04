@@ -13,26 +13,18 @@ interface Props {
 const { code = "", displayName, lang = "javascript", logo } = Astro.props;
 
 const lineCount = code.split("\n").length;
+const codeBlockId = `code-block-${crypto.randomUUID()}`;
 ---
 
-<div class="rounded-b-lg overflow-hidden border-t border-slate-200 mt-2" x-data="{ expanded: false, copyStatus: 'idle', copyCode() {
-	this.copyStatus = 'copying';
-	navigator.clipboard.writeText($refs.codeContent.textContent)
-		.then(() => {
-			this.copyStatus = 'copied';
-			setTimeout(() => this.copyStatus = 'idle', 2000);
-		})
-		.catch(() => {
-			this.copyStatus = 'error';
-			setTimeout(() => this.copyStatus = 'idle', 2000);
-		});
-} }">
+<div
+	class="rounded-b-lg overflow-hidden border-t border-slate-200 mt-2"
+	data-code-block
+>
 	<button 
 		class="w-full bg-slate-50 px-4 py-2 flex items-center justify-between hover:bg-slate-100 transition-colors"
-		@click="expanded = !expanded"
+		data-code-toggle
 		aria-expanded="false"
-		:aria-expanded="expanded"
-		aria-controls="code-block"
+		aria-controls={codeBlockId}
 	>
 		<div class="flex items-center space-x-3">
 			{logo && <Image 
@@ -44,7 +36,7 @@ const lineCount = code.split("\n").length;
 				height={20}
 			/>}
 			<div class="text-sm text-slate-500">
-				<span x-text="expanded ? 'Hide' : 'View'"></span>
+				<span data-code-toggle-label>View</span>
 				<span> {displayName} code</span>
 				<span class="text-xs text-slate-400 ml-2">({lineCount} lines)</span>
 			</div>
@@ -53,7 +45,7 @@ const lineCount = code.split("\n").length;
 			<svg 
 				xmlns="http://www.w3.org/2000/svg" 
 				class="h-5 w-5 transition-transform"
-				:class="expanded ? 'rotate-180' : ''"
+				data-code-chevron
 				fill="none" 
 				viewBox="0 0 24 24" 
 				stroke="currentColor"
@@ -64,34 +56,28 @@ const lineCount = code.split("\n").length;
 		</div>
 	</button>
 	<div 
-		id="code-block"
+		id={codeBlockId}
 		class="overflow-hidden transition-[max-height] duration-300 ease-in-out"
-		x-ref="code"
-		:style="expanded ? { maxHeight: $refs.code.scrollHeight + 'px' } : { maxHeight: '0px' }"
+		data-code-region
+		style="max-height: 0px"
 		role="region"
 		aria-label={`${displayName} code example`}
+		aria-hidden="true"
 	>
 		<div class="p-4 overflow-x-auto bg-white">
 			<div class="code-wrapper relative">
 				<button
 					class="absolute top-2 right-2 px-3 py-1 text-sm bg-slate-100 hover:bg-slate-200 rounded-md flex items-center gap-2 transition-colors"
-					@click="copyCode"
+					data-code-copy
 					aria-label="Copy code to clipboard"
-					:aria-live="copyStatus !== 'idle' ? 'polite' : 'off'"
+					aria-live="polite"
 				>
-					<template x-if="copyStatus === 'idle'">
-						<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2M8 8h12a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2v-8a2 2 0 012-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-						</svg>
-					</template>
-					<span x-text="
-						copyStatus === 'idle' ? 'Copy code' :
-						copyStatus === 'copying' ? 'Copying...' :
-						copyStatus === 'copied' ? 'Copied!' :
-						'Failed to copy'
-					"></span>
+					<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2M8 8h12a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2v-8a2 2 0 012-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+					<span data-code-copy-label>Copy code</span>
 				</button>
-				<div x-ref="codeContent">
+				<div data-code-content>
 					<Code code={code} lang={lang} theme="github-light" wrap />
 				</div>
 			</div>
@@ -104,4 +90,73 @@ const lineCount = code.split("\n").length;
 	document.querySelectorAll('pre[tabindex]').forEach(pre => {
 		pre.removeAttribute('tabindex');
 	});
+
+	const copyLabels = {
+		idle: "Copy code",
+		copying: "Copying...",
+		copied: "Copied!",
+		error: "Failed to copy",
+	} as const;
+
+	type CopyStatus = keyof typeof copyLabels;
+
+	for (const block of document.querySelectorAll<HTMLElement>("[data-code-block]")) {
+		if (block.dataset.codeBlockReady === "true") continue;
+		block.dataset.codeBlockReady = "true";
+
+		const toggle = block.querySelector<HTMLButtonElement>("[data-code-toggle]");
+		const toggleLabel = block.querySelector<HTMLElement>(
+			"[data-code-toggle-label]",
+		);
+		const chevron = block.querySelector<SVGElement>("[data-code-chevron]");
+		const region = block.querySelector<HTMLElement>("[data-code-region]");
+		const copyButton = block.querySelector<HTMLButtonElement>("[data-code-copy]");
+		const copyLabel = block.querySelector<HTMLElement>("[data-code-copy-label]");
+		const codeContent = block.querySelector<HTMLElement>("[data-code-content]");
+
+		if (!toggle || !toggleLabel || !region) continue;
+		const requiredToggle = toggle;
+		const requiredToggleLabel = toggleLabel;
+		const requiredRegion = region;
+
+		let expanded = false;
+		let copyResetTimer: number | undefined;
+
+		function setExpanded(nextExpanded: boolean) {
+			expanded = nextExpanded;
+			requiredToggle.setAttribute("aria-expanded", String(expanded));
+			requiredToggleLabel.textContent = expanded ? "Hide" : "View";
+			chevron?.classList.toggle("rotate-180", expanded);
+			requiredRegion.setAttribute("aria-hidden", String(!expanded));
+			requiredRegion.style.maxHeight = expanded
+				? `${requiredRegion.scrollHeight}px`
+				: "0px";
+		}
+
+		function setCopyStatus(status: CopyStatus) {
+			if (!copyButton || !copyLabel) return;
+			copyLabel.textContent = copyLabels[status];
+		}
+
+		requiredToggle.addEventListener("click", () => setExpanded(!expanded));
+
+		copyButton?.addEventListener("click", () => {
+			window.clearTimeout(copyResetTimer);
+			setCopyStatus("copying");
+
+			navigator.clipboard
+				.writeText(codeContent?.textContent ?? "")
+				.then(() => {
+					setCopyStatus("copied");
+				})
+				.catch(() => {
+					setCopyStatus("error");
+				})
+				.finally(() => {
+					copyResetTimer = window.setTimeout(() => {
+						setCopyStatus("idle");
+					}, 2000);
+				});
+		});
+	}
 </script> 

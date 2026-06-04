@@ -5,7 +5,7 @@ import Datastar from "../../components/datastar/datastar.astro";
 import Hyperscript from "../../components/hyperscript/hyperscript.astro";
 import JQuery from "../../components/jquery/jquery.astro";
 import ReactNestedCheckboxes from "../../components/react/ReactNestedCheckboxes";
-import Stimulus from "../../components/stimulus/stimulusContainer.astro";
+import Stimulus from "../../components/stimulus/stimulus.astro";
 import SvelteNestedCheckboxes from "../../components/svelte/SvelteNestedCheckboxes.svelte";
 import Vanillajs from "../../components/vanillajs/vanillajs.astro";
 import VueNestedCheckboxes from "../../components/vue/VueNestedCheckboxes.vue";
@@ -28,25 +28,15 @@ const frameworkId = framework;
 ---
 
 <Layout title={`${FRAMEWORKS[frameworkId].displayName} Test Page`}>
-	<script>
-		// Signal when the page is ready
-
-		window.addEventListener('load', () => {
-			// Give a small delay for frameworks to initialize
-			setTimeout(() => {
-				window.frameworkReady = true;
-			}, 50);
-		});
-	</script>
 	<div class="min-h-screen p-8">
 		<div
 			class="framework-container"
 			data-framework={framework}
 			data-framework-ready={framework}
 		>
-			{frameworkId === "vue" && <VueNestedCheckboxes />}
+			{frameworkId === "vue" && <VueNestedCheckboxes client:only="vue" />}
 			{frameworkId === "react" && <ReactNestedCheckboxes client:only="react" />}
-			{frameworkId === "svelte" && <SvelteNestedCheckboxes />}
+			{frameworkId === "svelte" && <SvelteNestedCheckboxes client:only="svelte" />}
 			{frameworkId === "alpine" && <Alpine />}
 			{frameworkId === "jquery" && <JQuery />}
 			{frameworkId === "vanillajs" && <Vanillajs />}

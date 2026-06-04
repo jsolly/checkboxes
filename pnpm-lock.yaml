@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@astrojs/alpinejs':
-        specifier: ^0.4.1
-        version: 0.4.1(@types/alpinejs@3.13.11)(alpinejs@3.14.8)
       '@astrojs/check':
         specifier: ^0.9.4
         version: 0.9.4(typescript@5.7.2)
@@ -130,12 +127,6 @@ packages:
 
   '@antfu/utils@0.7.10':
     resolution: {integrity: sha512-+562v9k4aI80m1+VuMHehNJWLOFjBnXn3tdOitzD0il5b7smkSBal4+a3oKiQTbrwMmN/TBUMDvbdoWDehgOww==}
-
-  '@astrojs/alpinejs@0.4.1':
-    resolution: {integrity: sha512-ifC2dh0eaEMFwqXrx5y1pXhuKjqlOo9OmcLjNmHSMV866bH5VLGcpjy+VNf0MR9Qeax82olDib/o5Vmmzg6brA==}
-    peerDependencies:
-      '@types/alpinejs': ^3.0.0
-      alpinejs: ^3.0.0
 
   '@astrojs/check@0.9.4':
     resolution: {integrity: sha512-IOheHwCtpUfvogHHsvu0AbeRZEnjJg3MopdLddkJE70mULItS/Vh37BHcI00mcOJcH1vhD3odbpvWokpxam7xA==}
@@ -3929,11 +3920,6 @@ snapshots:
       '@jridgewell/trace-mapping': 0.3.25
 
   '@antfu/utils@0.7.10': {}
-
-  '@astrojs/alpinejs@0.4.1(@types/alpinejs@3.13.11)(alpinejs@3.14.8)':
-    dependencies:
-      '@types/alpinejs': 3.13.11
-      alpinejs: 3.14.8
 
   '@astrojs/check@0.9.4(typescript@5.7.2)':
     dependencies:

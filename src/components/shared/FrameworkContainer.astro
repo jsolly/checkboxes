@@ -5,12 +5,18 @@ import type { FrameworkStats, FrameworkStatsRecord } from "../../types/stats";
 import { maxBundleSize } from "../../utils/metricDisplay";
 import PerformanceBadge from "../shared/PerformanceBadge.astro";
 
+interface Contributor {
+	name: string;
+	github: string;
+}
+
 interface Props {
 	framework: FrameworkId;
 	title: string;
+	contributor?: Contributor;
 }
 
-const { framework, title } = Astro.props;
+const { framework, title, contributor } = Astro.props;
 
 const frameworkStats: FrameworkStats = stats.frameworks[framework];
 const maxBundle = maxBundleSize(stats.frameworks as FrameworkStatsRecord);
@@ -24,18 +30,32 @@ const maxBundle = maxBundleSize(stats.frameworks as FrameworkStatsRecord);
 	<div class="opacity-0 transition-opacity duration-300" data-framework-wrapper>
 		<div class="bg-white/40 rounded-xl border border-white/50 shadow-lg overflow-hidden relative">
 			<div 
-				class="bg-white/60 px-4 py-3 flex border-b border-white/20 items-center justify-between backdrop-blur-md"
+				class="bg-white/60 px-4 py-3 flex border-b border-white/20 items-center justify-between gap-3 backdrop-blur-md"
 			>
 				<h3 class="font-semibold text-gray-700 select-none">
 					{title}
 				</h3>
+				{contributor && (
+					<p class="text-xs text-slate-500 shrink-0">
+						Contributed by{" "}
+						<a
+							href={`https://github.com/${contributor.github}`}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-slate-600 hover:text-slate-800 underline-offset-2 hover:underline"
+						>
+							{contributor.name}
+						</a>
+					</p>
+				)}
 			</div>
 			<div class="framework-content">
 				<slot />
 			</div>
+			<PerformanceBadge stats={frameworkStats} maxBundle={maxBundle} />
+			<slot name="code" />
 		</div>
 	</div>
-	<PerformanceBadge stats={frameworkStats} maxBundle={maxBundle} />
 </div>
 
 <script is:inline define:vars={{ framework }}>

@@ -9,5 +9,5 @@ const { default: code } = await import("./alpine.astro?raw");
 
 <FrameworkContainer framework="alpine" title="Alpine.js">
   <Alpine />
-  <CodeBlock code={code} displayName="Alpine.js" lang="astro" logo={alpineLogo} />
+  <CodeBlock slot="code" code={code} displayName="Alpine.js" lang="astro" logo={alpineLogo} />
 </FrameworkContainer>

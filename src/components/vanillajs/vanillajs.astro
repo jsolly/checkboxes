@@ -11,44 +11,26 @@ const childCheckboxItems = [
 ];
 ---
 
-<div class="px-3 py-2" data-checkbox-container>
+<div class="checkbox-demo" data-checkbox-container>
   <div>
-    <div class="p-2 rounded-lg hover:bg-slate-100 transition-colors">
-      <div class="flex items-center space-x-3">
-        <input 
-          type="checkbox" 
-          id={parentCheckbox.id}
-          class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-        >
-        <label for={parentCheckbox.id} class="text-slate-700 cursor-pointer text-sm font-medium">
-          {parentCheckbox.label}
-        </label>
-      </div>
-    </div>
+    <input type="checkbox" id={parentCheckbox.id}>
+    <label for={parentCheckbox.id}>{parentCheckbox.label}</label>
+  </div>
 
-    <div class="ml-8">
-      {childCheckboxItems.map(item => (
-        <div class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
-          <div class="flex items-center space-x-3">
-            <input 
-              type="checkbox" 
-              id={item.id}
-              class="h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-            >
-            <label for={item.id} class="text-slate-700 cursor-pointer text-sm font-medium">
-              {item.label}
-            </label>
-          </div>
-        </div>
-      ))}
-    </div>
+  <div class="checkbox-children">
+    {childCheckboxItems.map(item => (
+      <div>
+        <input type="checkbox" id={item.id}>
+        <label for={item.id}>{item.label}</label>
+      </div>
+    ))}
   </div>
 </div>
 
 <script is:inline>
 document.querySelectorAll('[data-checkbox-container]').forEach(container => {
   const parent = container.querySelector('input:first-of-type');
-  const children = container.querySelectorAll('.ml-8 input');
+  const children = container.querySelectorAll('.checkbox-children input');
 
   function updateParent() {
     const total = children.length;

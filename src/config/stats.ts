@@ -1,3 +1,4 @@
+import type { BundleMeasurementAudit } from "../utils/bundleMeasurement";
 import type {
 	CodeComplexityRaw,
 	CodeComplexitySubscores,
@@ -5,9 +6,11 @@ import type {
 import type { FrameworkId } from "./frameworks";
 
 export type { CodeComplexityRaw, CodeComplexitySubscores };
+export type { BundleMeasurementAudit };
 
 export interface FrameworkStats {
 	bundleSize: number;
+	bundleMeasurement: BundleMeasurementAudit;
 	codeComplexity: number;
 	vibeComplexity: number;
 	bundleSizeZScore: number;
@@ -21,6 +24,7 @@ export interface StatsMetadata {
 	lastUpdated: string;
 	description: string;
 	codeComplexityVersion: string;
+	bundleMeasurementVersion: string;
 	metrics: {
 		bundleSize: string;
 		codeComplexity: string;
@@ -44,8 +48,8 @@ export const STATS_CONFIG = {
 	// Paths
 	STATS_FILE_PATH: "src/data/framework-stats.json",
 
-	// Server config
-	PREVIEW_URL: "http://localhost:4321/test",
+	// Server config — override with STATS_PREVIEW_URL when preview binds another port
+	PREVIEW_URL: process.env.STATS_PREVIEW_URL ?? "http://localhost:4321/test",
 
 	// Measurement options
 	BUNDLE_SIZE_PRECISION: 2,

@@ -12,5 +12,5 @@ const { default: code } = await import("./hyperscript.astro?raw");
   title="Hyperscript"
 >
   <Hyperscript />
-  <CodeBlock code={code} displayName="Hyperscript" lang="astro" logo={hyperscriptLogo} />
+  <CodeBlock slot="code" code={code} displayName="Hyperscript" lang="astro" logo={hyperscriptLogo} />
 </FrameworkContainer> 

@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as dotenv from "dotenv";
-import type { Page, Protocol } from "puppeteer";
+import type { Page } from "puppeteer";
 import puppeteer from "puppeteer";
 import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
 import {
@@ -10,6 +10,13 @@ import {
 	STATS_CONFIG,
 	type StatsFile,
 } from "../config/stats";
+import {
+	BUNDLE_MEASUREMENT_VERSION,
+	type BundleMeasurementAudit,
+	type JsTransferMeasurement,
+	buildBundleMeasurementAudit,
+	measureJsTransfer,
+} from "./bundleMeasurement";
 import { calculateStatsZScores } from "./calculateZScores";
 import { analyzeCodeComplexity } from "./code-complexity";
 import { CODE_COMPLEXITY_VERSION } from "./code-complexity/types";
@@ -18,13 +25,6 @@ import { readImplementationSources } from "./implementationSources";
 
 dotenv.config({ path: ".env.local" });
 dotenv.config();
-
-interface CDPEvent {
-	type: string;
-	response: Protocol.Network.Response & {
-		encodedDataLength: number;
-	};
-}
 
 function calculateMedian(measurements: number[]): number {
 	const sorted = [...measurements].sort((a, b) => a - b);
@@ -45,46 +45,74 @@ function getExistingVibeComplexity(
 	return frameworkStats?.vibeComplexity ?? frameworkStats?.complexityScore ?? 0;
 }
 
-async function measureBundleSize(page: Page, framework: FrameworkId) {
-	const measurements: number[] = [];
-
-	for (let i = 0; i < STATS_CONFIG.BUNDLE_SIZE_ITERATIONS; i++) {
-		const client = await page.createCDPSession();
-
-		await page.setCacheEnabled(false);
-
-		await client.send("Network.clearBrowserCache");
-		await client.send("Network.clearBrowserCookies");
-
-		await client.send("Network.enable");
-
-		let totalJsSize = 0;
-		client.on("Network.responseReceived", (event: CDPEvent) => {
-			if (event.type === "Script") {
-				totalJsSize += event.response.encodedDataLength;
-			}
-		});
-
-		await page.goto(`${STATS_CONFIG.PREVIEW_URL}/${framework}`, {
-			waitUntil: "networkidle0",
-		});
-
-		await client.detach();
-
-		measurements.push(
-			Number((totalJsSize / 1024).toFixed(STATS_CONFIG.BUNDLE_SIZE_PRECISION)),
-		);
-		console.log(`    Run ${i + 1}: ${measurements[i]}kb`);
+function selectMedianBy<T>(items: T[], value: (item: T) => number): T {
+	if (items.length === 0) {
+		throw new Error("Cannot select a median from an empty list");
 	}
 
-	const median = calculateMedian(measurements);
-	console.log(`    Median bundle size: ${median}kb`);
+	return [...items].sort((a, b) => value(a) - value(b))[
+		Math.floor(items.length / 2)
+	];
+}
 
-	return median;
+async function measureBaselineBundle(
+	page: Page,
+): Promise<JsTransferMeasurement> {
+	const measurements: JsTransferMeasurement[] = [];
+
+	for (let i = 0; i < STATS_CONFIG.BUNDLE_SIZE_ITERATIONS; i++) {
+		const measurement = await measureJsTransfer(page, "/baseline");
+		measurements.push(measurement);
+		console.log(
+			`    Run ${i + 1}: ${measurement.jsTransferTotalBytes} B network, ${measurement.inlineJsBytes} B inline`,
+		);
+	}
+
+	return selectMedianBy(
+		measurements,
+		(measurement) =>
+			measurement.jsTransferTotalBytes + measurement.inlineJsBytes,
+	);
+}
+
+async function measureFrameworkBundle(
+	page: Page,
+	baselineBytes: number,
+	baselineInlineBytes: number,
+	framework: FrameworkId,
+) {
+	const audits: BundleMeasurementAudit[] = [];
+
+	for (let i = 0; i < STATS_CONFIG.BUNDLE_SIZE_ITERATIONS; i++) {
+		const measurement = await measureJsTransfer(page, `/${framework}`);
+		const audit = buildBundleMeasurementAudit(
+			measurement,
+			baselineBytes,
+			baselineInlineBytes,
+		);
+		audits.push(audit);
+		console.log(
+			`    Run ${i + 1}: ${audit.jsImplementationTotalKiB} KiB implementation (${audit.jsImplementationDeltaKiB} KiB network, ${audit.inlineJsImplementationBytes} B inline)`,
+		);
+	}
+
+	const medianAudit = selectMedianBy(
+		audits,
+		(audit) => audit.jsImplementationTotalBytes,
+	);
+	console.log(
+		`    Median implementation bundle: ${medianAudit.jsImplementationTotalKiB} KiB`,
+	);
+
+	return {
+		bundleSize: medianAudit.jsImplementationTotalKiB,
+		bundleMeasurement: medianAudit,
+	};
 }
 
 async function generateStats(): Promise<void> {
 	console.log("\n📊 Starting stats generation with config:");
+	console.log(`  • Preview URL: ${STATS_CONFIG.PREVIEW_URL}`);
 	console.log(
 		`  • Bundle size iterations: ${STATS_CONFIG.BUNDLE_SIZE_ITERATIONS}`,
 	);
@@ -105,10 +133,23 @@ async function generateStats(): Promise<void> {
 	const stats = {} as Record<FrameworkId, FrameworkStats>;
 
 	try {
+		console.log("📏 Measuring baseline route...");
+		const baselineMeasurement = await measureBaselineBundle(page);
+		const baselineBytes = baselineMeasurement.jsTransferTotalBytes;
+		const baselineInlineBytes = baselineMeasurement.inlineJsBytes;
+		console.log(
+			`  Baseline JS transfer: ${baselineBytes} bytes (${baselineMeasurement.jsRequestCount} requests, ${baselineInlineBytes} B inline)`,
+		);
+
 		for (const id of Object.keys(FRAMEWORKS) as FrameworkId[]) {
 			console.log(`📦 Measuring ${id}...`);
-			const size = await measureBundleSize(page, id);
-			console.log(`  Bundle size: ${size}kb`);
+			const bundle = await measureFrameworkBundle(
+				page,
+				baselineBytes,
+				baselineInlineBytes,
+				id,
+			);
+			console.log(`  Bundle size: ${bundle.bundleSize} KiB implementation`);
 
 			const codeComplexityResult = analyzeCodeComplexity(implementations[id]);
 			console.log(
@@ -116,7 +157,8 @@ async function generateStats(): Promise<void> {
 			);
 
 			stats[id] = {
-				bundleSize: size,
+				bundleSize: bundle.bundleSize,
+				bundleMeasurement: bundle.bundleMeasurement,
 				codeComplexity: codeComplexityResult.score,
 				vibeComplexity: 0,
 				bundleSizeZScore: 0,
@@ -204,8 +246,10 @@ async function generateStats(): Promise<void> {
 				lastUpdated: new Date().toISOString(),
 				description: "Framework comparison metrics",
 				codeComplexityVersion: CODE_COMPLEXITY_VERSION,
+				bundleMeasurementVersion: BUNDLE_MEASUREMENT_VERSION,
 				metrics: {
-					bundleSize: "Size in KB",
+					bundleSize:
+						"Implementation JavaScript payload (KiB): external transfer above baseline plus inline JS above baseline",
 					codeComplexity:
 						"Deterministic 0-100 composite of size, logic, reactive, nesting, and vocabulary",
 					vibeComplexity:
