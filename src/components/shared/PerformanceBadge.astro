@@ -19,6 +19,7 @@ const rows = METRIC_ORDER.map((key) => {
 	const meta = METRIC_DISPLAY[key];
 	return {
 		key,
+		id: `metric-${key}-${crypto.randomUUID()}`,
 		name: meta.name,
 		anchor: meta.anchor,
 		tooltip: meta.tooltip,
@@ -34,9 +35,10 @@ const rows = METRIC_ORDER.map((key) => {
 		rows.map((row) => (
 			<button
 				type="button"
-				class="metric-row group"
+				class="metric-row"
 				data-metric={row.key}
 				aria-label={`${row.name}: ${row.value}. Open details.`}
+				aria-describedby={row.id}
 			>
 				<span class="metric-name">{row.name}</span>
 				<span class="metric-track">
@@ -46,7 +48,9 @@ const rows = METRIC_ORDER.map((key) => {
 					/>
 				</span>
 				<span class="metric-value">{row.value}</span>
-				<span class="metric-tooltip" role="tooltip">{row.tooltip}</span>
+				<span class="metric-tooltip" role="tooltip" id={row.id}>
+					{row.tooltip}
+				</span>
 			</button>
 		))
 	}
