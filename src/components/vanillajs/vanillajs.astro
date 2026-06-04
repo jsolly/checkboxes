@@ -1,4 +1,4 @@
-<fieldset class=checkbox-container>
+<fieldset class=checkbox-demo style=border:none>
   <legend>
     <input type=checkbox id=parent-vanilla>
     <label for=parent-vanilla>Parent</label>
@@ -23,7 +23,7 @@
 </fieldset>
 
 <script is:inline>
-  for (const container of document.querySelectorAll('.checkbox-container')) {
+  for (const container of document.querySelectorAll('.checkbox-demo')) {
     const parent = container.querySelector('legend > input');
     const children = [...container.querySelectorAll('.checkbox-children input')];
 
