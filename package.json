@@ -21,6 +21,7 @@
 		"lint-staged": "lint-staged"
 	},
 	"lint-staged": {
+		".agents/**": [],
 		"*": ["biome check --no-errors-on-unmatched --write"]
 	},
 	"dependencies": {
