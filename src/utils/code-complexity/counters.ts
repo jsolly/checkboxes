@@ -7,6 +7,8 @@ import {
 import type { InlineDecisionPointSource } from "../decision-points/types";
 import { stripPresentation } from "./clean";
 
+const JS_EXTENSIONS = new Set([".js", ".jsx", ".ts", ".tsx"]);
+
 function countMatches(value: string, pattern: RegExp): number {
 	return Array.from(value.matchAll(pattern)).length;
 }
@@ -90,7 +92,7 @@ function countReactiveSurface(code: string): {
 	const stateAtoms =
 		countMatches(
 			code,
-			/\b(?:useState|useReducer|useRef|useEffect|useMemo|useCallback|\$state|\$derived|\$effect|reactive|computed|watch)\b/g,
+			/\b(?:useState|useReducer|useRef|useEffect|us eMemo|useCallback|\$state|\$derived|\$effect|reactive|(?<!-)computed|watch)\b/g,
 		) +
 		countMatches(code, /\bdata-signals\b|\bdata-computed\b|\bdata-effect\b/g) +
 		countMatches(code, /\bx-data\b/g);
@@ -109,7 +111,7 @@ function countReactiveSurface(code: string): {
 			/\b(?:v-model|x-model|bind:|v-bind(?::\w+)?|data-bind(?::\w+)?)\b/g,
 		) +
 		countMatches(code, /\b(?:ref=|x-ref|data-ref)\b/g) +
-		countMatches(code, /\b(?:checked=|:checked|data-bind:)\b/g);
+		countMatches(code, /\b(?:checked=|:checked)\b/g);
 
 	const directives =
 		countMatches(code, /\bv-if(?!-)\b|\bv-else-if\b|\bv-show\b|\bv-for\b/g) +
@@ -173,7 +175,7 @@ export function collectRawMetrics(source: InlineDecisionPointSource) {
 		countDistinctOperatorsAndOperands(source.code);
 
 	const controlDepth = Math.max(
-		maxBraceDepth(scripts),
+		maxBraceDepth(JS_EXTENSIONS.has(source.extension) ? source.code : scripts),
 		maxTemplateControlDepth(markup),
 		countSelectorStateDepth(styles),
 	);
