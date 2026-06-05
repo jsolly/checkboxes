@@ -1,0 +1,257 @@
+---
+/**
+ * BundleAmortizationChart.astro
+ *
+ * Complements the single-component "JS Bundle" metric. The card metric measures
+ * one widget in isolation, which is the best case for compile-per-component
+ * frameworks (they ship only what one component needs) and the worst case for
+ * ship-once-runtime frameworks (they pay their whole runtime for one widget).
+ *
+ * This view models cumulative shipped JS as the app accrues DISTINCT interactive
+ * component types:
+ *
+ *     total(N) = runtime + N * marginalPerComponent
+ *
+ *   - runtime  : framework code paid once, shared across the whole app
+ *   - marginal : JS added per new *distinct* interactive component type
+ *                (re-rendering one component N times is cheap for everyone)
+ *
+ * Each row is calibrated so total(1) equals that framework's measured JS Bundle
+ * (KiB, gzip) from framework-stats.json. `runtime` for the component frameworks
+ * is estimated from each one's known client runtime; `marginal` is the remainder.
+ * These splits are estimates — the shape (flat vs. sloped), not the exact
+ * intercepts, is the point. Edit the two numbers per row to taste.
+ */
+
+interface Model {
+	id: string;
+	label: string;
+	runtime: number; // KiB gzip, paid once
+	marginal: number; // KiB gzip per distinct component type
+	color: string;
+	dash: number[]; // [] = solid
+	width: number;
+}
+
+// runtime + marginal === measured JS Bundle at N = 1 (see framework-stats.json)
+const MODEL: Model[] = [
+	{
+		id: "react",
+		label: "React",
+		runtime: 45,
+		marginal: 15.33,
+		color: "#149eca",
+		dash: [9, 5],
+		width: 2.5,
+	},
+	{
+		id: "vue",
+		label: "Vue",
+		runtime: 17,
+		marginal: 12.91,
+		color: "#3fae6f",
+		dash: [9, 5],
+		width: 2.5,
+	},
+	{
+		id: "svelte",
+		label: "Svelte",
+		runtime: 3,
+		marginal: 7.52,
+		color: "#ff3e00",
+		dash: [9, 5],
+		width: 2.5,
+	},
+	{
+		id: "jquery",
+		label: "jQuery",
+		runtime: 30,
+		marginal: 0.83,
+		color: "#0769ad",
+		dash: [5, 4],
+		width: 2,
+	},
+	{
+		id: "stimulus",
+		label: "Stimulus",
+		runtime: 9,
+		marginal: 1.87,
+		color: "#d97706",
+		dash: [5, 4],
+		width: 2,
+	},
+	{
+		id: "hyperscript",
+		label: "Hyperscript",
+		runtime: 24.94,
+		marginal: 0,
+		color: "#7c3aed",
+		dash: [],
+		width: 2,
+	},
+	{
+		id: "alpine",
+		label: "Alpine.js",
+		runtime: 15.73,
+		marginal: 0,
+		color: "#5eb1bf",
+		dash: [],
+		width: 2,
+	},
+	{
+		id: "datastar",
+		label: "Datastar",
+		runtime: 12.97,
+		marginal: 0,
+		color: "#0f9d6e",
+		dash: [],
+		width: 3.5,
+	},
+	{
+		id: "vanilla",
+		label: "Vanilla JS",
+		runtime: 0,
+		marginal: 0.31,
+		color: "#94928a",
+		dash: [2, 3],
+		width: 2,
+	},
+];
+
+const MAX_N = 25;
+const chartData = JSON.stringify({ model: MODEL, maxN: MAX_N });
+---
+
+<div
+	class="amort-card backdrop-blur-sm bg-white/90 rounded-xl shadow-lg border border-slate-200 overflow-hidden"
+>
+	<div class="bg-white/60 px-4 py-3 border-b border-white/20 backdrop-blur-md">
+		<h3 class="font-semibold text-gray-700 select-none">
+			Bundle cost as your app grows
+		</h3>
+		<p class="text-xs text-slate-500 mt-0.5">
+			Cumulative JavaScript shipped (KiB, gzip) vs. number of distinct
+			interactive component types. The card metric above is the leftmost point.
+		</p>
+	</div>
+
+	<div class="amort-body">
+		<div id="amort-legend" class="amort-legend" aria-hidden="true"></div>
+		<div class="amort-canvas-wrap">
+			<canvas
+				id="amort-canvas"
+				role="img"
+				aria-label="Line chart of cumulative shipped JavaScript versus number of distinct interactive component types. React rises fastest to about 428 KiB at 25 components, Vue to about 340, and Svelte to about 191, while Datastar stays flat near 13 KiB, Alpine near 16, and Hyperscript near 25. Vanilla JS climbs slowly to about 8. Runtime and declarative frameworks stay flat; compile-per-component frameworks grow linearly."
+			></canvas>
+		</div>
+	</div>
+
+	<script type="application/json" id="amort-model" set:html={chartData}></script>
+</div>
+
+<script>
+	import Chart from "chart.js/auto";
+
+	const el = document.getElementById("amort-model");
+	const canvas = document.getElementById("amort-canvas") as HTMLCanvasElement | null;
+	const legendEl = document.getElementById("amort-legend");
+	if (el && canvas && legendEl) {
+		const { model, maxN } = JSON.parse(el.textContent || "{}");
+
+		const Ns = Array.from({ length: maxN }, (_, i) => i + 1);
+		const datasets = model.map((f: any) => ({
+			label: f.label,
+			data: Ns.map((n) => ({ x: n, y: Number((f.runtime + f.marginal * n).toFixed(2)) })),
+			borderColor: f.color,
+			backgroundColor: f.color,
+			borderDash: f.dash,
+			borderWidth: f.width,
+			pointRadius: 0,
+			pointHoverRadius: 4,
+			tension: 0,
+			fill: false,
+		}));
+
+		// Custom legend (color + line style + slope), so meaning never relies on colour alone.
+		legendEl.innerHTML = model
+			.map((f: any) => {
+				const stroke = f.dash.length
+					? `border-top:2px dashed ${f.color}`
+					: `border-top:${f.width >= 3 ? 3 : 2}px solid ${f.color}`;
+				const tag = f.marginal === 0 ? "flat" : `+${f.marginal}/comp`;
+				return `<span class="amort-legend-item"><span class="amort-swatch" style="${stroke}"></span>${f.label}<span class="amort-tag">${tag}</span></span>`;
+			})
+			.join("");
+
+		new Chart(canvas, {
+			type: "line",
+			data: { datasets },
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				interaction: { mode: "nearest", axis: "x", intersect: false },
+				scales: {
+					x: {
+						type: "linear",
+						min: 1,
+						max: maxN,
+						title: { display: true, text: "distinct interactive component types", color: "#64748b" },
+						ticks: { stepSize: 4, color: "#64748b" },
+						grid: { color: "rgba(100,116,139,0.12)" },
+					},
+					y: {
+						min: 0,
+						title: { display: true, text: "cumulative shipped JS (KiB, gzip)", color: "#64748b" },
+						ticks: { color: "#64748b" },
+						grid: { color: "rgba(100,116,139,0.12)" },
+					},
+				},
+				plugins: {
+					legend: { display: false },
+					tooltip: {
+						callbacks: {
+							title: (items: any) => `${items[0].parsed.x} component types`,
+							label: (item: any) => `${item.dataset.label}: ${item.parsed.y.toFixed(1)} KiB`,
+						},
+					},
+				},
+			},
+		});
+	}
+</script>
+
+<style>
+	.amort-body {
+		padding: 0.85rem 1rem 1.1rem;
+	}
+
+	.amort-legend {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 0.9rem;
+		margin-bottom: 0.75rem;
+		font-size: 0.72rem;
+		color: rgb(71 85 105);
+	}
+
+	.amort-legend-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+	}
+
+	.amort-swatch {
+		display: inline-block;
+		width: 16px;
+	}
+
+	.amort-tag {
+		color: rgb(148 163 184);
+	}
+
+	.amort-canvas-wrap {
+		position: relative;
+		width: 100%;
+		height: 340px;
+	}
+</style>
