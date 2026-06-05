@@ -9,7 +9,7 @@ const scoreProperties = Object.fromEntries(
 	Object.keys(FRAMEWORKS).map((framework) => [
 		framework,
 		{
-			type: "number",
+			type: "integer",
 			minimum: 0,
 			maximum: 100,
 		},
@@ -17,7 +17,7 @@ const scoreProperties = Object.fromEntries(
 ) as Record<
 	FrameworkId,
 	{
-		type: "number";
+		type: "integer";
 		minimum: number;
 		maximum: number;
 	}

@@ -160,7 +160,9 @@ async function generateStats(): Promise<void> {
 			) as StatsFile;
 
 			for (const id of Object.keys(stats) as FrameworkId[]) {
-				stats[id].vibeComplexity = getExistingVibeComplexity(existingStats, id);
+				stats[id].vibeComplexity = Math.round(
+					getExistingVibeComplexity(existingStats, id),
+				);
 			}
 			console.log("ℹ️ Using existing vibe complexity scores");
 		} catch {
@@ -198,7 +200,7 @@ async function generateStats(): Promise<void> {
 		for (const id of Object.keys(implementationCode) as FrameworkId[]) {
 			const measurements = vibeMeasurements[id];
 			if (measurements.length > 0) {
-				const median = calculateMedian(measurements);
+				const median = Math.round(calculateMedian(measurements));
 				stats[id].vibeComplexity = median;
 				console.log(`    ${id} median vibe complexity: ${median}`);
 			}
