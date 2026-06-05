@@ -37,6 +37,7 @@ function makeStats(overrides: Partial<FrameworkStats>): FrameworkStats {
 	return {
 		bundleSize: 1.53,
 		bundleMeasurement: makeBundleMeasurement(),
+		sourceLines: 42,
 		codeComplexity: 60,
 		vibeComplexity: 65,
 		bundleSizeZScore: 0,

@@ -125,9 +125,11 @@ async function generateStats(): Promise<void> {
 			`  Code complexity: ${codeComplexityResult.score}/100 (logic decisions ${codeComplexityResult.raw.logicDecisions})`,
 		);
 
+		const source = implementations[id];
 		stats[id] = {
 			bundleSize: bundle.bundleSize,
 			bundleMeasurement: bundle.bundleMeasurement,
+			sourceLines: source.code.split("\n").length,
 			codeComplexity: codeComplexityResult.score,
 			vibeComplexity: 0,
 			bundleSizeZScore: 0,
@@ -158,7 +160,9 @@ async function generateStats(): Promise<void> {
 			) as StatsFile;
 
 			for (const id of Object.keys(stats) as FrameworkId[]) {
-				stats[id].vibeComplexity = getExistingVibeComplexity(existingStats, id);
+				stats[id].vibeComplexity = Math.round(
+					getExistingVibeComplexity(existingStats, id),
+				);
 			}
 			console.log("ℹ️ Using existing vibe complexity scores");
 		} catch {
@@ -196,7 +200,7 @@ async function generateStats(): Promise<void> {
 		for (const id of Object.keys(implementationCode) as FrameworkId[]) {
 			const measurements = vibeMeasurements[id];
 			if (measurements.length > 0) {
-				const median = calculateMedian(measurements);
+				const median = Math.round(calculateMedian(measurements));
 				stats[id].vibeComplexity = median;
 				console.log(`    ${id} median vibe complexity: ${median}`);
 			}
@@ -212,6 +216,8 @@ async function generateStats(): Promise<void> {
 			metrics: {
 				bundleSize:
 					"Normalized implementation JavaScript payload (KiB): built chunks, external runtimes, and inline JS above baseline",
+				sourceLines:
+					"Line count of the implementation source file shown on each card",
 				codeComplexity:
 					"Deterministic 0-100 composite of size, logic, reactive, nesting, and vocabulary",
 				vibeComplexity: "AI-judged implementation complexity on a 0-100 scale",

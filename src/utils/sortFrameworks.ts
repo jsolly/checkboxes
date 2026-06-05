@@ -13,6 +13,9 @@ const getMetricAndDirection = (option: SortOption): [SortMetric, boolean] => {
 	if (option.includes("bundleSize")) {
 		return [SortMetric.BundleSize, option.endsWith("Asc")];
 	}
+	if (option.includes("sourceLines")) {
+		return [SortMetric.SourceLines, option.endsWith("Asc")];
+	}
 	if (option.includes("codeComplexity")) {
 		return [SortMetric.CodeComplexity, option.endsWith("Asc")];
 	}

@@ -36,4 +36,5 @@
 	height: 1rem;
 	flex-shrink: 0;
 	accent-color: rgb(37 99 235);
+	cursor: pointer;
 }
