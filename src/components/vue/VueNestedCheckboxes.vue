@@ -7,11 +7,6 @@ const checkboxes = ref([
 	{ id: "child3-vue", label: "Child 3", checked: false },
 ]);
 
-const parent = {
-	id: "parent-vue",
-	label: "Parent",
-};
-
 const allChecked = computed(() => checkboxes.value.every((c) => c.checked));
 const someChecked = computed(() => checkboxes.value.some((c) => c.checked));
 
@@ -22,18 +17,18 @@ function toggleParent(e) {
 </script>
 
 <template>
-    <div class="checkbox-demo">
-        <div>
-            <input type="checkbox" :id="parent.id" :checked="allChecked"
-                :indeterminate="someChecked && !allChecked" @change="toggleParent" />
-            <label :for="parent.id">{{ parent.label }}</label>
-        </div>
+    <fieldset class="checkbox-demo">
+        <legend>
+            <label>
+                <input type="checkbox" :checked="allChecked"
+                    :indeterminate="someChecked && !allChecked" @change="toggleParent" /> Parent
+            </label>
+        </legend>
 
         <div class="checkbox-children">
-            <div v-for="checkbox in checkboxes" :key="checkbox.id">
-                <input type="checkbox" :id="checkbox.id" v-model="checkbox.checked" />
-                <label :for="checkbox.id">{{ checkbox.label }}</label>
-            </div>
+            <label v-for="checkbox in checkboxes" :key="checkbox.id">
+                <input type="checkbox" v-model="checkbox.checked" /> {{ checkbox.label }}
+            </label>
         </div>
-    </div>
+    </fieldset>
 </template>

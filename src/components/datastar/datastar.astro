@@ -1,38 +1,27 @@
 <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.1/bundles/datastar.js"></script>
 
-<div
+<fieldset
   class="checkbox-demo"
   data-signals="{ child1: false, child2: false, child3: false }"
   data-computed:checked="($child1?1:0)+($child2?1:0)+($child3?1:0)"
   data-computed:parent="$checked === 3"
   data-computed:indeterminate="$checked > 0 && $checked < 3"
 >
-  <div>
-    <input
-      type="checkbox"
-      id="parent-datastar"
-      data-ref:parent-input
-      data-bind:parent
-      data-on:change="$child1=$child2=$child3=event.target.checked"
-      data-effect="$parentInput.indeterminate = $indeterminate"
-    />
-    <label for="parent-datastar">Parent</label>
-  </div>
+  <legend>
+    <label>
+      <input
+        type="checkbox"
+        data-ref:parent-input
+        data-bind:parent
+        data-on:change="$child1=$child2=$child3=event.target.checked"
+        data-effect="$parentInput.indeterminate = $indeterminate"
+      /> Parent
+    </label>
+  </legend>
 
   <div class="checkbox-children">
-    <div>
-      <input type="checkbox" id="child1-datastar" data-bind:child1 />
-      <label for="child1-datastar">Child 1</label>
-    </div>
-
-    <div>
-      <input type="checkbox" id="child2-datastar" data-bind:child2 />
-      <label for="child2-datastar">Child 2</label>
-    </div>
-
-    <div>
-      <input type="checkbox" id="child3-datastar" data-bind:child3 />
-      <label for="child3-datastar">Child 3</label>
-    </div>
+    <label><input type="checkbox" data-bind:child1 /> Child 1</label>
+    <label><input type="checkbox" data-bind:child2 /> Child 2</label>
+    <label><input type="checkbox" data-bind:child3 /> Child 3</label>
   </div>
-</div>
+</fieldset>

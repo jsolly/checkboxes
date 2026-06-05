@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-function Checkbox({ id, label, checked, indeterminate, onChange }) {
+function Checkbox({ label, checked, indeterminate, onChange }) {
 	const ref = useRef();
 
 	useEffect(() => {
@@ -10,16 +10,10 @@ function Checkbox({ id, label, checked, indeterminate, onChange }) {
 	}, [indeterminate]);
 
 	return (
-		<div>
-			<input
-				ref={ref}
-				type="checkbox"
-				id={id}
-				checked={checked}
-				onChange={onChange}
-			/>
-			<label htmlFor={id}>{label}</label>
-		</div>
+		<label>
+			<input ref={ref} type="checkbox" checked={checked} onChange={onChange} />{" "}
+			{label}
+		</label>
 	);
 }
 
@@ -52,24 +46,26 @@ export default function NestedCheckboxes() {
 	);
 
 	return (
-		<div className="checkbox-demo">
-			<Checkbox
-				id="parent-react"
-				label="Parent"
-				checked={allChecked}
-				indeterminate={someChecked && !allChecked}
-				onChange={handleParentChange}
-			/>
+		<fieldset className="checkbox-demo">
+			<legend>
+				<Checkbox
+					label="Parent"
+					checked={allChecked}
+					indeterminate={someChecked && !allChecked}
+					onChange={handleParentChange}
+				/>
+			</legend>
 
 			<div className="checkbox-children">
 				{checkboxes.map((item) => (
 					<Checkbox
 						key={item.id}
-						{...item}
+						label={item.label}
+						checked={item.checked}
 						onChange={handleChildChange(item.id)}
 					/>
 				))}
 			</div>
-		</div>
+		</fieldset>
 	);
 }

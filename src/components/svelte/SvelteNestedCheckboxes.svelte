@@ -1,27 +1,22 @@
-<div class="checkbox-demo">
-  <div>
-    <input
-      type="checkbox"
-      id="parent-checkbox"
-      checked={allChecked}
-      indeterminate={isIndeterminate}
-      onchange={toggleAll}
-    />
-    <label for="parent-checkbox">Parent</label>
-  </div>
+<fieldset class="checkbox-demo">
+  <legend>
+    <label>
+      <input
+        type="checkbox"
+        checked={allChecked}
+        indeterminate={isIndeterminate}
+        onchange={toggleAll}
+      /> Parent
+    </label>
+  </legend>
   <div class="checkbox-children">
-    {#each checkboxes as checkbox, i}
-      <div>
-        <input
-          type="checkbox"
-          id="child-{i}"
-          bind:checked={checkbox.value}
-        />
-        <label for="child-{i}">{checkbox.label}</label>
-      </div>
+    {#each checkboxes as checkbox}
+      <label>
+        <input type="checkbox" bind:checked={checkbox.value} /> {checkbox.label}
+      </label>
     {/each}
   </div>
-</div>
+</fieldset>
 
 <script>
 let checkboxes = $state([

@@ -1,44 +1,25 @@
----
-const parentCheckbox = {
-	id: "parent-jquery",
-	label: "Parent",
-};
-
-const childCheckboxItems = [
-	{ id: "child1-jquery", label: "Child 1" },
-	{ id: "child2-jquery", label: "Child 2" },
-	{ id: "child3-jquery", label: "Child 3" },
-];
----
-
-<div class="checkbox-demo" data-checkbox-container>
-  <div>
-    <input type="checkbox" id={parentCheckbox.id}>
-    <label for={parentCheckbox.id}>{parentCheckbox.label}</label>
-  </div>
+<fieldset class="checkbox-demo">
+  <legend><label><input type="checkbox"> Parent</label></legend>
 
   <div class="checkbox-children">
-    {childCheckboxItems.map(item => (
-      <div>
-        <input type="checkbox" id={item.id}>
-        <label for={item.id}>{item.label}</label>
-      </div>
-    ))}
+    <label><input type="checkbox"> Child 1</label>
+    <label><input type="checkbox"> Child 2</label>
+    <label><input type="checkbox"> Child 3</label>
   </div>
-</div>
+</fieldset>
 
 <script>
 import $ from 'jquery';
 
-$('[data-checkbox-container]').each(function() {
+$('[data-framework="jquery"] .checkbox-demo').each(function() {
   const $container = $(this);
-  const $parent = $container.find('input:first');
+  const $parent = $container.find('legend input');
   const $children = $container.find('.checkbox-children input');
 
   function updateParent() {
     const total = $children.length;
     const checked = $children.filter(':checked').length;
-    
+
     $parent.prop('checked', checked === total);
     $parent.prop('indeterminate', checked > 0 && checked < total);
   }
@@ -49,4 +30,4 @@ $('[data-checkbox-container]').each(function() {
 
   $children.on('change', updateParent);
 });
-</script> 
+</script>
