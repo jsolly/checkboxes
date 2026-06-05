@@ -27,6 +27,7 @@ describe("A stats generation run emits explicit complexity metrics", () => {
 			react: {
 				bundleSize: 2,
 				bundleMeasurement: makeBundleMeasurement(),
+				sourceLines: 75,
 				codeComplexity: 74,
 				vibeComplexity: 60,
 				bundleSizeZScore: 0,
@@ -57,6 +58,7 @@ describe("A stats generation run emits explicit complexity metrics", () => {
 			vue: {
 				bundleSize: 1,
 				bundleMeasurement: makeBundleMeasurement(),
+				sourceLines: 40,
 				codeComplexity: 60,
 				vibeComplexity: 30,
 				bundleSizeZScore: 0,
@@ -106,6 +108,12 @@ describe("A stats generation run emits explicit complexity metrics", () => {
 				frameworkStats.bundleSize,
 				frameworkStats.bundleMeasurement.jsImplementationNormalizedKiB,
 				`${id} bundleSize/audit mismatch`,
+			);
+			assert.ok("sourceLines" in frameworkStats, `${id} missing sourceLines`);
+			assert.ok(
+				typeof frameworkStats.sourceLines === "number" &&
+					frameworkStats.sourceLines > 0,
+				`${id} sourceLines should be a positive number`,
 			);
 			assert.ok(
 				"codeComplexity" in frameworkStats,

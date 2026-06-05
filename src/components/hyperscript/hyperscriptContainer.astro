@@ -7,9 +7,10 @@ import Hyperscript from "./hyperscript.astro";
 const { default: code } = await import("./hyperscript.astro?raw");
 ---
 
-<FrameworkContainer 
-  framework="hyperscript" 
+<FrameworkContainer
+  framework="hyperscript"
   title="Hyperscript"
+  contributor={{ name: "htmx", url: "https://x.com/htmx_org" }}
 >
   <Hyperscript />
   <CodeBlock slot="code" code={code} displayName="Hyperscript" lang="astro" logo={hyperscriptLogo} />

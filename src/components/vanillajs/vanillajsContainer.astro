@@ -7,7 +7,11 @@ import VanillaJS from "./vanillajs.astro";
 const { default: code } = await import("./vanillajs.astro?raw");
 ---
 
-<FrameworkContainer framework="vanillajs" title="Vanilla JavaScript">
+<FrameworkContainer
+	framework="vanillajs"
+	title="Vanilla JavaScript"
+	contributor={{ name: "Yawar Amin", github: "yawaramin" }}
+>
 	<VanillaJS />
 	<CodeBlock slot="code" code={code} displayName="Vanilla JS" lang="javascript" logo={vanillaLogo} />
 </FrameworkContainer> 

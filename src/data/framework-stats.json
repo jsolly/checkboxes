@@ -1,11 +1,12 @@
 {
 	"metadata": {
-		"lastUpdated": "2026-06-05T12:15:07.410Z",
+		"lastUpdated": "2026-06-05T12:39:23.250Z",
 		"description": "Framework comparison metrics",
 		"codeComplexityVersion": "cc-1.0.0",
 		"bundleMeasurementVersion": "bm-2.0.0",
 		"metrics": {
 			"bundleSize": "Normalized implementation JavaScript payload (KiB): built chunks, external runtimes, and inline JS above baseline",
+			"sourceLines": "Line count of the implementation source file shown on each card",
 			"codeComplexity": "Deterministic 0-100 composite of size, logic, reactive, nesting, and vocabulary",
 			"vibeComplexity": "AI-judged implementation complexity on a 0-100 scale",
 			"bundleSizeZScore": "Standardized score relative to mean",
@@ -15,32 +16,33 @@
 	},
 	"frameworks": {
 		"vanillajs": {
-			"bundleSize": 0.26,
+			"bundleSize": 0.28,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/vanillajs",
-				"inlineJsBytes": 581,
+				"inlineJsBytes": 610,
 				"jsRequestCount": 0,
-				"jsRawBytes": 581,
-				"jsNormalizedBytes": 262,
+				"jsRawBytes": 610,
+				"jsNormalizedBytes": 287,
 				"jsSources": [
 					{
 						"kind": "inline",
-						"rawBytes": 581,
-						"normalizedBytes": 262
+						"rawBytes": 610,
+						"normalizedBytes": 287
 					}
 				],
 				"baselineInlineJsBytes": 0,
 				"baselineNormalizedBytes": 0,
-				"inlineJsImplementationBytes": 581,
-				"jsImplementationNormalizedBytes": 262,
-				"jsImplementationNormalizedKiB": 0.26,
+				"inlineJsImplementationBytes": 610,
+				"jsImplementationNormalizedBytes": 287,
+				"jsImplementationNormalizedKiB": 0.28,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
+			"sourceLines": 28,
 			"codeComplexity": 54,
-			"vibeComplexity": 25,
-			"bundleSizeZScore": -1.136776890955572,
-			"codeComplexityZScore": -0.039559388606461875,
-			"vibeComplexityZScore": -0.8574017423029912,
+			"vibeComplexity": 38,
+			"bundleSizeZScore": -1.1352337818659353,
+			"codeComplexityZScore": 0.06044626318479527,
+			"vibeComplexityZScore": -0.35526432925540125,
 			"codeComplexitySubscores": {
 				"size": 18,
 				"logic": 11.6,
@@ -64,53 +66,54 @@
 			}
 		},
 		"alpine": {
-			"bundleSize": 15.73,
+			"bundleSize": 15.64,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/alpine",
 				"inlineJsBytes": 0,
 				"jsRequestCount": 1,
-				"jsRawBytes": 44461,
-				"jsNormalizedBytes": 16105,
+				"jsRawBytes": 44258,
+				"jsNormalizedBytes": 16019,
 				"jsSources": [
 					{
 						"kind": "first-party",
-						"url": "/_astro/alpine.astro_astro_type_script_index_0_lang.CAgXQxpe.js",
-						"rawBytes": 44461,
-						"normalizedBytes": 16105
+						"url": "/_astro/alpine.astro_astro_type_script_index_0_lang.9qxo6GKI.js",
+						"rawBytes": 44258,
+						"normalizedBytes": 16019
 					}
 				],
 				"baselineInlineJsBytes": 0,
 				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 0,
-				"jsImplementationNormalizedBytes": 16105,
-				"jsImplementationNormalizedKiB": 15.73,
+				"jsImplementationNormalizedBytes": 16019,
+				"jsImplementationNormalizedKiB": 15.64,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
-			"codeComplexity": 68,
-			"vibeComplexity": 35,
-			"bundleSizeZScore": -0.22817763995672433,
-			"codeComplexityZScore": 0.8834930122109796,
-			"vibeComplexityZScore": -0.41770854112197003,
+			"sourceLines": 33,
+			"codeComplexity": 55,
+			"vibeComplexity": 28,
+			"bundleSizeZScore": -0.23315458427355226,
+			"codeComplexityZScore": 0.1276087778345679,
+			"vibeComplexityZScore": -0.8227173940651397,
 			"codeComplexitySubscores": {
-				"size": 17.5,
-				"logic": 10,
+				"size": 13.6,
+				"logic": 5,
 				"reactive": 8,
 				"nesting": 18,
-				"vocabulary": 14.2
+				"vocabulary": 10.4
 			},
 			"codeComplexityRaw": {
-				"astNodes": 158,
-				"logicDecisions": 3,
+				"astNodes": 92,
+				"logicDecisions": 1,
 				"reactiveSurface": 3,
 				"maxNestingDepth": 4,
-				"distinctOperators": 19,
-				"distinctOperands": 42,
+				"distinctOperators": 7,
+				"distinctOperands": 22,
 				"cssSelectorParts": 0,
 				"directives": 1,
 				"eventHandlers": 0,
 				"bindings": 1,
 				"stateAtoms": 1,
-				"vocabulary": 49
+				"vocabulary": 26
 			}
 		},
 		"vue": {
@@ -153,11 +156,12 @@
 				"jsImplementationNormalizedKiB": 29.88,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
+			"sourceLines": 35,
 			"codeComplexity": 69,
 			"vibeComplexity": 20,
-			"bundleSizeZScore": 0.6028940731417692,
-			"codeComplexityZScore": 0.9494253265550826,
-			"vibeComplexityZScore": -1.0772483428935018,
+			"bundleSizeZScore": 0.6031480051610527,
+			"codeComplexityZScore": 1.0678839829313846,
+			"vibeComplexityZScore": -1.1966798459129304,
 			"codeComplexitySubscores": {
 				"size": 19,
 				"logic": 7.9,
@@ -226,11 +230,12 @@
 				"jsImplementationNormalizedKiB": 60.34,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
+			"sourceLines": 72,
 			"codeComplexity": 60,
-			"vibeComplexity": 65,
-			"bundleSizeZScore": 2.3919007431757,
-			"codeComplexityZScore": 0.3560344974581559,
-			"vibeComplexityZScore": 0.9013710624210932,
+			"vibeComplexity": 68,
+			"bundleSizeZScore": 2.3920368305949067,
+			"codeComplexityZScore": 0.4634213510834311,
+			"vibeComplexityZScore": 1.047094865173814,
 			"codeComplexitySubscores": {
 				"size": 20,
 				"logic": 10,
@@ -293,11 +298,12 @@
 				"jsImplementationNormalizedKiB": 10.34,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
+			"sourceLines": 37,
 			"codeComplexity": 53,
 			"vibeComplexity": 15,
-			"bundleSizeZScore": -0.5447484197165039,
-			"codeComplexityZScore": -0.10549170295056484,
-			"vibeComplexityZScore": -1.2970949434840122,
+			"bundleSizeZScore": -0.5444188907344657,
+			"codeComplexityZScore": -0.006716251464977358,
+			"vibeComplexityZScore": -1.4304063783177996,
 			"codeComplexitySubscores": {
 				"size": 18.3,
 				"logic": 10,
@@ -349,31 +355,32 @@
 				"jsImplementationNormalizedKiB": 24.94,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
-			"codeComplexity": 26,
-			"vibeComplexity": 65,
-			"bundleSizeZScore": 0.31275313584801967,
-			"codeComplexityZScore": -1.885664190241345,
-			"vibeComplexityZScore": 0.9013710624210932,
+			"sourceLines": 23,
+			"codeComplexity": 24,
+			"vibeComplexity": 58,
+			"bundleSizeZScore": 0.31302617989371095,
+			"codeComplexityZScore": -1.9544291763083836,
+			"vibeComplexityZScore": 0.5796418003640755,
 			"codeComplexitySubscores": {
-				"size": 12.9,
+				"size": 12.5,
 				"logic": 0,
 				"reactive": 4,
 				"nesting": 0,
-				"vocabulary": 8.8
+				"vocabulary": 7.9
 			},
 			"codeComplexityRaw": {
-				"astNodes": 82,
+				"astNodes": 78,
 				"logicDecisions": 0,
 				"reactiveSurface": 1,
 				"maxNestingDepth": 0,
-				"distinctOperators": 9,
-				"distinctOperands": 12,
+				"distinctOperators": 7,
+				"distinctOperands": 11,
 				"cssSelectorParts": 0,
 				"directives": 0,
 				"eventHandlers": 1,
 				"bindings": 0,
 				"stateAtoms": 0,
-				"vocabulary": 19
+				"vocabulary": 16
 			}
 		},
 		"cssOnly": {
@@ -392,11 +399,12 @@
 				"jsImplementationNormalizedKiB": 0,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
+			"sourceLines": 75,
 			"codeComplexity": 82,
-			"vibeComplexity": 90,
-			"bundleSizeZScore": -1.1520474666026117,
-			"codeComplexityZScore": 1.8065454130284213,
-			"vibeComplexityZScore": 2.000604065373646,
+			"vibeComplexity": 85,
+			"bundleSizeZScore": -1.1516779339053798,
+			"codeComplexityZScore": 1.940996673378429,
+			"vibeComplexityZScore": 1.8417650753503692,
 			"codeComplexitySubscores": {
 				"size": 20,
 				"logic": 20,
@@ -420,33 +428,34 @@
 			}
 		},
 		"jquery": {
-			"bundleSize": 30.82,
+			"bundleSize": 30.84,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/jquery",
 				"inlineJsBytes": 0,
 				"jsRequestCount": 1,
-				"jsRawBytes": 88070,
-				"jsNormalizedBytes": 31557,
+				"jsRawBytes": 88096,
+				"jsNormalizedBytes": 31576,
 				"jsSources": [
 					{
 						"kind": "first-party",
-						"url": "/_astro/jquery.astro_astro_type_script_index_0_lang.FyI72Pg6.js",
-						"rawBytes": 88070,
-						"normalizedBytes": 31557
+						"url": "/_astro/jquery.astro_astro_type_script_index_0_lang.Bc3_QL3Q.js",
+						"rawBytes": 88096,
+						"normalizedBytes": 31576
 					}
 				],
 				"baselineInlineJsBytes": 0,
 				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 0,
-				"jsImplementationNormalizedBytes": 31557,
-				"jsImplementationNormalizedKiB": 30.82,
+				"jsImplementationNormalizedBytes": 31576,
+				"jsImplementationNormalizedKiB": 30.84,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
+			"sourceLines": 34,
 			"codeComplexity": 43,
-			"vibeComplexity": 30,
-			"bundleSizeZScore": 0.6581030774041428,
-			"codeComplexityZScore": -0.7648148463915945,
-			"vibeComplexityZScore": -0.6375551417124806,
+			"vibeComplexity": 34,
+			"bundleSizeZScore": 0.6595279550105767,
+			"codeComplexityZScore": -0.6783413979627037,
+			"vibeComplexityZScore": -0.5422455551792966,
 			"codeComplexitySubscores": {
 				"size": 18.4,
 				"logic": 5,
@@ -492,11 +501,12 @@
 				"jsImplementationNormalizedKiB": 10.87,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
+			"sourceLines": 42,
 			"codeComplexity": 48,
-			"vibeComplexity": 45,
-			"bundleSizeZScore": -0.5136199385898466,
-			"codeComplexityZScore": -0.43515327467107967,
-			"vibeComplexityZScore": 0.021984660059051055,
+			"vibeComplexity": 62,
+			"bundleSizeZScore": -0.5132924600883744,
+			"codeComplexityZScore": -0.3425288247138405,
+			"vibeComplexityZScore": 0.766623026287971,
 			"codeComplexitySubscores": {
 				"size": 18.8,
 				"logic": 7.9,
@@ -542,11 +552,12 @@
 				"jsImplementationNormalizedKiB": 12.97,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
+			"sourceLines": 28,
 			"codeComplexity": 43,
-			"vibeComplexity": 55,
-			"bundleSizeZScore": -0.39028067374837394,
-			"codeComplexityZScore": -0.7648148463915945,
-			"vibeComplexityZScore": 0.46167786124007215,
+			"vibeComplexity": 48,
+			"bundleSizeZScore": -0.38996131979254073,
+			"codeComplexityZScore": -0.6783413979627037,
+			"vibeComplexityZScore": 0.11218873555433716,
 			"codeComplexitySubscores": {
 				"size": 14.9,
 				"logic": 0,

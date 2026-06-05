@@ -7,7 +7,8 @@ import PerformanceBadge from "../shared/PerformanceBadge.astro";
 
 interface Contributor {
 	name: string;
-	github: string;
+	github?: string;
+	url?: string;
 }
 
 interface Props {
@@ -17,6 +18,12 @@ interface Props {
 }
 
 const { framework, title, contributor } = Astro.props;
+
+const contributorHref =
+	contributor?.url ??
+	(contributor?.github
+		? `https://github.com/${contributor.github}`
+		: undefined);
 
 const typedStats = stats as unknown as { frameworks: FrameworkStatsRecord };
 const frameworkStats: FrameworkStats = typedStats.frameworks[framework];
@@ -36,11 +43,11 @@ const maxBundle = maxBundleSize(typedStats.frameworks);
 				<h3 class="font-semibold text-gray-700 select-none">
 					{title}
 				</h3>
-				{contributor && (
+				{contributor && contributorHref && (
 					<p class="text-xs text-slate-500 shrink-0">
 						Contributed by{" "}
 						<a
-							href={`https://github.com/${contributor.github}`}
+							href={contributorHref}
 							target="_blank"
 							rel="noopener noreferrer"
 							class="text-slate-600 hover:text-slate-800 underline-offset-2 hover:underline"
