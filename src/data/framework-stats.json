@@ -1,6 +1,6 @@
 {
 	"metadata": {
-		"lastUpdated": "2026-06-04T03:54:14.800Z",
+		"lastUpdated": "2026-06-05T12:15:07.410Z",
 		"description": "Framework comparison metrics",
 		"codeComplexityVersion": "cc-1.0.0",
 		"bundleMeasurementVersion": "bm-2.0.0",
@@ -15,52 +15,52 @@
 	},
 	"frameworks": {
 		"vanillajs": {
-			"bundleSize": 0.31,
+			"bundleSize": 0.26,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/vanillajs",
-				"inlineJsBytes": 660,
+				"inlineJsBytes": 581,
 				"jsRequestCount": 0,
-				"jsRawBytes": 660,
-				"jsNormalizedBytes": 313,
+				"jsRawBytes": 581,
+				"jsNormalizedBytes": 262,
 				"jsSources": [
 					{
 						"kind": "inline",
-						"rawBytes": 660,
-						"normalizedBytes": 313
+						"rawBytes": 581,
+						"normalizedBytes": 262
 					}
 				],
 				"baselineInlineJsBytes": 0,
 				"baselineNormalizedBytes": 0,
-				"inlineJsImplementationBytes": 660,
-				"jsImplementationNormalizedBytes": 313,
-				"jsImplementationNormalizedKiB": 0.31,
+				"inlineJsImplementationBytes": 581,
+				"jsImplementationNormalizedBytes": 262,
+				"jsImplementationNormalizedKiB": 0.26,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
-			"codeComplexity": 46,
-			"vibeComplexity": 35,
-			"bundleSizeZScore": -1.1363908468918906,
-			"codeComplexityZScore": -0.7172506779181377,
-			"vibeComplexityZScore": -0.3718883287087489,
+			"codeComplexity": 54,
+			"vibeComplexity": 25,
+			"bundleSizeZScore": -1.136776890955572,
+			"codeComplexityZScore": -0.039559388606461875,
+			"vibeComplexityZScore": -0.8574017423029912,
 			"codeComplexitySubscores": {
-				"size": 20,
-				"logic": 5,
+				"size": 18,
+				"logic": 11.6,
 				"reactive": 0,
-				"nesting": 7,
-				"vocabulary": 14.2
+				"nesting": 12,
+				"vocabulary": 12
 			},
 			"codeComplexityRaw": {
-				"astNodes": 235,
-				"logicDecisions": 1,
+				"astNodes": 167,
+				"logicDecisions": 4,
 				"reactiveSurface": 0,
-				"maxNestingDepth": 2,
-				"distinctOperators": 30,
-				"distinctOperands": 37,
+				"maxNestingDepth": 3,
+				"distinctOperators": 21,
+				"distinctOperands": 27,
 				"cssSelectorParts": 0,
 				"directives": 0,
 				"eventHandlers": 0,
 				"bindings": 0,
 				"stateAtoms": 0,
-				"vocabulary": 49
+				"vocabulary": 34
 			}
 		},
 		"alpine": {
@@ -86,41 +86,41 @@
 				"jsImplementationNormalizedKiB": 15.73,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
-			"codeComplexity": 70,
-			"vibeComplexity": 18,
-			"bundleSizeZScore": -0.22991177912131716,
-			"codeComplexityZScore": 0.987107368620011,
-			"vibeComplexityZScore": -1.203743800820424,
+			"codeComplexity": 68,
+			"vibeComplexity": 35,
+			"bundleSizeZScore": -0.22817763995672433,
+			"codeComplexityZScore": 0.8834930122109796,
+			"vibeComplexityZScore": -0.41770854112197003,
 			"codeComplexitySubscores": {
-				"size": 18.4,
+				"size": 17.5,
 				"logic": 10,
 				"reactive": 8,
-				"nesting": 20,
-				"vocabulary": 14
+				"nesting": 18,
+				"vocabulary": 14.2
 			},
 			"codeComplexityRaw": {
-				"astNodes": 177,
+				"astNodes": 158,
 				"logicDecisions": 3,
 				"reactiveSurface": 3,
-				"maxNestingDepth": 5,
+				"maxNestingDepth": 4,
 				"distinctOperators": 19,
-				"distinctOperands": 40,
+				"distinctOperands": 42,
 				"cssSelectorParts": 0,
 				"directives": 1,
 				"eventHandlers": 0,
 				"bindings": 1,
 				"stateAtoms": 1,
-				"vocabulary": 48
+				"vocabulary": 49
 			}
 		},
 		"vue": {
-			"bundleSize": 29.91,
+			"bundleSize": 29.88,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/vue",
 				"inlineJsBytes": 3593,
 				"jsRequestCount": 3,
-				"jsRawBytes": 76138,
-				"jsNormalizedBytes": 30623,
+				"jsRawBytes": 76043,
+				"jsNormalizedBytes": 30602,
 				"jsSources": [
 					{
 						"kind": "inline",
@@ -129,65 +129,65 @@
 					},
 					{
 						"kind": "first-party",
-						"url": "/_astro/VueNestedCheckboxes.DnH9c0In.js",
-						"rawBytes": 1422,
-						"normalizedBytes": 744
+						"url": "/_astro/VueNestedCheckboxes.CDGCsvTy.js",
+						"rawBytes": 1314,
+						"normalizedBytes": 716
 					},
 					{
 						"kind": "first-party",
-						"url": "/_astro/client.BONbsUMg.js",
-						"rawBytes": 982,
-						"normalizedBytes": 608
+						"url": "/_astro/client.Blg3hzg8.js",
+						"rawBytes": 987,
+						"normalizedBytes": 611
 					},
 					{
 						"kind": "first-party",
-						"url": "/_astro/runtime-dom.esm-bundler.BmAL9YkP.js",
-						"rawBytes": 70141,
-						"normalizedBytes": 27798
+						"url": "/_astro/runtime-dom.esm-bundler.DNuA_tq2.js",
+						"rawBytes": 70149,
+						"normalizedBytes": 27802
 					}
 				],
 				"baselineInlineJsBytes": 0,
 				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 3593,
-				"jsImplementationNormalizedBytes": 30623,
-				"jsImplementationNormalizedKiB": 29.91,
+				"jsImplementationNormalizedBytes": 30602,
+				"jsImplementationNormalizedKiB": 29.88,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
-			"codeComplexity": 70,
-			"vibeComplexity": 22,
-			"bundleSizeZScore": 0.6036727332643333,
-			"codeComplexityZScore": 0.987107368620011,
-			"vibeComplexityZScore": -1.0080131015000298,
+			"codeComplexity": 69,
+			"vibeComplexity": 20,
+			"bundleSizeZScore": 0.6028940731417692,
+			"codeComplexityZScore": 0.9494253265550826,
+			"vibeComplexityZScore": -1.0772483428935018,
 			"codeComplexitySubscores": {
-				"size": 20,
+				"size": 19,
 				"logic": 7.9,
 				"reactive": 10.3,
 				"nesting": 18,
-				"vocabulary": 14.2
+				"vocabulary": 13.8
 			},
 			"codeComplexityRaw": {
-				"astNodes": 221,
+				"astNodes": 191,
 				"logicDecisions": 2,
 				"reactiveSurface": 5,
 				"maxNestingDepth": 4,
-				"distinctOperators": 22,
+				"distinctOperators": 21,
 				"distinctOperands": 41,
 				"cssSelectorParts": 0,
 				"directives": 1,
 				"eventHandlers": 0,
 				"bindings": 1,
 				"stateAtoms": 3,
-				"vocabulary": 49
+				"vocabulary": 46
 			}
 		},
 		"react": {
-			"bundleSize": 60.33,
+			"bundleSize": 60.34,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/react",
 				"inlineJsBytes": 3593,
 				"jsRequestCount": 4,
-				"jsRawBytes": 191047,
-				"jsNormalizedBytes": 61775,
+				"jsRawBytes": 191048,
+				"jsNormalizedBytes": 61785,
 				"jsSources": [
 					{
 						"kind": "inline",
@@ -196,9 +196,9 @@
 					},
 					{
 						"kind": "first-party",
-						"url": "/_astro/ReactNestedCheckboxes.Dg05yt27.js",
-						"rawBytes": 1035,
-						"normalizedBytes": 502
+						"url": "/_astro/ReactNestedCheckboxes.DeXrk-E4.js",
+						"rawBytes": 1036,
+						"normalizedBytes": 512
 					},
 					{
 						"kind": "first-party",
@@ -222,45 +222,45 @@
 				"baselineInlineJsBytes": 0,
 				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 3593,
-				"jsImplementationNormalizedBytes": 61775,
-				"jsImplementationNormalizedKiB": 60.33,
+				"jsImplementationNormalizedBytes": 61785,
+				"jsImplementationNormalizedKiB": 60.34,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
 			"codeComplexity": 60,
-			"vibeComplexity": 58,
-			"bundleSizeZScore": 2.3919407774654258,
-			"codeComplexityZScore": 0.27695818256244903,
-			"vibeComplexityZScore": 0.7535631923835173,
+			"vibeComplexity": 65,
+			"bundleSizeZScore": 2.3919007431757,
+			"codeComplexityZScore": 0.3560344974581559,
+			"vibeComplexityZScore": 0.9013710624210932,
 			"codeComplexitySubscores": {
 				"size": 20,
 				"logic": 10,
 				"reactive": 14.8,
 				"nesting": 0,
-				"vocabulary": 15.2
+				"vocabulary": 15.3
 			},
 			"codeComplexityRaw": {
-				"astNodes": 327,
+				"astNodes": 326,
 				"logicDecisions": 3,
 				"reactiveSurface": 12,
 				"maxNestingDepth": 0,
-				"distinctOperators": 40,
-				"distinctOperands": 45,
+				"distinctOperators": 38,
+				"distinctOperands": 47,
 				"cssSelectorParts": 0,
 				"directives": 0,
 				"eventHandlers": 3,
 				"bindings": 0,
 				"stateAtoms": 9,
-				"vocabulary": 58
+				"vocabulary": 59
 			}
 		},
 		"svelte": {
-			"bundleSize": 10.52,
+			"bundleSize": 10.34,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/svelte",
 				"inlineJsBytes": 3593,
 				"jsRequestCount": 3,
-				"jsRawBytes": 24769,
-				"jsNormalizedBytes": 10768,
+				"jsRawBytes": 24270,
+				"jsNormalizedBytes": 10585,
 				"jsSources": [
 					{
 						"kind": "inline",
@@ -269,55 +269,55 @@
 					},
 					{
 						"kind": "first-party",
-						"url": "/_astro/SvelteNestedCheckboxes.DBSLBwQH.js",
-						"rawBytes": 5372,
-						"normalizedBytes": 2640
+						"url": "/_astro/SvelteNestedCheckboxes.D5VZY1PO.js",
+						"rawBytes": 4992,
+						"normalizedBytes": 2488
 					},
 					{
 						"kind": "first-party",
-						"url": "/_astro/client.svelte.D0j4OYH2.js",
+						"url": "/_astro/client.svelte.Dv1zzMyf.js",
 						"rawBytes": 1093,
-						"normalizedBytes": 600
+						"normalizedBytes": 599
 					},
 					{
 						"kind": "first-party",
-						"url": "/_astro/render.s08-GxjB.js",
-						"rawBytes": 14711,
-						"normalizedBytes": 6055
+						"url": "/_astro/render.DIwoxc2i.js",
+						"rawBytes": 14592,
+						"normalizedBytes": 6025
 					}
 				],
 				"baselineInlineJsBytes": 0,
 				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 3593,
-				"jsImplementationNormalizedBytes": 10768,
-				"jsImplementationNormalizedKiB": 10.52,
+				"jsImplementationNormalizedBytes": 10585,
+				"jsImplementationNormalizedKiB": 10.34,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
-			"codeComplexity": 54,
+			"codeComplexity": 53,
 			"vibeComplexity": 15,
-			"bundleSizeZScore": -0.5361864836015174,
-			"codeComplexityZScore": -0.14913132907208812,
-			"vibeComplexityZScore": -1.3505418253107195,
+			"bundleSizeZScore": -0.5447484197165039,
+			"codeComplexityZScore": -0.10549170295056484,
+			"vibeComplexityZScore": -1.2970949434840122,
 			"codeComplexitySubscores": {
-				"size": 19,
+				"size": 18.3,
 				"logic": 10,
 				"reactive": 8,
 				"nesting": 3,
-				"vocabulary": 14
+				"vocabulary": 13.8
 			},
 			"codeComplexityRaw": {
-				"astNodes": 192,
+				"astNodes": 174,
 				"logicDecisions": 3,
 				"reactiveSurface": 3,
 				"maxNestingDepth": 1,
-				"distinctOperators": 26,
+				"distinctOperators": 24,
 				"distinctOperands": 37,
 				"cssSelectorParts": 0,
 				"directives": 1,
 				"eventHandlers": 0,
 				"bindings": 2,
 				"stateAtoms": 0,
-				"vocabulary": 48
+				"vocabulary": 46
 			}
 		},
 		"hyperscript": {
@@ -349,31 +349,31 @@
 				"jsImplementationNormalizedKiB": 24.94,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
-			"codeComplexity": 35,
-			"vibeComplexity": 55,
-			"bundleSizeZScore": 0.31150665240702147,
-			"codeComplexityZScore": -1.4984147825814558,
-			"vibeComplexityZScore": 0.6067651678932218,
+			"codeComplexity": 26,
+			"vibeComplexity": 65,
+			"bundleSizeZScore": 0.31275313584801967,
+			"codeComplexityZScore": -1.885664190241345,
+			"vibeComplexityZScore": 0.9013710624210932,
 			"codeComplexitySubscores": {
-				"size": 16.5,
+				"size": 12.9,
 				"logic": 0,
 				"reactive": 4,
-				"nesting": 3,
-				"vocabulary": 11
+				"nesting": 0,
+				"vocabulary": 8.8
 			},
 			"codeComplexityRaw": {
-				"astNodes": 138,
+				"astNodes": 82,
 				"logicDecisions": 0,
 				"reactiveSurface": 1,
-				"maxNestingDepth": 1,
-				"distinctOperators": 22,
-				"distinctOperands": 17,
+				"maxNestingDepth": 0,
+				"distinctOperators": 9,
+				"distinctOperands": 12,
 				"cssSelectorParts": 0,
 				"directives": 0,
 				"eventHandlers": 1,
 				"bindings": 0,
 				"stateAtoms": 0,
-				"vocabulary": 29
+				"vocabulary": 19
 			}
 		},
 		"cssOnly": {
@@ -392,81 +392,81 @@
 				"jsImplementationNormalizedKiB": 0,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
-			"codeComplexity": 84,
-			"vibeComplexity": 85,
-			"bundleSizeZScore": -1.1546144857381213,
-			"codeComplexityZScore": 1.9813162291005977,
-			"vibeComplexityZScore": 2.0747454127961777,
+			"codeComplexity": 82,
+			"vibeComplexity": 90,
+			"bundleSizeZScore": -1.1520474666026117,
+			"codeComplexityZScore": 1.8065454130284213,
+			"vibeComplexityZScore": 2.000604065373646,
 			"codeComplexitySubscores": {
 				"size": 20,
 				"logic": 20,
 				"reactive": 8,
 				"nesting": 20,
-				"vocabulary": 15.8
+				"vocabulary": 14.4
 			},
 			"codeComplexityRaw": {
-				"astNodes": 386,
+				"astNodes": 306,
 				"logicDecisions": 20,
 				"reactiveSurface": 3,
 				"maxNestingDepth": 6,
-				"distinctOperators": 27,
-				"distinctOperands": 57,
-				"cssSelectorParts": 432,
+				"distinctOperators": 26,
+				"distinctOperands": 45,
+				"cssSelectorParts": 418,
 				"directives": 0,
 				"eventHandlers": 0,
 				"bindings": 3,
 				"stateAtoms": 0,
-				"vocabulary": 64
+				"vocabulary": 51
 			}
 		},
 		"jquery": {
-			"bundleSize": 30.83,
+			"bundleSize": 30.82,
 			"bundleMeasurement": {
 				"measuredRoute": "/test/jquery",
 				"inlineJsBytes": 0,
 				"jsRequestCount": 1,
-				"jsRawBytes": 88080,
-				"jsNormalizedBytes": 31567,
+				"jsRawBytes": 88070,
+				"jsNormalizedBytes": 31557,
 				"jsSources": [
 					{
 						"kind": "first-party",
-						"url": "/_astro/jquery.astro_astro_type_script_index_0_lang.CaMxhEIh.js",
-						"rawBytes": 88080,
-						"normalizedBytes": 31567
+						"url": "/_astro/jquery.astro_astro_type_script_index_0_lang.FyI72Pg6.js",
+						"rawBytes": 88070,
+						"normalizedBytes": 31557
 					}
 				],
 				"baselineInlineJsBytes": 0,
 				"baselineNormalizedBytes": 0,
 				"inlineJsImplementationBytes": 0,
-				"jsImplementationNormalizedBytes": 31567,
-				"jsImplementationNormalizedKiB": 30.83,
+				"jsImplementationNormalizedBytes": 31557,
+				"jsImplementationNormalizedKiB": 30.82,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
-			"codeComplexity": 46,
-			"vibeComplexity": 38,
-			"bundleSizeZScore": 0.6577557904854051,
-			"codeComplexityZScore": -0.7172506779181377,
-			"vibeComplexityZScore": -0.2250903042184533,
+			"codeComplexity": 43,
+			"vibeComplexity": 30,
+			"bundleSizeZScore": 0.6581030774041428,
+			"codeComplexityZScore": -0.7648148463915945,
+			"vibeComplexityZScore": -0.6375551417124806,
 			"codeComplexitySubscores": {
-				"size": 20,
+				"size": 18.4,
 				"logic": 5,
 				"reactive": 0,
 				"nesting": 7,
-				"vocabulary": 13.6
+				"vocabulary": 12.1
 			},
 			"codeComplexityRaw": {
-				"astNodes": 236,
+				"astNodes": 176,
 				"logicDecisions": 1,
 				"reactiveSurface": 0,
 				"maxNestingDepth": 2,
-				"distinctOperators": 28,
-				"distinctOperands": 33,
+				"distinctOperators": 19,
+				"distinctOperands": 28,
 				"cssSelectorParts": 0,
 				"directives": 0,
 				"eventHandlers": 0,
 				"bindings": 0,
 				"stateAtoms": 0,
-				"vocabulary": 45
+				"vocabulary": 35
 			}
 		},
 		"stimulus": {
@@ -492,31 +492,31 @@
 				"jsImplementationNormalizedKiB": 10.87,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
-			"codeComplexity": 51,
-			"vibeComplexity": 48,
-			"bundleSizeZScore": -0.5156114074848054,
-			"codeComplexityZScore": -0.3621760848893567,
-			"vibeComplexityZScore": 0.264236444082532,
+			"codeComplexity": 48,
+			"vibeComplexity": 45,
+			"bundleSizeZScore": -0.5136199385898466,
+			"codeComplexityZScore": -0.43515327467107967,
+			"vibeComplexityZScore": 0.021984660059051055,
 			"codeComplexitySubscores": {
-				"size": 20,
+				"size": 18.8,
 				"logic": 7.9,
 				"reactive": 0,
 				"nesting": 7,
-				"vocabulary": 15.8
+				"vocabulary": 14.7
 			},
 			"codeComplexityRaw": {
-				"astNodes": 229,
+				"astNodes": 187,
 				"logicDecisions": 2,
 				"reactiveSurface": 0,
 				"maxNestingDepth": 2,
-				"distinctOperators": 26,
-				"distinctOperands": 54,
+				"distinctOperators": 23,
+				"distinctOperands": 46,
 				"cssSelectorParts": 0,
 				"directives": 0,
 				"eventHandlers": 0,
 				"bindings": 0,
 				"stateAtoms": 0,
-				"vocabulary": 64
+				"vocabulary": 53
 			}
 		},
 		"datastar": {
@@ -542,31 +542,31 @@
 				"jsImplementationNormalizedKiB": 12.97,
 				"compressionNote": "Ranked by normalized gzip-compressed JavaScript payload."
 			},
-			"codeComplexity": 45,
-			"vibeComplexity": 52,
-			"bundleSizeZScore": -0.3921609507845326,
-			"codeComplexityZScore": -0.7882655965238938,
-			"vibeComplexityZScore": 0.4599671434029261,
+			"codeComplexity": 43,
+			"vibeComplexity": 55,
+			"bundleSizeZScore": -0.39028067374837394,
+			"codeComplexityZScore": -0.7648148463915945,
+			"vibeComplexityZScore": 0.46167786124007215,
 			"codeComplexitySubscores": {
-				"size": 17.4,
+				"size": 14.9,
 				"logic": 0,
 				"reactive": 17,
 				"nesting": 0,
-				"vocabulary": 10.8
+				"vocabulary": 11
 			},
 			"codeComplexityRaw": {
-				"astNodes": 155,
+				"astNodes": 110,
 				"logicDecisions": 0,
 				"reactiveSurface": 18,
 				"maxNestingDepth": 0,
-				"distinctOperators": 6,
+				"distinctOperators": 7,
 				"distinctOperands": 24,
 				"cssSelectorParts": 0,
 				"directives": 0,
 				"eventHandlers": 0,
 				"bindings": 10,
 				"stateAtoms": 8,
-				"vocabulary": 28
+				"vocabulary": 29
 			}
 		}
 	}

@@ -1,37 +1,25 @@
 ---
 // @ts-nocheck
-const parentCheckbox = {
-	id: "parent-hyperscript",
-	label: "Parent",
-};
-
-const childCheckboxItems = [
-	{ id: "child1-hyperscript", label: "Child 1" },
-	{ id: "child2-hyperscript", label: "Child 2" },
-	{ id: "child3-hyperscript", label: "Child 3" },
-];
 ---
 <script src="https://unpkg.com/hyperscript.org@0.9.13"></script>
 
-<div class="checkbox-demo">
-  <div>
-    <input
-      type="checkbox"
-      id={parentCheckbox.id}
-      _="on click
-            set the checked of <input[type=checkbox]/> in the next <div/> to my checked
-          on click from the next <div/>
-            set my checked to no <input:not(:checked)/> in it
-            set my indeterminate to <:checked/> in it exists and <input:not(:checked)/> in it exists"
-    />
-    <label for={parentCheckbox.id}>{parentCheckbox.label}</label>
-  </div>
+<fieldset class="checkbox-demo">
+  <legend>
+    <label>
+      <input
+        type="checkbox"
+        _="on click
+              set the checked of <input[type=checkbox]/> in the next <div/> to my checked
+            on click from the next <div/>
+              set my checked to no <input:not(:checked)/> in it
+              set my indeterminate to <:checked/> in it exists and <input:not(:checked)/> in it exists"
+      /> Parent
+    </label>
+  </legend>
+
   <div class="checkbox-children">
-    {childCheckboxItems.map(item => (
-      <div>
-        <input type="checkbox" id={item.id} />
-        <label for={item.id}>{item.label}</label>
-      </div>
-    ))}
+    <label><input type="checkbox" /> Child 1</label>
+    <label><input type="checkbox" /> Child 2</label>
+    <label><input type="checkbox" /> Child 3</label>
   </div>
-</div> 
+</fieldset>

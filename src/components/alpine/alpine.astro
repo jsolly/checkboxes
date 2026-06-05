@@ -21,37 +21,30 @@
 	}
 </script>
 
-<div x-data="{
-	parent: { id: 'parent', label: 'Parent' },
+<fieldset class="checkbox-demo" x-data="{
 	checkboxes: [
-		{ id: 'child1', label: 'Child 1', checked: false },
-		{ id: 'child2', label: 'Child 2', checked: false },
-		{ id: 'child3', label: 'Child 3', checked: false }
+		{ label: 'Child 1', checked: false },
+		{ label: 'Child 2', checked: false },
+		{ label: 'Child 3', checked: false }
 	]
 }">
-	<div class="checkbox-demo">
-		<div>
-			<input 
-				type="checkbox" 
-				:id="parent.id" 
+	<legend>
+		<label>
+			<input
+				type="checkbox"
 				:checked="checkboxes.every(c => c.checked)"
 				@change="checkboxes.forEach(c => c.checked = $event.target.checked)"
 				x-effect="$el.indeterminate = checkboxes.some(c => c.checked) && !checkboxes.every(c => c.checked)"
-			>
-			<label :for="parent.id" x-text="parent.label"></label>
-		</div>
+			> Parent
+		</label>
+	</legend>
 
-		<div class="checkbox-children">
-			<template x-for="checkbox in checkboxes" :key="checkbox.id">
-				<div>
-					<input 
-						type="checkbox" 
-						:id="checkbox.id"
-						x-model="checkbox.checked"
-					>
-					<label :for="checkbox.id" x-text="checkbox.label"></label>
-				</div>
-			</template>
-		</div>
+	<div class="checkbox-children">
+		<template x-for="checkbox in checkboxes" :key="checkbox.label">
+			<label>
+				<input type="checkbox" x-model="checkbox.checked">
+				<span x-text="checkbox.label"></span>
+			</label>
+		</template>
 	</div>
-</div>
+</fieldset>
