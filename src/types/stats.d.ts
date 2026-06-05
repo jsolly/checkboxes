@@ -8,6 +8,7 @@ import type {
 export interface FrameworkStats {
 	bundleSize: number;
 	bundleMeasurement: BundleMeasurementAudit;
+	sourceLines: number;
 	codeComplexity: number;
 	vibeComplexity: number;
 	bundleSizeZScore: number;
@@ -24,6 +25,7 @@ export interface StatsMetadata {
 	bundleMeasurementVersion: string;
 	metrics: {
 		bundleSize: string;
+		sourceLines: string;
 		codeComplexity: string;
 		vibeComplexity: string;
 		bundleSizeZScore: string;

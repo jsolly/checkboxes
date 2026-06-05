@@ -7,7 +7,8 @@ import PerformanceBadge from "../shared/PerformanceBadge.astro";
 
 interface Contributor {
 	name: string;
-	github: string;
+	github?: string;
+	url?: string;
 }
 
 interface Props {
@@ -17,6 +18,12 @@ interface Props {
 }
 
 const { framework, title, contributor } = Astro.props;
+
+const contributorHref =
+	contributor?.url ??
+	(contributor?.github
+		? `https://github.com/${contributor.github}`
+		: undefined);
 
 const typedStats = stats as unknown as { frameworks: FrameworkStatsRecord };
 const frameworkStats: FrameworkStats = typedStats.frameworks[framework];
@@ -36,19 +43,64 @@ const maxBundle = maxBundleSize(typedStats.frameworks);
 				<h3 class="font-semibold text-gray-700 select-none">
 					{title}
 				</h3>
-				{contributor && (
-					<p class="text-xs text-slate-500 shrink-0">
-						Contributed by{" "}
-						<a
-							href={`https://github.com/${contributor.github}`}
-							target="_blank"
-							rel="noopener noreferrer"
-							class="text-slate-600 hover:text-slate-800 underline-offset-2 hover:underline"
+				<div class="flex items-center gap-3 shrink-0">
+					{contributor && contributorHref && (
+						<p class="text-xs text-slate-500">
+							Contributed by{" "}
+							<a
+								href={contributorHref}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-slate-600 hover:text-slate-800 underline-offset-2 hover:underline"
+							>
+								{contributor.name}
+							</a>
+						</p>
+					)}
+					<button
+						type="button"
+						data-fullscreen-toggle
+						aria-pressed="false"
+						aria-label="Expand to full screen"
+						title="Full screen"
+						class="text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-md p-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+					>
+						<svg
+							data-icon-expand
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
 						>
-							{contributor.name}
-						</a>
-					</p>
-				)}
+							<path d="M8 3H5a2 2 0 0 0-2 2v3" />
+							<path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+							<path d="M3 16v3a2 2 0 0 0 2 2h3" />
+							<path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+						</svg>
+						<svg
+							data-icon-collapse
+							class="h-5 w-5 hidden"
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<path d="M8 3v3a2 2 0 0 1-2 2H3" />
+							<path d="M21 8h-3a2 2 0 0 1-2-2V3" />
+							<path d="M3 16h3a2 2 0 0 1 2 2v3" />
+							<path d="M16 21v-3a2 2 0 0 1 2-2h3" />
+						</svg>
+					</button>
+				</div>
 			</div>
 			<div class="framework-content">
 				<slot />
@@ -60,22 +112,101 @@ const maxBundle = maxBundleSize(typedStats.frameworks);
 </div>
 
 <script is:inline define:vars={{ framework }}>
-	// Only initialize when the component becomes visible
-	const wrappers = document.querySelectorAll(`[data-framework="${framework}"] [data-framework-wrapper]`);
-	wrappers.forEach(wrapper => {
-		const observer = new IntersectionObserver((entries) => {
-			entries.forEach(entry => {
-				if (entry.isIntersecting) {
-					wrapper.classList.remove('opacity-0');
-					wrapper.classList.add('opacity-100');
-					observer.unobserve(wrapper);
-				}
+	(() => {
+		// Only initialize when the component becomes visible
+		const wrappers = document.querySelectorAll(`[data-framework="${framework}"] [data-framework-wrapper]`);
+		wrappers.forEach(wrapper => {
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						wrapper.classList.remove('opacity-0');
+						wrapper.classList.add('opacity-100');
+						observer.unobserve(wrapper);
+					}
+				});
+			}, {
+				threshold: 0.1,
+				rootMargin: '50px'
 			});
-		}, {
-			threshold: 0.1,
-			rootMargin: '50px'
+
+			observer.observe(wrapper);
 		});
-		
-		observer.observe(wrapper);
-	});
+
+		// Full-screen toggle for this framework
+		const container = document.querySelector(`[data-framework="${framework}"]`);
+		const toggleBtn = container?.querySelector('[data-fullscreen-toggle]');
+		const codeToggle = container?.querySelector('[data-code-toggle]');
+
+		// Remember whether the code block was already open so exiting full
+		// screen restores the user's prior state instead of forcing it shut.
+		let codeWasOpen = false;
+
+		function setFullscreen(on) {
+			if (!container) return;
+
+			if (on) {
+				// Only one framework can be full-screen at a time
+				document.querySelectorAll('.framework-container.is-fullscreen').forEach(el => {
+					if (el !== container) el.classList.remove('is-fullscreen');
+				});
+				container.classList.add('is-fullscreen');
+				document.body.style.overflow = 'hidden';
+				container.scrollTop = 0;
+				// The wrapper may still be hidden if it never scrolled into view
+				const wrapper = container.querySelector('[data-framework-wrapper]');
+				wrapper?.classList.remove('opacity-0');
+				wrapper?.classList.add('opacity-100');
+				// Auto-expand the code block when going full screen
+				codeWasOpen = codeToggle?.getAttribute('aria-expanded') === 'true';
+				if (codeToggle && !codeWasOpen) codeToggle.click();
+			} else {
+				// Collapse the code block again unless it was already open
+				if (codeToggle && !codeWasOpen && codeToggle.getAttribute('aria-expanded') === 'true') {
+					codeToggle.click();
+				}
+				container.classList.remove('is-fullscreen');
+				if (!document.querySelector('.framework-container.is-fullscreen')) {
+					document.body.style.overflow = '';
+				}
+			}
+
+			toggleBtn?.setAttribute('aria-pressed', String(on));
+			toggleBtn?.setAttribute('aria-label', on ? 'Exit full screen' : 'Expand to full screen');
+			toggleBtn?.querySelector('[data-icon-expand]')?.classList.toggle('hidden', on);
+			toggleBtn?.querySelector('[data-icon-collapse]')?.classList.toggle('hidden', !on);
+		}
+
+		toggleBtn?.addEventListener('click', (e) => {
+			e.stopPropagation();
+			setFullscreen(!container?.classList.contains('is-fullscreen'));
+		});
+
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && container?.classList.contains('is-fullscreen')) {
+				setFullscreen(false);
+			}
+		});
+	})();
 </script>
+
+<style>
+	.framework-container.is-fullscreen {
+		position: fixed;
+		inset: 0;
+		z-index: 50;
+		margin: 0;
+		border: none;
+		border-radius: 0;
+		overflow-y: auto;
+		background: #f8fafc;
+		padding: 1.5rem;
+		transform: none !important;
+		opacity: 1 !important;
+		cursor: default !important;
+	}
+
+	.framework-container.is-fullscreen [data-framework-wrapper] {
+		max-width: 64rem;
+		margin: 0 auto;
+	}
+</style>

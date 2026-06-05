@@ -62,6 +62,20 @@ export default function FrameworkSort() {
 							Bundle Size (largest first)
 						</option>
 					</optgroup>
+					<optgroup label="Source Lines">
+						<option
+							value={SortOption.SourceLinesAsc}
+							aria-label="Sort by source lines, ascending"
+						>
+							Lines (shortest first)
+						</option>
+						<option
+							value={SortOption.SourceLinesDsc}
+							aria-label="Sort by source lines, descending"
+						>
+							Lines (longest first)
+						</option>
+					</optgroup>
 					<optgroup label="Code Complexity">
 						<option
 							value={SortOption.CodeComplexityAsc}

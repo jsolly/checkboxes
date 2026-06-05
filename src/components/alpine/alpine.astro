@@ -1,24 +1,6 @@
 <script>
 	import Alpine from "alpinejs";
-
-	const globalWindow = window as Window & {
-		Alpine?: typeof Alpine;
-		__checkboxesAlpineStarted?: boolean;
-	};
-
-	globalWindow.Alpine = Alpine;
-
-	function startAlpine() {
-		if (globalWindow.__checkboxesAlpineStarted) return;
-		globalWindow.__checkboxesAlpineStarted = true;
-		Alpine.start();
-	}
-
-	if (document.readyState === "loading") {
-		document.addEventListener("DOMContentLoaded", startAlpine, { once: true });
-	} else {
-		startAlpine();
-	}
+	Alpine.start();
 </script>
 
 <fieldset class="checkbox-demo" x-data="{
