@@ -1,41 +1,21 @@
-<div class="checkbox-demo checkbox-group">
-  <!-- Parent checkbox -->
-  <div>
-    <input type="checkbox" class="parent-checkbox" id="parent-css" />
-    <label for="parent-css">Parent</label>
-  </div>
+<fieldset class="checkbox-demo checkbox-group">
+  <legend><label><input type="checkbox" class="parent-checkbox"> Parent</label></legend>
 
-  <!-- Child checkboxes -->
   <div class="checkbox-children">
-    <div>
-      <input type="checkbox" class="child-checkbox" id="child1-css" />
-      <label for="child1-css">Child 1</label>
-    </div>
-    <div>
-      <input type="checkbox" class="child-checkbox" id="child2-css" />
-      <label for="child2-css">Child 2</label>
-    </div>
-    <div>
-      <input type="checkbox" class="child-checkbox" id="child3-css" />
-      <label for="child3-css">Child 3</label>
-    </div>
+    <label><input type="checkbox" class="child-checkbox"> Child 1</label>
+    <label><input type="checkbox" class="child-checkbox"> Child 2</label>
+    <label><input type="checkbox" class="child-checkbox"> Child 3</label>
   </div>
-</div>
+</fieldset>
 
 <style>
 /* Base styles */
 .checkbox-group input[type="checkbox"] {
-  height: 1rem;
-  width: 1rem;
-  margin: 0;
   appearance: none;
   -webkit-appearance: none;
-  cursor: pointer;
   border: 1px solid rgb(126, 137, 147);
   border-radius: 0.20rem;
-  vertical-align: -0.125em;
   position: relative;
-  margin-top: 0.125rem;
   background-color: transparent;
 }
 
@@ -92,4 +72,3 @@
   box-shadow: 0 0 0 2px rgb(255 255 255), 0 0 0 4px rgb(59 130 246);
 }
 </style>
-  

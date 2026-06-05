@@ -72,7 +72,7 @@ const rows = METRIC_ORDER.map((key) => {
 	.metric-row {
 		position: relative;
 		display: grid;
-		grid-template-columns: 128px 1fr 56px;
+		grid-template-columns: 128px 1fr 64px;
 		align-items: center;
 		gap: 0.6rem;
 		width: 100%;
@@ -115,6 +115,7 @@ const rows = METRIC_ORDER.map((key) => {
 		font-size: 0.82rem;
 		font-weight: 800;
 		color: rgb(15 23 42);
+		white-space: nowrap;
 	}
 
 	.metric-tooltip {
@@ -145,7 +146,7 @@ const rows = METRIC_ORDER.map((key) => {
 
 	@media (max-width: 480px) {
 		.metric-row {
-			grid-template-columns: 108px 1fr 52px;
+			grid-template-columns: 108px 1fr 60px;
 		}
 	}
 </style>

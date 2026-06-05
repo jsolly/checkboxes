@@ -1,17 +1,15 @@
-<fieldset data-controller="checkbox-group" class="checkbox-demo" aria-label="Checkbox group">
-  <legend class="sr-only">Parent-child checkbox group</legend>
+<fieldset data-controller="checkbox-group" class="checkbox-demo">
+  <legend>
+    <label>
+      <input type="checkbox" data-checkbox-group-target="parent" data-action="checkbox-group#parentToggle" /> Parent
+    </label>
+  </legend>
 
-  <div>
-    <input id="stimulus-parent" type="checkbox" data-checkbox-group-target="parent" data-action="checkbox-group#parentToggle" aria-controls="stimulus-children" />
-    <label for="stimulus-parent">Parent</label>
-  </div>
-
-  <div id="stimulus-children" class="checkbox-children">
+  <div class="checkbox-children">
     { [1, 2, 3].map((i) =>
-      <div>
-        <input id={`stimulus-child-${i}`} type="checkbox" data-checkbox-group-target="child" data-action="checkbox-group#childToggle" />
-        <label for={`stimulus-child-${i}`}>Child {i}</label>
-      </div> )}
+      <label>
+        <input type="checkbox" data-checkbox-group-target="child" data-action="checkbox-group#childToggle" /> Child {i}
+      </label> )}
   </div>
 </fieldset>
 
