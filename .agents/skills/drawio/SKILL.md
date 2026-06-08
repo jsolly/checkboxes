@@ -28,7 +28,7 @@ If no format is mentioned, write the `.drawio` file and open it.
 ### Supported export formats
 
 | Format | Embed XML | Notes |
-|--------|-----------|-------|
+| -------- | ----------- | ------- |
 | `png` | Yes (`-e`) | Viewable everywhere, editable in draw.io |
 | `svg` | Yes (`-e`) | Scalable, editable in draw.io |
 | `pdf` | Yes (`-e`) | Printable, editable in draw.io |
@@ -36,7 +36,7 @@ If no format is mentioned, write the `.drawio` file and open it.
 
 ## CLI path
 
-```
+```text
 /Applications/draw.io.app/Contents/MacOS/draw.io -x -f <format> -e -b 10 -o <output> <input.drawio>
 ```
 
@@ -54,7 +54,7 @@ If the CLI isn't found, keep the `.drawio` file and tell the user.
 ## Troubleshooting
 
 | Problem | Cause | Solution |
-|---------|-------|----------|
+| --------- | ------- | ---------- |
 | CLI not found | Desktop app not installed | Keep the `.drawio` file; tell the user to install draw.io desktop |
 | Export produces empty/corrupt file | Invalid XML (unescaped chars, comments) | Validate XML well-formedness before writing |
 | Diagram opens but looks blank | Missing root cells `id="0"` and `id="1"` | Ensure the basic mxGraphModel structure is complete |
