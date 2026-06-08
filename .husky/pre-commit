@@ -1,11 +1,11 @@
-
-
+#!/bin/sh
 # BEGIN dotagents fleet pre-commit guard
 ROOT="$(git rev-parse --show-toplevel)"
-if [[ -x "$ROOT/.agents/scripts/fleet-precommit-check.sh" ]]; then
+if [ -x "$ROOT/.agents/scripts/fleet-precommit-check.sh" ]; then
   bash "$ROOT/.agents/scripts/fleet-precommit-check.sh" || exit 1
 fi
 # END dotagents fleet pre-commit guard
+
 echo "🚀 Running pre-commit hook..."
 pnpm run lint-staged
 lint_status=$?
