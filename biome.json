@@ -9,6 +9,7 @@
 		"ignoreUnknown": true,
 		"ignore": [
 			"**/*.min.js",
+			".agents/**/*",
 			".vercel/**/*",
 			".astro/**/*",
 			"dist/**/*",
