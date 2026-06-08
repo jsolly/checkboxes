@@ -92,7 +92,7 @@ function countReactiveSurface(code: string): {
 	const stateAtoms =
 		countMatches(
 			code,
-			/\b(?:useState|useReducer|useRef|useEffect|us eMemo|useCallback|\$state|\$derived|\$effect|reactive|(?<!-)computed|watch)\b/g,
+			/\b(?:useState|useReducer|useRef|useEffect|useMemo|useCallback|\$state|\$derived|\$effect|reactive|(?<!-)computed|watch)\b/g,
 		) +
 		countMatches(code, /\bdata-signals\b|\bdata-computed\b|\bdata-effect\b/g) +
 		countMatches(code, /\bx-data\b/g);
