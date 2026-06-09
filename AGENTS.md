@@ -1,6 +1,5 @@
 # AGENTS.md
 
-@.agents/AGENTS.md
 
 ## Cursor Cloud
 
@@ -13,11 +12,11 @@ Checkbox implementation gallery — multiple frameworks and approaches with perf
 ## Commands
 
 ```shell
-pnpm install
-pnpm dev
-pnpm build
-pnpm preview
-pnpm generate-stats
+npm install
+npm run dev
+npm run build
+npm run preview
+npm run generate-stats
 ```
 
 ## Project Rules
