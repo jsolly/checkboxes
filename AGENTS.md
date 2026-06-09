@@ -1,10 +1,5 @@
 # AGENTS.md
 
-
-## Cursor Cloud
-
-Cloud agents: see `.agents/docs/cloud-agents.md` (fleet layout, subtree updates).
-
 ## Purpose
 
 Checkbox implementation gallery — multiple frameworks and approaches with performance metrics. See `README.md`.
