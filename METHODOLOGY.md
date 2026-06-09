@@ -173,7 +173,7 @@ Only these sources are included in the normalized total:
 
 Excluded: CSS, JSON data scripts, dev-server artifacts (`@vite/client`, `@fs/`, `node_modules/`, source files), and non-JavaScript resources. Unknown external JavaScript hosts fail stats generation loudly so a new CDN cannot silently report as zero.
 
-**Important:** run `pnpm build` before `pnpm generate-stats`. Bundle measurement reads the built `dist/` artifacts directly.
+**Important:** run `npm run build` before `npm run generate-stats`. Bundle measurement reads the built `dist/` artifacts directly.
 
 ### Environment caveats
 
@@ -191,11 +191,11 @@ Z-scores for bundle size, Code Complexity, and Vibe Complexity are computed acro
 
 ## Reproducing The Numbers
 
-Run `pnpm build`, then `pnpm generate-stats`. Set `GEMINI_API_KEY` to update Vibe Complexity; leave it unset to preserve existing Vibe values.
+Run `npm run build`, then `npm run generate-stats`. Set `GEMINI_API_KEY` to update Vibe Complexity; leave it unset to preserve existing Vibe values.
 
 ```shell
-pnpm build
-pnpm generate-stats
+npm run build
+npm run generate-stats
 ```
 
 Optional `.env` for Vibe refresh:

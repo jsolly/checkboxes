@@ -1,6 +1,6 @@
 version: 2
 updates:
-# Keep dependencies up to date. Even though we use pnpm, Dependabot
+# Keep dependencies up to date. Even though we use npm, Dependabot
 # uses the npm registry to check for updates.
 - package-ecosystem: npm
   directory: /

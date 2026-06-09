@@ -81,7 +81,7 @@ async function generateStats(): Promise<void> {
 	const distDirectory = path.join(process.cwd(), "dist");
 	await fs.access(distDirectory).catch((cause) => {
 		throw new Error(
-			`dist/ not found at ${distDirectory} — run pnpm build first`,
+			`dist/ not found at ${distDirectory} — run npm run build first`,
 			{
 				cause,
 			},

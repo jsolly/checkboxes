@@ -22,16 +22,16 @@ A collection of checkbox implementations using different frameworks and approach
 ## Development
 
 ```shell
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 ## Generate performance metrics
 
 ```shell
 # Run these commands in sequence:
-pnpm build           # Build the project
-pnpm generate-stats  # Generate performance metrics from dist/
+npm run build           # Build the project
+npm run generate-stats  # Generate performance metrics from dist/
 ```
 
 Bundle sizes and Code Complexity are always measured. Vibe Complexity requires a Gemini API key. Without one, existing Vibe Complexity scores are preserved. To refresh Vibe Complexity, create a `.env` file with your key:
@@ -76,7 +76,7 @@ GEMINI_API_KEY=your_key_here
 4. **Add Framework Integration**
    - Install framework dependencies:
      ```bash
-     pnpm add @astrojs/your-framework your-framework
+     npm install @astrojs/your-framework your-framework
      ```
    - Update `astro.config.mjs` to add the framework integration:
      ```javascript
@@ -119,7 +119,7 @@ GEMINI_API_KEY=your_key_here
      ```
    - Generate framework stats:
      ```shell
-     pnpm generate-stats
+     npm run generate-stats
      ```
 
 At this point, you could open a PR. For full framework integration, see the [Astro Framework Integration Guide](https://docs.astro.build/en/guides/integrations-guide/). This usually involves modifying the `astro.config.mjs` file to add the framework and its configuration.
@@ -130,7 +130,7 @@ If you want to generate performance metrics for your new implementation, see the
 
 - If `generate-stats` fails, ensure:
   - Your GEMINI_API_KEY is valid and properly set in `.env` (only if refreshing Vibe Complexity)
-  - You've run `pnpm build` before running `pnpm generate-stats`
+  - You've run `npm run build` before running `npm run generate-stats`
   - Any external JavaScript runtime host used by the implementation must be explicitly allowlisted
   - You have Node.js 24+ installed
 - For framework integration issues, check:
@@ -172,7 +172,7 @@ Each framework implementation is evaluated on three metrics:
 
 ### Bundle Size
 - Measured in kibibytes (KiB)
-- Calculated from built isolated `/test/{framework}` artifacts after `pnpm build`
+- Calculated from built isolated `/test/{framework}` artifacts after `npm run build`
 - Includes first-party chunks, allowed external runtime scripts, and inline JavaScript
 - Represents normalized gzip-compressed implementation JavaScript above `/test/baseline`
 - Lower scores are better
@@ -206,7 +206,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Prerequisites
 
-- Node.js 20+
-- pnpm
+- Node.js 24+
+- npm
 - A Gemini API key (optional; only needed to refresh Vibe Complexity)
 
