@@ -8,6 +8,7 @@ import type { FrameworkStats, StatsFile } from "../types/stats";
 import {
 	BUNDLE_MEASUREMENT_VERSION,
 	type JsPayloadMeasurement,
+	type JsSourceAudit,
 	buildBundleMeasurementAudit,
 	measureBuiltJsPayload,
 } from "./bundleMeasurement";
@@ -19,6 +20,52 @@ import { readImplementationSources } from "./implementationSources";
 
 dotenv.config({ path: ".env.local" });
 dotenv.config();
+
+const LIBRARY_BUNDLED_INTO_IMPL = new Set<FrameworkId>([
+	"jquery",
+	"alpine",
+	"stimulus",
+]);
+
+const implStem = (file: string) =>
+	(file.split("/").pop() ?? file).split(".")[0].toLowerCase();
+
+function classifyBundleSplit(
+	id: FrameworkId,
+	implementationFile: string,
+	sources: JsSourceAudit[],
+): {
+	bundleRuntimeKiB: number;
+	bundleComponentKiB: number;
+	bundleSplittable: boolean;
+} {
+	const stem = implStem(implementationFile);
+	let runtime = 0;
+	let component = 0;
+	for (const s of sources) {
+		// The component's own JS = its inline island bootstrap + its first-party
+		// compiled chunk (matched by the implementation filename stem). Everything
+		// else — renderer, framework runtime, CDN, Astro glue — is shared runtime.
+		// External sources are always runtime (guards the Datastar CDN URL, which
+		// literally contains "datastar").
+		const isComponent =
+			s.kind === "inline" ||
+			(s.kind === "first-party" && (s.url ?? "").toLowerCase().includes(stem));
+		if (isComponent) component += s.normalizedBytes;
+		else runtime += s.normalizedBytes;
+	}
+	const bundleSplittable = !LIBRARY_BUNDLED_INTO_IMPL.has(id);
+	if (!bundleSplittable) {
+		runtime += component; // library fused with impl → attribute the chunk to runtime
+		component = 0;
+	}
+	const KiB = (b: number) => Number((b / 1024).toFixed(2));
+	return {
+		bundleRuntimeKiB: KiB(runtime),
+		bundleComponentKiB: KiB(component),
+		bundleSplittable,
+	};
+}
 
 function calculateMedian(measurements: number[]): number {
 	const sorted = [...measurements].sort((a, b) => a - b);
@@ -125,10 +172,19 @@ async function generateStats(): Promise<void> {
 			`  Code complexity: ${codeComplexityResult.score}/100 (logic decisions ${codeComplexityResult.raw.logicDecisions})`,
 		);
 
+		const split = classifyBundleSplit(
+			id,
+			FRAMEWORKS[id].implementationFile,
+			bundle.bundleMeasurement.jsSources,
+		);
+
 		const source = implementations[id];
 		stats[id] = {
 			bundleSize: bundle.bundleSize,
 			bundleMeasurement: bundle.bundleMeasurement,
+			bundleRuntimeKiB: split.bundleRuntimeKiB,
+			bundleComponentKiB: split.bundleComponentKiB,
+			bundleSplittable: split.bundleSplittable,
 			sourceLines: source.code.split("\n").length,
 			codeComplexity: codeComplexityResult.score,
 			vibeComplexity: 0,
