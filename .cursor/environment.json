@@ -1,9 +1,9 @@
 {
-  "install": "bash .dotagents/bootstrap.sh && bash scripts/cloud-agent-install.sh",
-  "terminals": [
-    {
-      "name": "dev",
-      "command": "npm run dev"
-    }
-  ]
+	"install": "bash .dotagents/bootstrap.sh && bash scripts/cloud-agent-install.sh",
+	"terminals": [
+		{
+			"name": "dev",
+			"command": "npm run dev"
+		}
+	]
 }

@@ -22,9 +22,7 @@
 	},
 	"lint-staged": {
 		".agents/**": [],
-		"!(.agents)/**/*": [
-			"biome check --no-errors-on-unmatched --write"
-		]
+		"!(.agents)/**/*": ["biome check --no-errors-on-unmatched --write"]
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.4",
