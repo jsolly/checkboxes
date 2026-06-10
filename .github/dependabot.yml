@@ -7,8 +7,3 @@ updates:
   # Check for updates at 2am UTC
   schedule:
     interval: daily
-
-- package-ecosystem: github-actions
-  directory: /.github/workflows
-  schedule:
-    interval: daily
