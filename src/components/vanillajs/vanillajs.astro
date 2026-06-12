@@ -1,27 +1,24 @@
-<fieldset class="checkbox-demo">
-  <legend><label><input type="checkbox"> Parent</label></legend>
+<fieldset class="checkbox-demo" >
+    <legend><label><input id="parent-input" type="checkbox"> Parent</label></legend>
 
-  <div class="checkbox-children">
-    <label><input type="checkbox"> Child 1</label>
-    <label><input type="checkbox"> Child 2</label>
-    <label><input type="checkbox"> Child 3</label>
-  </div>
+    <div id="checkbox-children" class="checkbox-children">
+        <label><input type="checkbox"> Child 1</label>
+        <label><input type="checkbox"> Child 2</label>
+        <label><input type="checkbox"> Child 3</label>
+    </div>
 </fieldset>
-
-<script is:inline>
-  for (const container of document.querySelectorAll('[data-framework="vanillajs"] .checkbox-demo')) {
-    const parent = container.querySelector('legend input');
-    const children = [...container.querySelectorAll('.checkbox-children input')];
+<script>
+    const container = document.getElementById('checkbox-children');
+    const parent = document.getElementById('parent-input');
+    const children = [...container.getElementsByTagName('input')];
 
     parent.addEventListener('change', () => {
-      for (const child of children) child.checked = parent.checked;
+        children.map(x => x.checked = parent.checked);
     });
-
-    for (const child of children) {
-      child.addEventListener('change', () => {
-        parent.checked = children.every(c => c.checked);
-        parent.indeterminate = !parent.checked && children.some(c => c.checked);
-      });
-    }
-  }
+    children.map((x) => {
+        x.addEventListener('change', () => {
+            parent.checked = children.every(c => c.checked);
+            parent.indeterminate = !parent.checked && children.some(c => c.checked);
+        })
+    });
 </script>
