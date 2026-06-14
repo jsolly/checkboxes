@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
-# Pre-push gate for checkboxes.
+# Pre-push gate + deploy for checkboxes.
 #
 # Invoked by .git-hooks/pre-push (core.hooksPath=.git-hooks, wired by `npm run
-# prepare`). Replaces the old .github/workflows/deploy.yml (which only built —
-# the S3 deploy steps were already commented out). The quality gate now runs
-# locally on push to main; deploy is handled by the hosting provider.
+# prepare`). The quality gate runs locally on push to main, then a production
+# deploy goes to Vercel via the pinned CLI. We deploy from the hook because the
+# Vercel↔GitHub git integration is disconnected — the push is now the deploy
+# trigger, so a failed deploy fails the push (tight feedback, nothing half-shipped).
+# Docs-only pushes take a fast path that skips both the gate and the deploy.
 #
 # Only acts on a non-deleting push to main/master; feature-branch pushes stay
 # fast. Escape hatch: FLEET_SKIP_PREPUSH=1 git push (audited).
 set -euo pipefail
 
 if [ "${FLEET_SKIP_PREPUSH:-}" = "1" ]; then
-  echo "⚠ FLEET_SKIP_PREPUSH=1 — skipping pre-push gate" >&2
+  echo "⚠ FLEET_SKIP_PREPUSH=1 — skipping pre-push gate + deploy" >&2
   exit 0
 fi
 
@@ -67,10 +69,37 @@ if prepush_doc_only "$REMOTE_SHA" "$LOCAL_SHA"; then
 fi
 
 echo "▶ pre-push gate (checkboxes) → $push_to_main"
+trap 'echo "✗ pre-push gate failed — nothing deployed; push aborted" >&2' ERR
+
+# The gate + deploy validate the WORKING TREE — refuse if it differs from the
+# pushed commit, or prod would ship code that never lands on main.
+if [ -n "$(git status --porcelain)" ]; then
+  echo "✗ working tree dirty — commit or stash so the gate tests exactly what ships" >&2
+  exit 1
+fi
+if [ "$LOCAL_SHA" != "$(git rev-parse HEAD)" ]; then
+  echo "✗ pushed SHA is not HEAD — push from the checkout being validated" >&2
+  exit 1
+fi
+# Non-fast-forward guard: git rejects the push only AFTER this hook, so a stale
+# clone would deploy prod and then have its push bounced.
+if [ -n "$REMOTE_SHA" ] && [ "$REMOTE_SHA" != "$ZERO" ] && git cat-file -e "$REMOTE_SHA" 2>/dev/null; then
+  if ! git merge-base --is-ancestor "$REMOTE_SHA" "$LOCAL_SHA"; then
+    echo "✗ remote main advanced (non-fast-forward) — pull/rebase before pushing" >&2
+    exit 1
+  fi
+fi
+
+# --- Quality gate ---
 echo "• lint"
 npm run lint
 echo "• astro check"
 npx astro check
 echo "• build"
 npm run build
-echo "✓ pre-push gate complete"
+
+# --- Deploy: production deploy to Vercel (remote build) ---
+echo "• production deploy (Vercel)"
+trap 'echo "✗ Vercel deploy failed — production NOT updated; push aborted. Fix and re-run the push (or: npm run deploy)." >&2' ERR
+"$ROOT/node_modules/.bin/vercel" deploy --prod --yes
+echo "✓ pre-push gate + deploy complete"

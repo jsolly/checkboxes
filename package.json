@@ -9,6 +9,7 @@
 	"scripts": {
 		"dev": "astro dev",
 		"build": "astro build",
+		"deploy": "vercel deploy --prod --yes",
 		"preview": "astro preview",
 		"astro": "astro",
 		"prepare": "if [ -z \"$CI\" ] && [ -d .git ]; then git config core.hooksPath .git-hooks; fi",
