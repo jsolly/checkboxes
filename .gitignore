@@ -24,9 +24,8 @@ npm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# vercel: track the project link (no secrets), ignore everything else local
-.vercel/*
-!.vercel/project.json
+# vercel (local CLI state; the hook passes VERCEL_ORG_ID/VERCEL_PROJECT_ID)
+.vercel
 # editor (local symlinks to ~/.agents rules — machine-specific)
 
 # Superpowers brainstorm scratch (local server state, not project artifacts)
