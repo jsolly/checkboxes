@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Spec:** docs/superpowers/specs/2026-06-03-methodology-exposure-design.md
+**Spec:** docs/specs/2026-06-03-methodology-exposure-design.md
 
 **Goal:** Replace the loud metric pills with a calm "relative bars" card footer using full metric names, and expose the scoring methodology through three layers — glance tooltip, per-metric focus modal, and a dedicated `/methodology` page.
 
