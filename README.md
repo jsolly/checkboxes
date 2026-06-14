@@ -2,7 +2,6 @@
 
 A collection of checkbox implementations using different frameworks and approaches.
 
-
 ## Features
 
 - Multiple implementation examples:
@@ -55,6 +54,7 @@ GEMINI_API_KEY=your_key_here
    - Add your framework's logo as an SVG file to `src/assets/logos/`
    - Name it consistently (e.g., `your-framework.svg`)
    - Example logo import in your container:
+
      ```astro
      ---
      import yourFrameworkLogo from "../../assets/logos/your-framework.svg";
@@ -64,6 +64,7 @@ GEMINI_API_KEY=your_key_here
 
 3. **Update Framework Configuration**
    - Add the framework to `src/config/frameworks.ts`:
+
      ```typescript
      export const FRAMEWORKS = {
        yourFramework: {
@@ -75,10 +76,13 @@ GEMINI_API_KEY=your_key_here
 
 4. **Add Framework Integration**
    - Install framework dependencies:
+
      ```bash
      npm install @astrojs/your-framework your-framework
      ```
+
    - Update `astro.config.mjs` to add the framework integration:
+
      ```javascript
      import yourFramework from '@astrojs/your-framework';
 
@@ -92,6 +96,7 @@ GEMINI_API_KEY=your_key_here
 
 5. **Update Test Page**
    - Modify `src/pages/test/[framework].astro` to include your framework:
+
      ```astro
      ---
      import YourFramework from "../../components/your-framework/your-framework";
@@ -107,6 +112,7 @@ GEMINI_API_KEY=your_key_here
 
 6. **Add Framework Stats**
    - Update `src/config/stats.ts` if your framework needs special handling:
+
      ```typescript
      SUPPORTED_EXTENSIONS: [
        ".tsx", 
@@ -117,7 +123,9 @@ GEMINI_API_KEY=your_key_here
        ".your-extension"  // Add if needed
      ],
      ```
+
    - Generate framework stats:
+
      ```shell
      npm run generate-stats
      ```
@@ -141,7 +149,7 @@ If you want to generate performance metrics for your new implementation, see the
 
 ## Project Structure
 
-```
+```text
 src/
 ├── components/
 │   ├── react/
@@ -171,6 +179,7 @@ src/
 Each framework implementation is evaluated on three metrics:
 
 ### Bundle Size
+
 - Measured in kibibytes (KiB)
 - Calculated from built isolated `/test/{framework}` artifacts after `npm run build`
 - Includes first-party chunks, allowed external runtime scripts, and inline JavaScript
@@ -178,12 +187,14 @@ Each framework implementation is evaluated on three metrics:
 - Lower scores are better
 
 ### Code Complexity
+
 - Deterministic 0-100 composite of size, logic, reactive, nesting, and vocabulary
 - Calculated from the actual implementation source shown on each card
 - The `logic` axis reuses Decision Points (branch/template/selector counts)
 - Higher scores indicate more implementation surface area
 
 ### Vibe Complexity
+
 - AI-judged implementation complexity on a 0-100 scale
 - Uses the same implementation source as Code Complexity
 - Requires a Gemini API key to refresh
@@ -192,6 +203,7 @@ Each framework implementation is evaluated on three metrics:
 See [METHODOLOGY.md](METHODOLOGY.md) for counting rules, normalization, and reproduction steps.
 
 The metrics are normalized using z-scores to provide relative performance indicators, displayed as colored badges:
+
 - 🟢 Excellent (z-score < -1.5)
 - 🟢 Good (z-score < -0.5)
 - 🟡 Average (-0.5 ≤ z-score < 0.5)
@@ -199,9 +211,11 @@ The metrics are normalized using z-scores to provide relative performance indica
 - 🔴 Poor (z-score ≥ 1.5)
 
 ## Demo
+
 Check out the live demo at [checkboxes.xyz](https://checkboxes.xyz)
 
 ## License
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Prerequisites
@@ -209,4 +223,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Node.js 24+
 - npm
 - A Gemini API key (optional; only needed to refresh Vibe Complexity)
-

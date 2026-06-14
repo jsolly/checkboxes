@@ -4,7 +4,7 @@
 
 Add project-specific test rules below.
 
-# Test Suite Architecture
+## Test Suite Architecture
 
 This project treats tests as production documentation for real user flows.
 Each test should answer: **"what happened for a real user or system event?"**
