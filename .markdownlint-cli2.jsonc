@@ -1,4 +1,6 @@
 {
+  // Respect .gitignore so generated/build/local markdown (dist/, .astro/, .vercel/, etc.) is never linted.
+  "gitignore": true,
   "config": {
     // Enable the full default rule set; overrides below opt specific rules out/in.
     "default": true,
