@@ -12,7 +12,7 @@
 		"deploy": "VERCEL_ORG_ID=team_T8yHg0aDz7nCbyBgJh5a2saR VERCEL_PROJECT_ID=prj_Qy2iDBHuQ0n16tuT1vBmeIrgKkxr vercel deploy --prod --yes",
 		"preview": "astro preview",
 		"astro": "astro",
-		"prepare": "if [ -z \"$CI\" ] && [ -d .git ]; then git config core.hooksPath .git-hooks; fi",
+		"prepare": "if [ -z \"$CI\" ] && git rev-parse --git-dir >/dev/null 2>&1; then git config core.hooksPath .git-hooks; fi",
 		"lint": "biome lint .",
 		"lint-fix": "biome lint --write .",
 		"format": "biome format --write .",
