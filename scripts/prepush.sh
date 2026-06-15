@@ -113,6 +113,8 @@ fi
 # --- Quality gate ---
 echo "• lint"
 npm run lint
+echo "• yaml lint"
+npm run check:yaml
 echo "• astro check"
 npx astro check
 echo "• build"
