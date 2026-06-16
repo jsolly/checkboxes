@@ -12,13 +12,13 @@
         data-on:change="$_child.fill($_parent)"
         data-effect="$_parentInput.checked = $_child.every(Boolean);
                      $_parentInput.indeterminate=$_child.some(Boolean) && !$_child.every(Boolean)"
-      /> Parent
+      > Parent
     </label>
   </legend>
 
   <div class="checkbox-children">
-    <label><input type="checkbox" data-bind:_child /> Child 1</label>
-    <label><input type="checkbox" data-bind:_child /> Child 2</label>
-    <label><input type="checkbox" data-bind:_child /> Child 3</label>
+    <label><input type="checkbox" data-bind:_child > Child 1</label>
+    <label><input type="checkbox" data-bind:_child > Child 2</label>
+    <label><input type="checkbox" data-bind:_child > Child 3</label>
   </div>
 </fieldset>
