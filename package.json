@@ -20,6 +20,7 @@
 		"check:md": "bash scripts/lint-md.sh",
 		"check:yaml": "uvx yamllint@1.38.0 .",
 		"generate-stats": "tsx src/utils/generate-stats.ts",
+		"worktree:init": "bash scripts/worktree-init.sh; npm_config_cache=\"${TMPDIR:-/tmp}/checkboxes-npm-cache\" npm ci",
 		"test": "tsx --test \"tests/**/*.test.ts\"",
 		"lint-staged": "lint-staged"
 	},
