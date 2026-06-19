@@ -2,23 +2,23 @@
 
 <fieldset
   class="checkbox-demo"
-  data-signals="{_child: Array(3).fill(false)}">
+  data-signals="{_child: Array($_child.length).fill(false)}">
   <legend>
     <label>
       <input
         type="checkbox"
-        data-ref:parent-input
+        data-ref:_parent-input
         data-bind:_parent
-        data-on:change="$_child=Array(3).fill($_parent)"
-        data-effect="$parentInput.checked = $_child.every(Boolean);
-                     $parentInput.indeterminate=$_child.some(Boolean) && !$_child.every(Boolean)"
-      /> Parent
+        data-on:change="$_child.fill($_parent)"
+        data-effect="$_parentInput.checked = $_child.every(Boolean);
+                     $_parentInput.indeterminate=$_child.some(Boolean) && !$_child.every(Boolean)"
+      > Parent
     </label>
   </legend>
 
   <div class="checkbox-children">
-    <label><input type="checkbox" data-bind:_child /> Child 1</label>
-    <label><input type="checkbox" data-bind:_child /> Child 2</label>
-    <label><input type="checkbox" data-bind:_child /> Child 3</label>
+    <label><input type="checkbox" data-bind:_child > Child 1</label>
+    <label><input type="checkbox" data-bind:_child > Child 2</label>
+    <label><input type="checkbox" data-bind:_child > Child 3</label>
   </div>
 </fieldset>

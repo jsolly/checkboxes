@@ -77,7 +77,7 @@ The count starts at **0**, not 1, because it counts decision constructs rather t
 **Declarative attributes:**
 
 - Alpine-style: `x-if`, `x-show`, `x-for`
-- Datastar-style: `data-if`, `data-show`, `data-for`, `data-bind`, `data-on-*`
+- Datastar-style: `data-signals`, `data-show`, `data-ref`, `data-bind`, `data-on`
 - Hyperscript: conditional and loop tokens inside `_="..."` or `data-script` attribute bodies (`if`, `else`, `unless`, `for`, `repeat`)
 
 **Behavioral CSS selectors** (in implementation stylesheets):
