@@ -22,10 +22,13 @@ source "${DOTAGENTS_GATE_LIB:-$HOME/code/dotagents/gate/gate-lib.sh}" || {
 gate_begin "checkboxes" deploys   # parse push; gitleaks; md-lint; doc-only fast path; banner; ERR trap
 gate_require_clean_tree           # refuse dirty tree / pushed-SHA≠HEAD / non-fast-forward
 
+gate_require_node                 # enforce the pinned Node (.nvmrc), not whatever's on PATH
+
 # --- Quality gate (run_step: silent on green, full output + abort on red) ---
+run_step "dep grounding" gate_check_dep_grounding .git-hooks/pre-push scripts/*.sh
 run_step "lint"        npm run lint
 run_step "yaml lint"   npm run check:yaml
-run_step "astro check" npx astro check
+run_step "astro check" npx --no-install astro check
 run_step "build"       npm run build
 
 # --- Deploy: production deploy to Vercel (remote build; streams) ---
