@@ -31,9 +31,8 @@ npm-debug.log*
 # Superpowers brainstorm scratch (local server state, not project artifacts)
 .superpowers/
 
-# Cursor: track cloud config and rules; ignore other local editor state
+# Cursor: track local-editor rules; ignore other editor state
 .cursor/*
-!.cursor/environment.json
 !.cursor/hooks.json
 !.cursor/rules/
 !.cursor/rules/**
