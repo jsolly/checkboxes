@@ -8,6 +8,9 @@ import type {
 export interface FrameworkStats {
 	bundleSize: number;
 	bundleMeasurement: BundleMeasurementAudit;
+	bundleRuntimeKiB: number;
+	bundleComponentKiB: number;
+	bundleSplittable: boolean;
 	sourceLines: number;
 	codeComplexity: number;
 	vibeComplexity: number;

@@ -1,0 +1,206 @@
+---
+/**
+ * BundleCompositionChart.astro
+ *
+ * Renders the measured runtime-vs-per-component bundle split that
+ * `generate-stats` computes and stores in framework-stats.json
+ * (bundleRuntimeKiB / bundleComponentKiB / bundleSplittable). No classification
+ * happens here — this component just displays the stored numbers, so the values
+ * recompute on every `pnpm generate-stats`.
+ */
+
+import stats from "../../data/framework-stats.json";
+
+const LABELS: Record<string, string> = {
+	react: "React",
+	vue: "Vue",
+	svelte: "Svelte",
+	alpine: "Alpine.js",
+	vanillajs: "Vanilla JS",
+	jquery: "jQuery",
+	stimulus: "Stimulus",
+	datastar: "Datastar",
+	hyperscript: "Hyperscript",
+	cssOnly: "CSS Only",
+};
+
+interface FrameworkStat {
+	bundleRuntimeKiB: number;
+	bundleComponentKiB: number;
+	bundleSplittable: boolean;
+}
+
+const rows = Object.entries(stats.frameworks as Record<string, FrameworkStat>)
+	.map(([id, f]) => ({
+		id,
+		label: LABELS[id] ?? id,
+		runtimeKiB: f.bundleRuntimeKiB ?? 0,
+		componentKiB: f.bundleComponentKiB ?? 0,
+		totalKiB: Number(((f.bundleRuntimeKiB ?? 0) + (f.bundleComponentKiB ?? 0)).toFixed(2)),
+		bundled: f.bundleSplittable === false,
+	}))
+	.sort((a, b) => b.totalKiB - a.totalKiB);
+
+const maxTotal = Math.max(...rows.map((r) => r.totalKiB), 1);
+const pct = (v: number) => `${(v / maxTotal) * 100}%`;
+const hasBundled = rows.some((r) => r.bundled);
+---
+
+<div
+	class="bundle-comp backdrop-blur-sm bg-white/90 rounded-xl shadow-lg border border-slate-200 overflow-hidden"
+>
+	<div class="bg-white/60 px-4 py-3 border-b border-white/20 backdrop-blur-md">
+		<h3 class="font-semibold text-gray-700 select-none">
+			Where the bundle goes: runtime vs. per-component
+		</h3>
+		<p class="text-xs text-slate-500 mt-0.5">
+			Measured JS (KiB, gzip) split into framework runtime paid once and the JS
+			this one component adds. For a widget this small the per-component JS is
+			&le;4 KiB everywhere &mdash; the bundle is almost entirely fixed runtime.
+		</p>
+	</div>
+
+	<div class="bundle-comp-body">
+		<div class="bundle-legend">
+			<span class="bundle-legend-item"
+				><span class="sw sw-runtime"></span>shared runtime (paid once)</span
+			>
+			<span class="bundle-legend-item"
+				><span class="sw sw-component"></span>per-component JS (this widget)</span
+			>
+		</div>
+
+		<div class="bundle-rows">
+			{
+				rows.map((r) => (
+					<div class="bundle-row">
+						<div class="bundle-label">{r.label}</div>
+						<div class="bundle-track">
+							{r.runtimeKiB > 0 && (
+								<div
+									class="seg seg-runtime"
+									style={`width:${pct(r.runtimeKiB)}`}
+									title={`${r.label} runtime: ${r.runtimeKiB} KiB`}
+								/>
+							)}
+							{r.componentKiB > 0 && (
+								<div
+									class="seg seg-component"
+									style={`width:${pct(r.componentKiB)}; min-width:3px`}
+									title={`${r.label} per-component: ${r.componentKiB} KiB`}
+								/>
+							)}
+						</div>
+						<div class="bundle-value">
+							{r.totalKiB} KiB{r.bundled ? <span class="bundle-flag">*</span> : null}
+						</div>
+					</div>
+				))
+			}
+		</div>
+
+		<p class="bundle-footnote">
+			Measures JavaScript only. Datastar, Alpine, and Hyperscript express
+			per-component behavior as HTML attributes, so their per-component cost
+			reads as ~0 here &mdash; it isn't free, it moves into markup this view
+			doesn't count.
+			{
+				hasBundled && (
+					<Fragment>
+						{" "}
+						<span class="bundle-flag">*</span> jQuery, Alpine, and Stimulus bundle
+						their library into one chunk with the implementation, so per-component
+						JS can't be separated from runtime &mdash; shown entirely as runtime.
+					</Fragment>
+				)
+			}
+		</p>
+	</div>
+</div>
+
+<style>
+	.bundle-comp-body {
+		padding: 0.85rem 1rem 1.1rem;
+	}
+
+	.bundle-legend {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 1rem;
+		margin-bottom: 0.9rem;
+		font-size: 0.72rem;
+		color: rgb(71 85 105);
+	}
+
+	.bundle-legend-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.sw {
+		display: inline-block;
+		width: 12px;
+		height: 12px;
+		border-radius: 3px;
+	}
+
+	.sw-runtime {
+		background: #64748b;
+	}
+
+	.sw-component {
+		background: #f59e0b;
+	}
+
+	.bundle-row {
+		display: grid;
+		grid-template-columns: 5.5rem 1fr 5rem;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.22rem 0;
+	}
+
+	.bundle-label {
+		font-size: 0.8rem;
+		color: rgb(55 65 81);
+		text-align: right;
+	}
+
+	.bundle-track {
+		display: flex;
+		height: 14px;
+		background: rgb(241 245 249);
+		border-radius: 4px;
+		overflow: hidden;
+	}
+
+	.seg {
+		height: 100%;
+	}
+
+	.seg-runtime {
+		background: #64748b;
+	}
+
+	.seg-component {
+		background: #f59e0b;
+	}
+
+	.bundle-value {
+		font-size: 0.75rem;
+		color: rgb(71 85 105);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.bundle-flag {
+		color: rgb(148 163 184);
+	}
+
+	.bundle-footnote {
+		margin-top: 0.85rem;
+		font-size: 0.68rem;
+		line-height: 1.4;
+		color: rgb(148 163 184);
+	}
+</style>
