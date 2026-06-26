@@ -34,6 +34,7 @@ npm-debug.log*
 # Cursor: track local-editor rules; ignore other editor state
 .cursor/*
 !.cursor/hooks.json
+!.cursor/worktrees.json
 !.cursor/rules/
 !.cursor/rules/**
 
