@@ -4,11 +4,29 @@
 
 Ship profile: `vercel-static`
 
-Production URL: <https://checkboxes.xyz>
+Production URL: <https://www.checkboxes.xyz>
 
-Vercel Git integration deploys production on push to `main`. After push, verify <https://checkboxes.xyz> returns HTTP 200 — do not run a manual `vercel deploy` unless Git integration is broken.
+Apex `https://checkboxes.xyz` redirects (308) to `https://www.checkboxes.xyz/` — use the www URL for curl/smoke checks and sitemap canonicals.
 
-Local gate before push: `npm run lint && npm run check:yaml && npx astro check && npm run build`.
+**Deploy model:** Vercel Git integration deploys production on push to `main`. No local `npm run deploy`, `vercel deploy --prod`, or CLI deploy step.
+
+**Local gate before push** (also enforced by `.git-hooks/pre-push` on push to `main`):
+
+```shell
+npm ci   # or npm run worktree:init in a worktree
+npm run lint && npm run check:yaml && npx astro check && npm run build
+```
+
+Markdown lint uses `node_modules/.bin/markdownlint-cli2` (pinned in `package-lock.json`). If `node_modules` is missing, the gate fails — no npx fallback.
+
+**Post-push verification (step 12):** After push lands, wait for the Vercel Git deploy to reach READY, then:
+
+```shell
+curl -sf -o /dev/null -w '%{http_code}\n' https://www.checkboxes.xyz
+curl -sf https://www.checkboxes.xyz | grep -q 'checkboxes.xyz'
+```
+
+Record **`deploy: verified at https://www.checkboxes.xyz (Vercel Git)`** when production returns HTTP 200. Do not treat push alone as shipped.
 
 ## Purpose
 
@@ -27,14 +45,6 @@ npm run generate-stats
 ## Project Rules
 
 - Use `--headed --persistent` when launching playwright-cli for interactive browser sessions. Without `--headed`, it defaults to headless.
-
-## Deploy
-
-Production deploy is owned by **Vercel's GitHub integration** — a push to `main` triggers a Vercel build/deploy after the pre-push gate passes. There is no local `npm run deploy` or CLI deploy step; `/ship` records `deploy: none (Vercel Git)`.
-
-## CI (local pre-push gate)
-
-- `.git-hooks/pre-push` (wired via `core.hooksPath=.git-hooks`, fires on push to `main`) runs lint → yaml → astro check → build. It does **not** deploy. After the push lands, babysit the Vercel GitHub deployment in the dashboard.
 
 ## AWS
 
