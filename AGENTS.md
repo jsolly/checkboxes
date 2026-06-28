@@ -1,5 +1,15 @@
 # AGENTS.md
 
+## Ship
+
+Ship profile: `vercel-static`
+
+Production URL: <https://checkboxes.xyz>
+
+Vercel Git integration deploys production on push to `main`. After push, verify <https://checkboxes.xyz> returns HTTP 200 — do not run a manual `vercel deploy` unless Git integration is broken.
+
+Local gate before push: `npm run lint && npm run check:yaml && npx astro check && npm run build`.
+
 ## Purpose
 
 Checkbox implementation gallery — multiple frameworks and approaches with performance metrics. See `README.md`.
