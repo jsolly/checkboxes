@@ -26,7 +26,7 @@ curl -sf -o /dev/null -w '%{http_code}\n' https://www.checkboxes.xyz
 curl -sf https://www.checkboxes.xyz | grep -q 'checkboxes.xyz'
 ```
 
-Record **`deploy: verified at https://www.checkboxes.xyz (Vercel Git)`** when production returns HTTP 200. Do not treat push alone as shipped.
+Record **`deploy: verified at <https://www.checkboxes.xyz> (Vercel Git)`** when production returns HTTP 200. Do not treat push alone as shipped.
 
 ## Purpose
 
