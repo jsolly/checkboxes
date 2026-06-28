@@ -16,7 +16,10 @@ export function extractScriptBlocks(code: string): string[] {
 	}
 
 	for (const match of code.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
-		scripts.push(match[1]);
+		const block = match[1];
+		if (block !== undefined) {
+			scripts.push(block);
+		}
 	}
 
 	return scripts;
@@ -30,9 +33,9 @@ export function removeScriptAndStyleBlocks(code: string): string {
 }
 
 export function extractStyleBlocks(code: string): string[] {
-	return Array.from(code.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)).map(
-		(match) => match[1],
-	);
+	return Array.from(code.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi))
+		.map((match) => match[1])
+		.filter((block): block is string => block !== undefined);
 }
 
 export function countVueTemplateDirectives(code: string): number {
@@ -61,7 +64,10 @@ export function countBehavioralSelectors(code: string): number {
 function countHyperscriptDecisionTokens(code: string): number {
 	let total = 0;
 	for (const match of code.matchAll(hyperscriptAttributePattern)) {
-		total += countMatches(match[2], hyperscriptDecisionTokenPattern);
+		const value = match[2];
+		if (value !== undefined) {
+			total += countMatches(value, hyperscriptDecisionTokenPattern);
+		}
 	}
 	return total;
 }

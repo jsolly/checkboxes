@@ -19,7 +19,7 @@
   window.Stimulus = Application.start()
 
   window.Stimulus.register("checkbox-group", class extends Controller {
-    static targets = [ 'parent', 'child' ]
+    static override targets = [ 'parent', 'child' ]
 
     declare readonly parentTarget: HTMLInputElement
     declare readonly childTargets: HTMLInputElement[]

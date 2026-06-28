@@ -103,17 +103,20 @@ describe("Code Complexity composite analyzer", () => {
 			values.filter((score) => score <= 10).length <= 2,
 			`expected most frameworks above 10, got ${JSON.stringify(scores)}`,
 		);
+		const cssOnly = scores.cssOnly;
+		const reactScore = scores.react;
+		assert.ok(cssOnly !== undefined && reactScore !== undefined);
 		assert.ok(
-			scores.cssOnly >= 80,
-			`cssOnly expected high, got ${scores.cssOnly}`,
+			cssOnly >= 80,
+			`cssOnly expected high, got ${cssOnly}`,
 		);
 		assert.ok(
-			scores.react >= 50,
-			`react expected mid/high, got ${scores.react}`,
+			reactScore >= 50,
+			`react expected mid/high, got ${reactScore}`,
 		);
 		assert.ok(
-			scores.cssOnly > scores.react,
-			`expected cssOnly (${scores.cssOnly}) > react (${scores.react})`,
+			cssOnly > reactScore,
+			`expected cssOnly (${cssOnly}) > react (${reactScore})`,
 		);
 	});
 

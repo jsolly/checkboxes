@@ -1,7 +1,7 @@
 ---
 import type { FrameworkId } from "../../config/frameworks";
 import stats from "../../data/framework-stats.json";
-import type { FrameworkStats, FrameworkStatsRecord } from "../../types/stats";
+import type { FrameworkStatsRecord } from "../../types/stats";
 import { maxBundleSize } from "../../utils/metricDisplay";
 import PerformanceBadge from "../shared/PerformanceBadge.astro";
 
@@ -26,7 +26,10 @@ const contributorHref =
 		: undefined);
 
 const typedStats = stats as unknown as { frameworks: FrameworkStatsRecord };
-const frameworkStats: FrameworkStats = typedStats.frameworks[framework];
+const frameworkStats = typedStats.frameworks[framework];
+if (!frameworkStats) {
+	throw new Error(`Missing stats for framework: ${framework}`);
+}
 const maxBundle = maxBundleSize(typedStats.frameworks);
 ---
 

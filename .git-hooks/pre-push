@@ -24,7 +24,7 @@ gate_require_node                 # enforce the pinned Node (.nvmrc), not whatev
 run_step "dep grounding" gate_check_dep_grounding .git-hooks/pre-push scripts/*.sh
 run_step "lint"        npm run lint
 run_step "yaml lint"   npm run check:yaml
-run_step "astro check" npx --no-install astro check
+run_step "astro check (types)" npm run check:ts
 run_step "build"       npm run build
 
 echo "✓ pre-push gate passed — push will land; Vercel deploys via GitHub integration."

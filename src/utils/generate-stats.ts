@@ -23,9 +23,19 @@ dotenv.config();
 function calculateMedian(measurements: number[]): number {
 	const sorted = [...measurements].sort((a, b) => a - b);
 	const mid = Math.floor(sorted.length / 2);
-	return sorted.length % 2 !== 0
-		? sorted[mid]
-		: (sorted[mid - 1] + sorted[mid]) / 2;
+	if (sorted.length % 2 !== 0) {
+		const value = sorted[mid];
+		if (value === undefined) {
+			throw new Error("calculateMedian invariant failed: missing middle value");
+		}
+		return value;
+	}
+	const lower = sorted[mid - 1];
+	const upper = sorted[mid];
+	if (lower === undefined || upper === undefined) {
+		throw new Error("calculateMedian invariant failed: missing pair values");
+	}
+	return (lower + upper) / 2;
 }
 
 function getExistingVibeComplexity(
@@ -183,7 +193,10 @@ async function generateStats(): Promise<void> {
 				const { scores } = await evaluateVibeComplexity(implementationCode);
 
 				for (const [id, score] of Object.entries(scores)) {
-					vibeMeasurements[id].push(score);
+					const bucket = vibeMeasurements[id as FrameworkId];
+					if (bucket) {
+						bucket.push(score);
+					}
 				}
 			} catch (error) {
 				const message = error instanceof Error ? error.message : String(error);
@@ -199,7 +212,7 @@ async function generateStats(): Promise<void> {
 
 		for (const id of Object.keys(implementationCode) as FrameworkId[]) {
 			const measurements = vibeMeasurements[id];
-			if (measurements.length > 0) {
+			if (measurements && measurements.length > 0) {
 				const median = Math.round(calculateMedian(measurements));
 				stats[id].vibeComplexity = median;
 				console.log(`    ${id} median vibe complexity: ${median}`);

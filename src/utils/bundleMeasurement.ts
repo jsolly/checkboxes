@@ -469,6 +469,9 @@ export async function measureBuiltJsPayload(
 
 	for (let index = 0; index < pendingReferences.length; index++) {
 		const reference = pendingReferences[index];
+		if (!reference) {
+			continue;
+		}
 		const content =
 			reference.kind === "inline"
 				? Buffer.from(reference.content ?? "", "utf8")

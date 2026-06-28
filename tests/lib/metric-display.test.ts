@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type {
-	BundleMeasurementAudit,
 	FrameworkStats,
 	FrameworkStatsRecord,
 } from "../../src/types/stats";
+import type { BundleMeasurementAudit } from "../../src/utils/bundleMeasurement";
 import {
 	METRIC_DISPLAY,
 	barFillPercent,
