@@ -16,11 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Checkout dotagents tsconfig baseline
-        uses: actions/checkout@v4
-        with:
-          repository: jsolly/dotagents
-          path: ../dotagents
-          sparse-checkout: tsconfig
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse \
+            "https://x-access-token:${GH_TOKEN}@github.com/jsolly/dotagents.git" \
+            "${GITHUB_WORKSPACE}/../dotagents"
+          git -C "${GITHUB_WORKSPACE}/../dotagents" sparse-checkout set tsconfig
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
