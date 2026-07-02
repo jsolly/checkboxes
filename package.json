@@ -62,7 +62,7 @@
 		"alpinejs": "^3.14.8",
 		"astro": "^7.0.5",
 		"dotenv": "^16.4.7",
-		"jquery": "^3.7.1",
+		"jquery": "^4.0.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"sharp": "^0.33.5",
@@ -74,7 +74,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"@types/jquery": "^3.5.32",
+		"@types/jquery": "^4.0.1",
 		"@types/node": "^22.15.29",
 		"@types/sortablejs": "^1.15.8",
 		"@typescript-eslint/typescript-estree": "^8.60.1",
