@@ -1,12 +1,12 @@
 ---
 import { Image } from "astro:assets";
 import { Code } from "astro:components";
-import type { BuiltinLanguage } from "shiki";
+import type { BundledLanguage } from "shiki";
 
 interface Props {
 	code: string;
 	displayName: string;
-	lang?: BuiltinLanguage;
+	lang?: BundledLanguage;
 	logo?: ImageMetadata;
 }
 
