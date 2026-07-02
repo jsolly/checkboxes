@@ -4,13 +4,15 @@
 
 Ship profile: `vercel-static`
 
+**Integration: branch → PR → CI-gated auto-merge (canonical).** Open a PR from your branch; `.github/workflows/auto-merge.yml` enables squash auto-merge once **`CI / ci`** is green. Direct push to `main` is break-glass only.
+
 Production URL: <https://www.checkboxes.xyz>
 
 Apex `https://checkboxes.xyz` redirects (308) to `https://www.checkboxes.xyz/` — use the www URL for curl/smoke checks and sitemap canonicals.
 
-**Deploy model:** Vercel Git integration deploys production on push to `main`. No local `npm run deploy`, `vercel deploy --prod`, or CLI deploy step.
+**Deploy model:** Vercel Git integration deploys production on merge to `main`. No local `npm run deploy`, `vercel deploy --prod`, or CLI deploy step.
 
-**Local gate before push** (also enforced by `.git-hooks/pre-push` on push to `main`):
+**Local gate before push** (cheap checks; full gate runs in GitHub CI on the PR):
 
 ```shell
 npm ci   # or npm run worktree:init in a worktree
