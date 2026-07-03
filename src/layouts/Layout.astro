@@ -5,6 +5,8 @@ import "../styles/checkbox-demo.css";
 interface Props {
 	title?: string;
 	description?: string;
+	/** Root-relative path to the social share image. */
+	image?: string;
 	/** When true, the page is excluded from search indexes (used for the /test/* demo pages). */
 	noindex?: boolean;
 }
@@ -12,10 +14,12 @@ interface Props {
 const {
 	title = "checkboxes.xyz",
 	description = "A gallery comparing how JavaScript frameworks and CSS-only approaches implement nested parent-child checkboxes, with bundle-size and performance metrics.",
+	image = "/og-image.jpg",
 	noindex = false,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const imageURL = new URL(image, Astro.site);
 ---
 
 <!DOCTYPE html>
@@ -34,10 +38,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:image" content={imageURL} />
+		<meta property="og:image:width" content="1280" />
+		<meta property="og:image:height" content="720" />
+		<meta property="og:image:alt" content="Nested parent-child checkboxes with checked and indeterminate states" />
 
-		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={imageURL} />
 	</head>
 	<body>
 		<header class="site-header">
