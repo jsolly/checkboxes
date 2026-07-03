@@ -4,9 +4,18 @@ import "../styles/checkbox-demo.css";
 
 interface Props {
 	title?: string;
+	description?: string;
+	/** When true, the page is excluded from search indexes (used for the /test/* demo pages). */
+	noindex?: boolean;
 }
 
-const { title = "checkboxes.xyz" } = Astro.props;
+const {
+	title = "checkboxes.xyz",
+	description = "A gallery comparing how JavaScript frameworks and CSS-only approaches implement nested parent-child checkboxes, with bundle-size and performance metrics.",
+	noindex = false,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!DOCTYPE html>
@@ -15,7 +24,20 @@ const { title = "checkboxes.xyz" } = Astro.props;
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{title}</title>
+		<meta name="description" content={description} />
 		<meta name="theme-color" content="#f8fafc" />
+		<link rel="canonical" href={canonicalURL} />
+		{noindex && <meta name="robots" content="noindex, follow" />}
+
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="checkboxes.xyz" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonicalURL} />
+
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
 	</head>
 	<body>
 		<header class="site-header">
