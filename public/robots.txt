@@ -1,0 +1,7 @@
+# https://www.checkboxes.xyz
+# The /test/* demo pages are intentionally noindex (see Layout.astro); they are left
+# crawlable here so search engines can read the noindex directive and drop them.
+User-agent: *
+Allow: /
+
+Sitemap: https://www.checkboxes.xyz/sitemap-index.xml

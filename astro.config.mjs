@@ -16,7 +16,13 @@ import tailwindcss from "@tailwindcss/vite";
 // https://astro.build/config
 export default defineConfig({
 	site: "https://www.checkboxes.xyz",
-	integrations: [sitemap(), vue(), react(), svelte()],
+	integrations: [
+		// The /test/* routes are noindex demo/measurement pages — keep them out of the sitemap.
+		sitemap({ filter: (page) => !page.includes("/test/") }),
+		vue(),
+		react(),
+		svelte(),
+	],
 	adapter: vercel(),
 	vite: {
 		plugins: [tailwindcss()],
