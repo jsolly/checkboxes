@@ -76,7 +76,7 @@
 		"@biomejs/biome": "1.9.4",
 		"@tailwindcss/vite": "^4.3.2",
 		"@types/jquery": "^4.0.1",
-		"@types/node": "^22.15.29",
+		"@types/node": "^26.1.0",
 		"@types/sortablejs": "^1.15.8",
 		"@typescript-eslint/typescript-estree": "^8.60.1",
 		"lint-staged": "^17.0.8",
