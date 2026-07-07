@@ -83,6 +83,6 @@
 		"markdownlint-cli2": "^0.23.0",
 		"tsx": "^4.23.0",
 		"typescript": "^6.0.3",
-		"vercel": "^54.21.0"
+		"vercel": "^54.21.1"
 	}
 }
