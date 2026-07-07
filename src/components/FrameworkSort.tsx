@@ -24,7 +24,11 @@ export default function FrameworkSort() {
 		return (
 			<div className="max-w-6xl mx-auto mb-4 flex justify-end px-4">
 				<div className="flex items-center gap-2">
-					<span className="text-slate-700 text-sm" aria-label="Loading state">
+					<span
+						role="status"
+						className="text-slate-700 text-sm"
+						aria-label="Loading state"
+					>
 						Loading...
 					</span>
 				</div>

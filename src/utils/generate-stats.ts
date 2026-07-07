@@ -7,8 +7,8 @@ import { STATS_CONFIG } from "../config/stats";
 import type { FrameworkStats, StatsFile } from "../types/stats";
 import {
 	BUNDLE_MEASUREMENT_VERSION,
-	type JsPayloadMeasurement,
 	buildBundleMeasurementAudit,
+	type JsPayloadMeasurement,
 	measureBuiltJsPayload,
 } from "./bundleMeasurement";
 import { calculateStatsZScores } from "./calculateZScores";
