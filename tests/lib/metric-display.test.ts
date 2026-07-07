@@ -6,9 +6,9 @@ import type {
 } from "../../src/types/stats";
 import type { BundleMeasurementAudit } from "../../src/utils/bundleMeasurement";
 import {
-	METRIC_DISPLAY,
 	barFillPercent,
 	formatMetricValue,
+	METRIC_DISPLAY,
 	maxBundleSize,
 	zScoreColorClass,
 } from "../../src/utils/metricDisplay";

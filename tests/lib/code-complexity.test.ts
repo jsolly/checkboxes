@@ -106,14 +106,8 @@ describe("Code Complexity composite analyzer", () => {
 		const cssOnly = scores.cssOnly;
 		const reactScore = scores.react;
 		assert.ok(cssOnly !== undefined && reactScore !== undefined);
-		assert.ok(
-			cssOnly >= 80,
-			`cssOnly expected high, got ${cssOnly}`,
-		);
-		assert.ok(
-			reactScore >= 50,
-			`react expected mid/high, got ${reactScore}`,
-		);
+		assert.ok(cssOnly >= 80, `cssOnly expected high, got ${cssOnly}`);
+		assert.ok(reactScore >= 50, `react expected mid/high, got ${reactScore}`);
 		assert.ok(
 			cssOnly > reactScore,
 			`expected cssOnly (${cssOnly}) > react (${reactScore})`,

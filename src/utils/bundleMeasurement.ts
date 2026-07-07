@@ -115,7 +115,7 @@ export function parseBuiltJsReferences(
 ): BuiltJsReference[] {
 	const references: BuiltJsReference[] = [];
 	const seenUrls = new Set<string>();
-	const openingTagAttributes = String.raw`(?:[^>'"]*|"[^"]*"|'[^']*')*`;
+	const openingTagAttributes = `(?:[^>'"]*|"[^"]*"|'[^']*')*`;
 	const linkPattern = new RegExp(
 		String.raw`<link\b${openingTagAttributes}>`,
 		"gi",
