@@ -60,7 +60,7 @@
 		"@types/react": "^19.0.2",
 		"@types/react-dom": "^19.0.2",
 		"alpinejs": "^3.14.8",
-		"astro": "^7.0.6",
+		"astro": "^7.0.7",
 		"dotenv": "^17.4.2",
 		"jquery": "^4.0.0",
 		"react": "^19.0.0",
