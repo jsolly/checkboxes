@@ -24,4 +24,5 @@ jobs:
       - run: npm run lint
       - run: npm run check:yaml
       - run: npm run check:ts
+      - run: npm test
       - run: npm run build
