@@ -15,10 +15,10 @@
 		"lint": "biome lint .",
 		"lint-fix": "biome lint --write .",
 		"format": "biome format --write .",
-		"check:biome": "biome check --write .",
+		"check:biome": "biome check --write . --error-on-warnings",
 		"check:ts": "astro check --minimumSeverity warning --minimumFailingSeverity warning",
 		"check:md": "bash scripts/lint-md.sh",
-		"check:yaml": "uvx yamllint@1.38.0 .",
+		"check:yaml": "uvx yamllint@1.38.0 -s .",
 		"generate-stats": "tsx src/utils/generate-stats.ts",
 		"worktree:init": "bash scripts/worktree-init.sh; npm ci",
 		"test": "tsx --test --test-reporter=dot \"tests/**/*.test.ts\"",
@@ -28,7 +28,7 @@
 	"lint-staged": {
 		".agents/**": [],
 		"!(.agents)/**/*": [
-			"biome check --no-errors-on-unmatched --write"
+			"biome check --no-errors-on-unmatched --write --error-on-warnings"
 		]
 	},
 	"overrides": {
