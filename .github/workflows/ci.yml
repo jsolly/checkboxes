@@ -22,7 +22,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
       - run: npm ci
       - run: npm run check:actions
-      - run: npm run lint
+      - run: npx --no-install biome ci . --error-on-warnings
       - run: npm run check:yaml
       - run: npm run check:ts
       - run: npm test
