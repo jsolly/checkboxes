@@ -21,6 +21,7 @@ jobs:
           cache: npm
       - uses: astral-sh/setup-uv@v5
       - run: npm ci
+      - run: npm run check:actions
       - run: npm run lint
       - run: npm run check:yaml
       - run: npm run check:ts
