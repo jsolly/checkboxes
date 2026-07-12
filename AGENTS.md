@@ -55,3 +55,10 @@ Set `AWS_PROFILE` locally in your shell or gitignored `.env.local` — never com
 ## Logging & shared-infra
 
 Structured logging and alarm conventions: see `~/code/shared-infra/docs/adding-a-project.md`. Canonical Node logger: `~/code/family-memory/src/shared/logging.ts` (sync via `scripts/sync-shared-logger.sh` where applicable).
+
+## Local UI verification
+
+No auth — public UI only. Follow `rules/frontend-verification.md` (fleet smoke: desktop + mobile screenshots, console clean).
+
+- **Dev server:** `npm run dev` (Astro; use the URL printed on start, typically <http://localhost:4321>)
+- **Auth:** none — public pages only. No `DEFAULT_USER` / `DEFAULT_PASSWORD`.
