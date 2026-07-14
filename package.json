@@ -79,7 +79,7 @@
 		"@types/jquery": "^4.0.1",
 		"@types/node": "^26.1.1",
 		"@types/sortablejs": "^1.15.8",
-		"@typescript-eslint/typescript-estree": "^8.63.0",
+		"@typescript-eslint/typescript-estree": "^8.64.0",
 		"github-actionlint": "^1.7.12",
 		"lint-staged": "^17.0.8",
 		"markdownlint-cli2": "^0.23.0",
