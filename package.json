@@ -86,6 +86,6 @@
 		"shellcheck": "^4.1.0",
 		"tsx": "^4.23.1",
 		"typescript": "^6.0.3",
-		"vercel": "^55.0.0"
+		"vercel": "^56.3.0"
 	}
 }
