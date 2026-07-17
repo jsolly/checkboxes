@@ -71,7 +71,7 @@
 		"sortablejs": "^1.15.6",
 		"svelte": "^5.56.6",
 		"tailwindcss": "^4.3.2",
-		"vue": "^3.5.13"
+		"vue": "^3.5.40"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.3",
