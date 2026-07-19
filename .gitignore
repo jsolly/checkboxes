@@ -37,6 +37,9 @@ npm-debug.log*
 !.cursor/worktrees.json
 !.cursor/rules/
 !.cursor/rules/**
+!.cursor/CLOUD.md
+!.cursor/environment.json
+!.cursor/install-cloud-skills.sh
 
 
 # Materialized agent config (fetched by .dotagents/bootstrap.sh; not committed)
