@@ -12,6 +12,12 @@ Production URL: <https://www.checkboxes.xyz>
 
 Profile delta: `https://checkboxes.xyz` redirects (308) to the canonical `www` URL.
 
+**Prod verify:** `/ship` requires `x-release-id` to match `origin/main` (12-char). HTTP 200 alone is insufficient.
+
+```bash
+curl -sSIL https://www.checkboxes.xyz/ | rg -i '^x-release-id:'
+```
+
 ## Purpose
 
 Checkbox implementation gallery — multiple frameworks and approaches with performance metrics. See `README.md`.

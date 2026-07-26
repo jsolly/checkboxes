@@ -25,6 +25,7 @@ run_step "dep grounding" gate_check_dep_grounding .git-hooks/pre-commit scripts/
 run_step "biome ci"     npx --no-install biome ci . --error-on-warnings
 run_step "yaml lint"   npm run check:yaml
 run_step "actionlint"             npm run check:actions
+run_step "release-id contract" npm run check:release-id
 run_step "astro check (types)" npm run check:ts
 run_step "build"       npm run build
 
