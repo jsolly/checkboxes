@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import "../styles/checkbox-demo.css";
+import { RELEASE_ID } from "../release-id";
 
 interface Props {
 	title?: string;
@@ -30,6 +31,7 @@ const imageURL = new URL(image, Astro.site);
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<meta name="theme-color" content="#f8fafc" />
+		<meta name="release-id" content={RELEASE_ID} />
 		<link rel="canonical" href={canonicalURL} />
 		{noindex && <meta name="robots" content="noindex, follow" />}
 

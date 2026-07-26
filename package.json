@@ -8,7 +8,9 @@
 	},
 	"scripts": {
 		"dev": "astro dev",
+		"prebuild": "node scripts/gen-release-id.mjs",
 		"build": "astro build",
+		"postbuild": "node scripts/restore-release-stub.mjs",
 		"preview": "astro preview",
 		"astro": "astro",
 		"prepare": "if [ -z \"$CI\" ] && git rev-parse --git-dir >/dev/null 2>&1; then git config core.hooksPath .git-hooks; fi",
@@ -19,6 +21,7 @@
 		"check:ts": "astro check --minimumSeverity warning --minimumFailingSeverity warning",
 		"check:md": "bash scripts/lint-md.sh",
 		"check:yaml": "uvx yamllint@1.38.0 -s .",
+		"check:release-id": "node scripts/check-release-id.mjs",
 		"generate-stats": "tsx src/utils/generate-stats.ts",
 		"worktree:init": "bash scripts/worktree-init.sh; npm ci",
 		"test": "tsx --test --test-reporter=dot \"tests/**/*.test.ts\"",
