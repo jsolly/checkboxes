@@ -1,14 +1,3 @@
 {
-	"$schema": "https://openapi.vercel.sh/vercel.json",
-	"headers": [
-		{
-			"source": "/(.*)",
-			"headers": [
-				{
-					"key": "x-release-id",
-					"value": "dev"
-				}
-			]
-		}
-	]
+	"$schema": "https://openapi.vercel.sh/vercel.json"
 }
