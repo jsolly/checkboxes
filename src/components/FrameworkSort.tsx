@@ -24,11 +24,7 @@ export default function FrameworkSort() {
 		return (
 			<div className="max-w-6xl mx-auto mb-4 flex justify-end px-4">
 				<div className="flex items-center gap-2">
-					<span
-						role="status"
-						className="text-slate-700 text-sm"
-						aria-label="Loading state"
-					>
+					<span role="status" className="text-slate-700 text-sm">
 						Loading...
 					</span>
 				</div>
@@ -49,62 +45,36 @@ export default function FrameworkSort() {
 					className="px-3 py-2 border border-slate-200 rounded-lg text-slate-700
             focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
 				>
-					<option value={SortOption.None} aria-label="No sorting, manual order">
-						Manual Order
-					</option>
+					<option value={SortOption.None}>Manual Order</option>
 					<optgroup label="Bundle Size">
-						<option
-							value={SortOption.BundleSizeAsc}
-							aria-label="Sort by bundle size, ascending"
-						>
+						<option value={SortOption.BundleSizeAsc}>
 							Bundle Size (smallest first)
 						</option>
-						<option
-							value={SortOption.BundleSizeDsc}
-							aria-label="Sort by bundle size, descending"
-						>
+						<option value={SortOption.BundleSizeDsc}>
 							Bundle Size (largest first)
 						</option>
 					</optgroup>
 					<optgroup label="Source Lines">
-						<option
-							value={SortOption.SourceLinesAsc}
-							aria-label="Sort by source lines, ascending"
-						>
+						<option value={SortOption.SourceLinesAsc}>
 							Lines (shortest first)
 						</option>
-						<option
-							value={SortOption.SourceLinesDsc}
-							aria-label="Sort by source lines, descending"
-						>
+						<option value={SortOption.SourceLinesDsc}>
 							Lines (longest first)
 						</option>
 					</optgroup>
 					<optgroup label="Code Complexity">
-						<option
-							value={SortOption.CodeComplexityAsc}
-							aria-label="Sort by Code Complexity, ascending"
-						>
+						<option value={SortOption.CodeComplexityAsc}>
 							Code Complexity (simplest first)
 						</option>
-						<option
-							value={SortOption.CodeComplexityDsc}
-							aria-label="Sort by Code Complexity, descending"
-						>
+						<option value={SortOption.CodeComplexityDsc}>
 							Code Complexity (most complex first)
 						</option>
 					</optgroup>
 					<optgroup label="Vibe Complexity">
-						<option
-							value={SortOption.VibeComplexityAsc}
-							aria-label="Sort by Vibe Complexity, ascending"
-						>
+						<option value={SortOption.VibeComplexityAsc}>
 							Vibe Complexity (simplest first)
 						</option>
-						<option
-							value={SortOption.VibeComplexityDsc}
-							aria-label="Sort by Vibe Complexity, descending"
-						>
+						<option value={SortOption.VibeComplexityDsc}>
 							Vibe Complexity (most complex first)
 						</option>
 					</optgroup>

@@ -21,10 +21,10 @@ const contentJson = JSON.stringify(
 <dialog id="metric-modal" class="metric-modal" aria-labelledby="metric-modal-title">
 	<div class="metric-modal__content">
 		<span id="metric-modal-tag" class="metric-modal-tag"></span>
-		<h2 id="metric-modal-title" class="metric-modal-title"></h2>
+		<h2 id="metric-modal-title" class="metric-modal-title">Metric details</h2>
 		<p id="metric-modal-blurb" class="metric-modal-blurb"></p>
 		<div class="metric-modal-foot">
-			<a id="metric-modal-link" href="/methodology" class="metric-modal-link">
+			<a id="metric-modal-link" href="/methodology/" class="metric-modal-link">
 				Read the full methodology →
 			</a>
 			<button type="button" id="metric-modal-close" class="metric-modal-close">
@@ -50,7 +50,7 @@ const contentJson = JSON.stringify(
 		tagEl.className = `metric-modal-tag ${meta.kind === "ai" ? "is-ai" : "is-det"}`;
 		titleEl.textContent = meta.name;
 		blurbEl.textContent = meta.blurb;
-		linkEl.setAttribute("href", `/methodology#${meta.anchor}`);
+		linkEl.setAttribute("href", `/methodology/#${meta.anchor}`);
 		dialog.showModal();
 	}
 

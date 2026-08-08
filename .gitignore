@@ -43,3 +43,4 @@ npm-debug.log*
 
 
 # Materialized agent config (fetched by .dotagents/bootstrap.sh; not committed)
+.seo-audit/
