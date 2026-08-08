@@ -38,25 +38,26 @@ const rows = METRIC_ORDER.map((key) => {
 <div class="metric-footer">
 	{
 		rows.map((row) => (
-			<button
-				type="button"
-				class="metric-row"
-				data-metric={row.key}
-				aria-label={`${row.name}: ${row.value}. Open details.`}
-				aria-describedby={row.id}
-			>
-				<span class="metric-name">{row.name}</span>
-				<span class="metric-track">
-					<span
-						class={`metric-fill ${row.colorClass}`}
-						style={`width: ${row.fill}%`}
-					/>
-				</span>
-				<span class="metric-value">{row.value}</span>
+			<div class="metric-item">
+				<button
+					type="button"
+					class="metric-row"
+					data-metric={row.key}
+					aria-describedby={row.id}
+				>
+					<span class="metric-name">{row.name}</span>
+					<span class="metric-track">
+						<span
+							class={`metric-fill ${row.colorClass}`}
+							style={`width: ${row.fill}%`}
+						/>
+					</span>
+					<span class="metric-value">{row.value}</span>
+				</button>
 				<span class="metric-tooltip" role="tooltip" id={row.id}>
 					{row.tooltip}
 				</span>
-			</button>
+			</div>
 		))
 	}
 </div>
@@ -69,8 +70,11 @@ const rows = METRIC_ORDER.map((key) => {
 		border-top: 1px solid rgb(241 245 249);
 	}
 
-	.metric-row {
+	.metric-item {
 		position: relative;
+	}
+
+	.metric-row {
 		display: grid;
 		grid-template-columns: 128px 1fr 64px;
 		align-items: center;
@@ -138,8 +142,8 @@ const rows = METRIC_ORDER.map((key) => {
 		pointer-events: none;
 	}
 
-	.metric-row:hover .metric-tooltip,
-	.metric-row:focus-visible .metric-tooltip {
+	.metric-item:hover .metric-tooltip,
+	.metric-item:focus-within .metric-tooltip {
 		visibility: visible;
 		opacity: 1;
 	}

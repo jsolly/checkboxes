@@ -43,9 +43,9 @@ const maxBundle = maxBundleSize(typedStats.frameworks);
 			<div 
 				class="bg-white/60 px-4 py-3 flex border-b border-white/20 items-center justify-between gap-3 backdrop-blur-md"
 			>
-				<h3 class="font-semibold text-gray-700 select-none">
+				<h2 class="font-semibold text-gray-700 select-none">
 					{title}
-				</h3>
+				</h2>
 				<div class="flex items-center gap-3 shrink-0">
 					{contributor && contributorHref && (
 						<p class="text-xs text-slate-500">
@@ -66,7 +66,7 @@ const maxBundle = maxBundleSize(typedStats.frameworks);
 						aria-pressed="false"
 						aria-label="Expand to full screen"
 						title="Full screen"
-						class="text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-md p-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+						class="text-slate-600 hover:text-slate-800 hover:bg-slate-200/60 rounded-md p-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
 					>
 						<svg
 							data-icon-expand
@@ -144,6 +144,33 @@ const maxBundle = maxBundleSize(typedStats.frameworks);
 		// screen restores the user's prior state instead of forcing it shut.
 		let codeWasOpen = false;
 
+		function setBackgroundInert(on) {
+			const header = document.querySelector('.site-header');
+			const footer = document.querySelector('body > footer');
+			const skip = document.querySelector('.skip-link');
+			const grid = document.getElementById('framework-grid');
+			const pageChrome = [
+				header,
+				footer,
+				skip,
+				grid?.previousElementSibling,
+				grid?.previousElementSibling?.previousElementSibling,
+			];
+			for (const el of pageChrome) {
+				if (!el) continue;
+				if (on) el.setAttribute('inert', '');
+				else el.removeAttribute('inert');
+			}
+			document.querySelectorAll('.framework-container').forEach((el) => {
+				if (el === container) {
+					el.removeAttribute('inert');
+					return;
+				}
+				if (on) el.setAttribute('inert', '');
+				else el.removeAttribute('inert');
+			});
+		}
+
 		function setFullscreen(on) {
 			if (!container) return;
 
@@ -154,6 +181,7 @@ const maxBundle = maxBundleSize(typedStats.frameworks);
 				});
 				container.classList.add('is-fullscreen');
 				document.body.style.overflow = 'hidden';
+				setBackgroundInert(true);
 				container.scrollTop = 0;
 				// The wrapper may still be hidden if it never scrolled into view
 				const wrapper = container.querySelector('[data-framework-wrapper]');
@@ -162,12 +190,14 @@ const maxBundle = maxBundleSize(typedStats.frameworks);
 				// Auto-expand the code block when going full screen
 				codeWasOpen = codeToggle?.getAttribute('aria-expanded') === 'true';
 				if (codeToggle && !codeWasOpen) codeToggle.click();
+				toggleBtn?.focus();
 			} else {
 				// Collapse the code block again unless it was already open
 				if (codeToggle && !codeWasOpen && codeToggle.getAttribute('aria-expanded') === 'true') {
 					codeToggle.click();
 				}
 				container.classList.remove('is-fullscreen');
+				setBackgroundInert(false);
 				if (!document.querySelector('.framework-container.is-fullscreen')) {
 					document.body.style.overflow = '';
 				}
@@ -196,7 +226,7 @@ const maxBundle = maxBundleSize(typedStats.frameworks);
 	.framework-container.is-fullscreen {
 		position: fixed;
 		inset: 0;
-		z-index: 50;
+		z-index: 60;
 		margin: 0;
 		border: none;
 		border-radius: 0;

@@ -35,13 +35,13 @@ const codeBlockId = `code-block-${crypto.randomUUID()}`;
 				width={20}
 				height={20}
 			/>}
-			<div class="text-sm text-slate-500">
+			<div class="text-sm text-slate-600">
 				<span data-code-toggle-label>View</span>
 				<span> {displayName} code</span>
-				<span class="text-xs text-slate-400 ml-2">({lineCount} lines)</span>
+				<span class="text-xs text-slate-600 ml-2">({lineCount} lines)</span>
 			</div>
 		</div>
-		<div class="text-slate-400">
+		<div class="text-slate-600">
 			<svg 
 				xmlns="http://www.w3.org/2000/svg" 
 				class="h-5 w-5 transition-transform"
@@ -63,6 +63,7 @@ const codeBlockId = `code-block-${crypto.randomUUID()}`;
 		role="region"
 		aria-label={`${displayName} code example`}
 		aria-hidden="true"
+		inert
 	>
 		<div class="p-4 overflow-x-auto bg-white">
 			<div class="code-wrapper relative">
@@ -128,6 +129,11 @@ const codeBlockId = `code-block-${crypto.randomUUID()}`;
 			requiredToggleLabel.textContent = expanded ? "Hide" : "View";
 			chevron?.classList.toggle("rotate-180", expanded);
 			requiredRegion.setAttribute("aria-hidden", String(!expanded));
+			if (expanded) {
+				requiredRegion.removeAttribute("inert");
+			} else {
+				requiredRegion.setAttribute("inert", "");
+			}
 			requiredRegion.style.maxHeight = expanded
 				? `${requiredRegion.scrollHeight}px`
 				: "0px";
