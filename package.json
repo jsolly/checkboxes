@@ -71,7 +71,7 @@
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",
 		"sharp": "^0.35.3",
-		"shiki": "^4.4.1",
+		"shiki": "^4.4.2",
 		"sortablejs": "^1.15.6",
 		"svelte": "^5.56.8",
 		"tailwindcss": "^4.3.2",
