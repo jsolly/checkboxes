@@ -88,7 +88,7 @@
 		"lint-staged": "^17.3.0",
 		"markdownlint-cli2": "^0.23.1",
 		"shellcheck": "^4.1.0",
-		"tsx": "^4.23.5",
+		"tsx": "^4.23.11",
 		"typescript": "^6.0.3",
 		"vercel": "^56.4.0"
 	}
