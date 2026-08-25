@@ -9,8 +9,8 @@ name: Auto Merge
 # https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
 # When APP_PRIVATE_KEY + APP_CLIENT_ID (or APP_ID) are set, mint an App
 # installation token (~1h, own identity) so the land is a real push. If unset,
-# keep GITHUB_TOKEN --auto (do not fail). REPO_AUTOMATION_TOKEN is a last-resort
-# PAT, not required. Do not invent App credentials or a PAT.
+# keep GITHUB_TOKEN --auto (do not fail). No classic PAT required. Do not invent
+# App credentials or a PAT.
 #
 # Mint `if` uses job env (not step if): the secrets context is not available in
 # steps.if (GitHub context availability + actionlint).
@@ -56,17 +56,14 @@ jobs:
 
       - name: Enable auto-merge for owner/member PRs
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.REPO_AUTOMATION_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
           HAS_APP_TOKEN: ${{ steps.app-token.outputs.token != '' }}
-          HAS_AUTOMATION_TOKEN: ${{ secrets.REPO_AUTOMATION_TOKEN != '' }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
           if [ "$HAS_APP_TOKEN" = "true" ]; then
             echo "Arming auto-merge with GitHub App installation token (not GITHUB_TOKEN → push fires)."
-          elif [ "$HAS_AUTOMATION_TOKEN" = "true" ]; then
-            echo "Arming auto-merge with REPO_AUTOMATION_TOKEN (last-resort PAT)."
           else
-            echo "No App/PAT — arming GITHUB_TOKEN --auto."
+            echo "No App credentials — arming GITHUB_TOKEN --auto."
           fi
           gh pr merge --auto --squash --delete-branch --repo "$GITHUB_REPOSITORY" "$PR_NUMBER"
