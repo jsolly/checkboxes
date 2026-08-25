@@ -1,0 +1,10 @@
+# github-actionlint 1.7.12 (rhysd/actionlint) ships stale
+# actions/create-github-app-token@v3 metadata: it still requires deprecated
+# app-id and does not know canonical client-id.
+# https://github.com/rhysd/actionlint/issues/669
+# Remove when actionlint's popular_actions.go matches upstream action.yml.
+paths:
+  .github/workflows/**/*.{yml,yaml}:
+    ignore:
+      - 'missing input "app-id" which is required by action "actions/create-github-app-token@'
+      - 'input "client-id" is not defined in action "actions/create-github-app-token@'

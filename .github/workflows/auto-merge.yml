@@ -11,6 +11,9 @@ name: Auto Merge
 # installation token (~1h, own identity) so the land is a real push. If unset,
 # keep GITHUB_TOKEN --auto (do not fail). REPO_AUTOMATION_TOKEN is a last-resort
 # PAT, not required. Do not invent App credentials or a PAT.
+#
+# Mint `if` uses job env (not step if): the secrets context is not available in
+# steps.if (GitHub context availability + actionlint).
 
 on:
   pull_request:
@@ -37,10 +40,12 @@ jobs:
         github.event.pull_request.author_association == 'OWNER' ||
         github.event.pull_request.author_association == 'MEMBER'
       )
+    env:
+      HAS_APP_CREDS: ${{ secrets.APP_PRIVATE_KEY != '' && (vars.APP_CLIENT_ID != '' || secrets.APP_CLIENT_ID != '' || vars.APP_ID != '' || secrets.APP_ID != '') }}
     steps:
       - name: Mint GitHub App token
         id: app-token
-        if: ${{ secrets.APP_PRIVATE_KEY != '' && (vars.APP_CLIENT_ID != '' || secrets.APP_CLIENT_ID != '' || vars.APP_ID != '' || secrets.APP_ID != '') }}
+        if: ${{ env.HAS_APP_CREDS == 'true' }}
         uses: actions/create-github-app-token@v3
         with:
           client-id: ${{ vars.APP_CLIENT_ID || secrets.APP_CLIENT_ID }}
