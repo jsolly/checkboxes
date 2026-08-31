@@ -6,6 +6,8 @@ Ship profile: `vercel-static`
 
 Integration: `pr-auto-merge`
 
+The auto-merge bot waits for this repo's `ci` check because Free private repos cannot set required checks.
+
 CI owner: `local`
 
 Production URL: <https://www.checkboxes.xyz>
