@@ -56,7 +56,7 @@
 		"@astrojs/react": "^6.0.4",
 		"@astrojs/sitemap": "^3.7.3",
 		"@astrojs/svelte": "^9.0.1",
-		"@astrojs/vercel": "^11.0.8",
+		"@astrojs/vercel": "^11.0.9",
 		"@astrojs/vue": "^7.0.2",
 		"@google/genai": "^2.18.0",
 		"@hotwired/stimulus": "^3.2.2",
