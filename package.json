@@ -81,7 +81,7 @@
 		"@biomejs/biome": "2.5.10",
 		"@tailwindcss/vite": "^4.3.3",
 		"@types/jquery": "^4.0.1",
-		"@types/node": "^26.4.0",
+		"@types/node": "^26.4.1",
 		"@types/sortablejs": "^1.15.8",
 		"@typescript-eslint/typescript-estree": "^8.69.0",
 		"github-actionlint": "^1.7.12",
