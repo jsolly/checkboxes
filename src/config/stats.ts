@@ -1,4 +1,9 @@
-export const STATS_CONFIG = {
+export const STATS_CONFIG: {
+	VIBE_COMPLEXITY_ITERATIONS: number;
+	STATS_FILE_PATH: string;
+	BUNDLE_SIZE_PRECISION: number;
+	UPDATE_VIBE_COMPLEXITY: boolean;
+} = {
 	// Number of iterations for AI-judged measurements
 	VIBE_COMPLEXITY_ITERATIONS: 5,
 
@@ -10,4 +15,4 @@ export const STATS_CONFIG = {
 
 	// Feature flags
 	UPDATE_VIBE_COMPLEXITY: true,
-} as const;
+};

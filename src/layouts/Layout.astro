@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import "../styles/checkbox-demo.css";
+import "../styles/checkbox-demo-classes.jsx";
 import { RELEASE_ID } from "../release-id";
 
 interface Props {
@@ -26,6 +27,9 @@ const imageURL = new URL(image, Astro.site);
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<style is:inline>
+			@layer theme, base, components, utilities, layout, pages, demo;
+		</style>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{title}</title>
@@ -87,6 +91,7 @@ const imageURL = new URL(image, Astro.site);
 </html>
 
 <style>
+	@layer layout {
 	.skip-link {
 		position: absolute;
 		left: 0.75rem;
@@ -127,4 +132,5 @@ const imageURL = new URL(image, Astro.site);
 		margin-left: 1.1rem;
 	}
 	.site-header__nav a:hover { text-decoration: underline; }
+	}
 </style>

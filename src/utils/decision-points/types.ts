@@ -1,5 +1,4 @@
 import type { FrameworkId } from "../../config/frameworks";
-import type { ImplementationSource } from "../implementationSources";
 
 export const DECISION_POINT_SCORE_CAP = 30;
 
@@ -15,8 +14,6 @@ export interface DecisionPointResult {
 	normalizedScore: number;
 	breakdown: DecisionPointBreakdown;
 }
-
-export type DecisionPointSource = ImplementationSource;
 
 export interface InlineDecisionPointSource {
 	framework: FrameworkId;

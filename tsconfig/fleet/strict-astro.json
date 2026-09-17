@@ -3,10 +3,14 @@
 	"compilerOptions": {
 		"noUncheckedIndexedAccess": true,
 		"noUnusedParameters": true,
+		"noUnusedLocals": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitOverride": true,
 		"allowUnreachableCode": false,
-		"allowUnusedLabels": false
+		"allowUnusedLabels": false,
+		"exactOptionalPropertyTypes": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"verbatimModuleSyntax": true
 	}
 }

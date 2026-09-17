@@ -243,6 +243,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 </script>
 
 <style is:global>
+	@layer pages {
 	/* Only show grab cursor on desktop devices */
 	@media (min-width: 1024px) {
 		[data-framework] {
@@ -261,6 +262,7 @@ const frameworks = Object.entries(FRAMEWORKS).map(([id]) => ({
 		.framework-container:hover {
 			border-color: rgb(203 213 225); /* slate-300 */
 		}
+	}
 	}
 </style>
 

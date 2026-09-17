@@ -13,8 +13,8 @@ import { FRAMEWORKS, isValidFramework } from "../../config/frameworks";
 import Layout from "../../layouts/Layout.astro";
 
 export function getStaticPaths() {
-	return Object.keys(FRAMEWORKS).map((framework) => ({
-		params: { framework },
+	return Object.keys(FRAMEWORKS).map((id) => ({
+		params: { framework: id },
 	}));
 }
 

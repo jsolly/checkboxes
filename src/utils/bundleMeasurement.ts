@@ -6,7 +6,7 @@ import { STATS_CONFIG } from "../config/stats";
 export const BUNDLE_MEASUREMENT_VERSION = "bm-2.0.0";
 
 /** Cross-origin hosts that carry implementation runtime JS (jquery → jsdelivr, hyperscript/datastar → unpkg/jsdelivr). */
-export const ALLOWED_CDN_HOSTS = new Set(["unpkg.com", "cdn.jsdelivr.net"]);
+const ALLOWED_CDN_HOSTS = new Set(["unpkg.com", "cdn.jsdelivr.net"]);
 
 export interface BuiltJsReference {
 	kind: "first-party" | "external" | "inline";
@@ -14,7 +14,7 @@ export interface BuiltJsReference {
 	content?: string;
 }
 
-export interface JsSourceAudit {
+interface JsSourceAudit {
 	kind: BuiltJsReference["kind"];
 	url?: string;
 	rawBytes: number;
@@ -61,15 +61,35 @@ export function bytesToKiB(
 	return Number((bytes / 1024).toFixed(precision));
 }
 
-function parseAttributes(tag: string): Record<string, string> {
-	const attributes: Record<string, string> = {};
+type ParsedTagAttributes = {
+	rel?: string;
+	href?: string;
+	src?: string;
+	type?: string;
+	"component-url"?: string;
+	"renderer-url"?: string;
+};
+
+function parseAttributes(tag: string): ParsedTagAttributes {
+	const attributes: ParsedTagAttributes = {};
 	const attributePattern =
 		/([\w:-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
 
 	for (const match of tag.matchAll(attributePattern)) {
 		const [, name, doubleQuoted, singleQuoted, bare] = match;
 		if (!name || name === "script" || name === "link") continue;
-		attributes[name.toLowerCase()] = doubleQuoted ?? singleQuoted ?? bare ?? "";
+		const key = name.toLowerCase();
+		const value = doubleQuoted ?? singleQuoted ?? bare ?? "";
+		if (
+			key === "rel" ||
+			key === "href" ||
+			key === "src" ||
+			key === "type" ||
+			key === "component-url" ||
+			key === "renderer-url"
+		) {
+			attributes[key] = value;
+		}
 	}
 
 	return attributes;
@@ -404,9 +424,11 @@ async function readFirstPartySource(
 	) {
 		throw new Error(`First-party chunk path escapes dist/: ${url}`);
 	}
-	return fs.readFile(resolvedPath).catch((cause) => {
+	try {
+		return await fs.readFile(resolvedPath);
+	} catch (cause) {
 		throw new Error(`Missing first-party JavaScript chunk ${url}`, { cause });
-	});
+	}
 }
 
 async function readExternalSource(url: string): Promise<Buffer> {
@@ -488,7 +510,7 @@ export async function measureBuiltJsPayload(
 		const rawBytes = content.byteLength;
 		jsSources.push({
 			kind: reference.kind,
-			url: reference.url,
+			...(reference.url === undefined ? {} : { url: reference.url }),
 			rawBytes,
 			normalizedBytes: normalizeJsBytes(content),
 		});

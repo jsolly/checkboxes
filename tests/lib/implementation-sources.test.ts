@@ -8,7 +8,11 @@ describe("A stats generation run reads the same source files shown on cards", ()
 		const sources = await readImplementationSources();
 		const frameworkIds = Object.keys(FRAMEWORKS) as FrameworkId[];
 
-		assert.deepEqual(Object.keys(sources).sort(), frameworkIds.sort());
+		const byId = (a: string, b: string) => a.localeCompare(b);
+		assert.deepEqual(
+			Object.keys(sources).sort(byId),
+			[...frameworkIds].sort(byId),
+		);
 
 		for (const id of frameworkIds) {
 			const source = sources[id];

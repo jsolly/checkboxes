@@ -1,10 +1,24 @@
-import { useEffect, useState } from "react";
+import {
+	type ChangeEvent,
+	useCallback,
+	useEffect,
+	useId,
+	useState,
+} from "react";
 import { useFrameworkSort } from "../contexts/frameworkSort";
 import { SortOption } from "../types/sort";
 
 export default function FrameworkSort() {
+	const sortSelectId = useId();
 	const [mounted, setMounted] = useState(false);
 	const { sortBy, setSortBy } = useFrameworkSort();
+
+	const handleSortChange = useCallback(
+		(event: ChangeEvent<HTMLSelectElement>) => {
+			setSortBy(event.target.value as SortOption);
+		},
+		[setSortBy],
+	);
 
 	useEffect(() => {
 		setMounted(true);
@@ -35,13 +49,13 @@ export default function FrameworkSort() {
 	return (
 		<div className="max-w-6xl mx-auto mb-4 flex justify-end px-4">
 			<div className="flex items-center gap-2">
-				<label htmlFor="framework-sort" className="text-slate-700 text-sm">
+				<label htmlFor={sortSelectId} className="text-slate-700 text-sm">
 					Sort
 				</label>
 				<select
-					id="framework-sort"
+					id={sortSelectId}
 					value={sortBy}
-					onChange={(e) => setSortBy(e.target.value as SortOption)}
+					onChange={handleSortChange}
 					className="px-3 py-2 border border-slate-200 rounded-lg text-slate-700
             focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
 				>
