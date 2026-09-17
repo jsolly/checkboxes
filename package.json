@@ -70,6 +70,7 @@
 		"alpinejs": "^3.17.2",
 		"astro": "^7.3.2",
 		"dotenv": "^17.4.2",
+		"hyperscript.org": "0.9.13",
 		"jquery": "^4.0.0",
 		"react": "^19.2.8",
 		"react-dom": "^19.3.0",

@@ -3,13 +3,10 @@ import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { STATS_CONFIG } from "../config/stats";
 
-export const BUNDLE_MEASUREMENT_VERSION = "bm-2.0.0";
-
-/** Cross-origin hosts that carry implementation runtime JS (jquery → jsdelivr, hyperscript/datastar → unpkg/jsdelivr). */
-const ALLOWED_CDN_HOSTS = new Set(["unpkg.com", "cdn.jsdelivr.net"]);
+export const BUNDLE_MEASUREMENT_VERSION = "bm-3.0.0";
 
 export interface BuiltJsReference {
-	kind: "first-party" | "external" | "inline";
+	kind: "first-party" | "inline";
 	url?: string;
 	content?: string;
 }
@@ -105,28 +102,20 @@ function isJavaScriptScriptType(type: string | undefined): boolean {
 	);
 }
 
-function classifyExternalUrl(
+function classifyJsUrl(
 	url: string,
 	previewOrigin: string,
-): BuiltJsReference["kind"] | null {
+): "first-party" | null {
 	const parsed = new URL(url, previewOrigin);
 	const origin = new URL(previewOrigin).origin;
 
-	if (parsed.origin === origin && parsed.pathname.startsWith("/_astro/")) {
-		return parsed.pathname.endsWith(".js") ? "first-party" : null;
-	}
-
 	if (parsed.origin !== origin) {
-		if (
-			parsed.protocol === "https:" &&
-			ALLOWED_CDN_HOSTS.has(parsed.hostname)
-		) {
-			return "external";
-		}
-		throw new Error(`Uncounted external JavaScript host: ${parsed.hostname}`);
+		throw new Error(
+			`Remote JavaScript host is not allowed: ${parsed.hostname}`,
+		);
 	}
 
-	return null;
+	return parsed.pathname.endsWith(".js") ? "first-party" : null;
 }
 
 export function parseBuiltJsReferences(
@@ -146,7 +135,7 @@ export function parseBuiltJsReferences(
 	);
 
 	function addUrlReference(url: string): void {
-		const kind = classifyExternalUrl(url, previewOrigin);
+		const kind = classifyJsUrl(url, previewOrigin);
 		if (!kind) return;
 		if (seenUrls.has(url)) return;
 		seenUrls.add(url);
@@ -431,24 +420,6 @@ async function readFirstPartySource(
 	}
 }
 
-async function readExternalSource(url: string): Promise<Buffer> {
-	const response = await fetch(url, {
-		signal: AbortSignal.timeout(30_000),
-	});
-	const finalUrl = new URL(response.url);
-	if (!ALLOWED_CDN_HOSTS.has(finalUrl.hostname)) {
-		throw new Error(
-			`External JavaScript redirected to uncounted host: ${finalUrl.hostname}`,
-		);
-	}
-	if (!response.ok) {
-		throw new Error(
-			`Could not fetch external JavaScript ${url}: ${response.status}`,
-		);
-	}
-	return Buffer.from(await response.arrayBuffer());
-}
-
 function resolveModuleSpecifier(
 	specifier: string,
 	importerUrl: string,
@@ -459,13 +430,13 @@ function resolveModuleSpecifier(
 		specifier.startsWith("https://") ||
 		specifier.startsWith("/")
 	) {
-		const kind = classifyExternalUrl(specifier, previewOrigin);
+		const kind = classifyJsUrl(specifier, previewOrigin);
 		return kind ? { kind, url: specifier } : null;
 	}
 
 	if (specifier.startsWith(".")) {
 		const resolved = new URL(specifier, new URL(importerUrl, previewOrigin));
-		const kind = classifyExternalUrl(resolved.href, previewOrigin);
+		const kind = classifyJsUrl(resolved.href, previewOrigin);
 		return kind ? { kind, url: resolved.pathname } : null;
 	}
 
@@ -494,18 +465,26 @@ export async function measureBuiltJsPayload(
 		if (!reference) {
 			continue;
 		}
-		const content =
-			reference.kind === "inline"
-				? Buffer.from(reference.content ?? "", "utf8")
-				: reference.kind === "first-party" && reference.url
-					? await readFirstPartySource(
-							distDirectory,
-							reference.url,
-							previewOrigin,
-						)
-					: reference.url
-						? await readExternalSource(reference.url)
-						: Buffer.alloc(0);
+		let content: Buffer;
+		switch (reference.kind) {
+			case "inline":
+				content = Buffer.from(reference.content ?? "", "utf8");
+				break;
+			case "first-party":
+				if (!reference.url) {
+					throw new Error("First-party JavaScript reference is missing a url");
+				}
+				content = await readFirstPartySource(
+					distDirectory,
+					reference.url,
+					previewOrigin,
+				);
+				break;
+			default: {
+				const exhaustive: never = reference.kind;
+				throw new Error(`Unsupported JavaScript reference kind: ${exhaustive}`);
+			}
+		}
 
 		const rawBytes = content.byteLength;
 		jsSources.push({

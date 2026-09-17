@@ -139,7 +139,7 @@ If you want to generate performance metrics for your new implementation, see the
 - If `generate-stats` fails, ensure:
   - Your GEMINI_API_KEY is valid and properly set in `.env` (only if refreshing Vibe Complexity)
   - You've run `npm run build` before running `npm run generate-stats`
-  - Any external JavaScript runtime host used by the implementation must be explicitly allowlisted
+  - Built test routes must not load implementation JavaScript from remote hosts (no jsDelivr/unpkg allowlist)
   - You have Node.js 24+ installed
 - For framework integration issues, check:
   - Required dependencies are installed
@@ -182,7 +182,7 @@ Each framework implementation is evaluated on three metrics:
 
 - Measured in kibibytes (KiB)
 - Calculated from built isolated `/test/{framework}` artifacts after `npm run build`
-- Includes first-party chunks, allowed external runtime scripts, and inline JavaScript
+- Includes first-party built chunks and inline JavaScript (no remote CDN runtimes)
 - Represents normalized gzip-compressed implementation JavaScript above `/test/baseline`
 - Lower scores are better
 

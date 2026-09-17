@@ -38,6 +38,10 @@ npm run generate-stats
 
 - Use `--headed --persistent` when launching playwright-cli for interactive browser sessions. Without `--headed`, it defaults to headless.
 
+## No CDN for app assets
+
+Prefer local npm packages (or same-origin vendored files under `src/vendor/` / `public/`) for implementation JavaScript. Do not load product demo runtimes from jsDelivr, unpkg, or other CDNs. Bundle measurement fails if built test routes still reference remote JS hosts.
+
 ## AWS
 
 Set `AWS_PROFILE` locally in your shell or gitignored `.env.local` — never commit profile names.
