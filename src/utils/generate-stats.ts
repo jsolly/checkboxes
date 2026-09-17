@@ -229,7 +229,7 @@ async function generateStats(): Promise<void> {
 			bundleMeasurementVersion: BUNDLE_MEASUREMENT_VERSION,
 			metrics: {
 				bundleSize:
-					"Normalized implementation JavaScript payload (KiB): built chunks, external runtimes, and inline JS above baseline",
+					"Normalized implementation JavaScript payload (KiB): local built chunks and inline JS above baseline",
 				sourceLines:
 					"Line count of the implementation source file shown on each card",
 				codeComplexity:

@@ -156,5 +156,25 @@ describe("A stats generation run emits explicit complexity metrics", () => {
 			"bundleMeasurementVersion" in stats.metadata,
 			"metadata missing bundleMeasurementVersion",
 		);
+		assert.equal(stats.metadata.bundleMeasurementVersion, "bm-3.0.0");
+	});
+
+	it("does not record remote CDN URLs in bundle measurement sources", () => {
+		const serialized = JSON.stringify(stats);
+		assert.equal(serialized.includes("jsdelivr"), false);
+		assert.equal(serialized.includes("unpkg.com"), false);
+
+		for (const [id, frameworkStats] of Object.entries(stats.frameworks)) {
+			for (const source of frameworkStats.bundleMeasurement.jsSources) {
+				const url = "url" in source ? source.url : undefined;
+				if (typeof url !== "string") continue;
+				const parsed = new URL(url, "http://localhost:4321");
+				assert.equal(
+					parsed.origin,
+					"http://localhost:4321",
+					`${id} recorded a non-same-origin JS url: ${url}`,
+				);
+			}
+		}
 	});
 });

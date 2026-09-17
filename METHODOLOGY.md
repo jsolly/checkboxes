@@ -127,7 +127,7 @@ When `GEMINI_API_KEY` is set, the generator can refresh Vibe Complexity (median 
 
 JS Bundle is the **normalized implementation JavaScript payload** above a shared baseline test route (`/test/baseline`). It is measured from the built isolated `/test/{framework}` artifacts — not the gallery index, which loads every framework at once, and not browser transfer behavior.
 
-The formula version is stored in stats metadata (`bundleMeasurementVersion`, currently `bm-2.0.0`).
+The formula version is stored in stats metadata (`bundleMeasurementVersion`, currently `bm-3.0.0`).
 
 ### What gets measured
 
@@ -140,7 +140,7 @@ The formula version is stored in stats metadata (`bundleMeasurementVersion`, cur
 | **`jsRawBytes`** | Decoded JavaScript bytes before normalization |
 | **`inlineJsBytes`** | Raw UTF-8 size of inline `<script>` blocks on the framework test route |
 | **`inlineJsImplementationBytes`** | Inline script bytes above the baseline route, kept as audit detail |
-| **`jsSources`** | Per-source audit of first-party chunks, external runtime scripts, and inline scripts |
+| **`jsSources`** | Per-source audit of first-party chunks and inline scripts |
 
 ### Measurement target
 
@@ -153,32 +153,31 @@ The baseline page (`/test/baseline`) uses the same Astro layout and measurement 
 Measurement reads the built Astro output:
 
 1. Parse `dist/test/baseline/index.html` and each `dist/test/{framework}/index.html`.
-2. Collect required JavaScript references: first-party `/_astro/*.js` chunks, Astro island `component-url` / `renderer-url` chunks, allowed external runtime scripts, and inline JavaScript `<script>` blocks.
-3. Read first-party chunks directly from `dist/_astro`.
-4. Fetch allowed external runtime scripts as decoded bytes.
-5. Follow first-party module imports so tiny wrapper chunks that import a runtime still count the imported JavaScript.
-6. Compress every counted JavaScript source with the same local gzip settings.
-7. Subtract the baseline normalized bytes from each framework route.
-8. Store the audit trail and display `jsImplementationNormalizedKiB`.
+2. Collect required JavaScript references: same-origin `*.js` files (Astro `/_astro/` chunks, island `component-url` / `renderer-url` chunks, and any other same-origin script such as a vendored `public/` file), plus inline JavaScript `<script>` blocks.
+3. Read those files directly from `dist/`.
+4. Follow first-party module imports so tiny wrapper chunks that import a runtime still count the imported JavaScript.
+5. Compress every counted JavaScript source with the same local gzip settings.
+6. Subtract the baseline normalized bytes from each framework route.
+7. Store the audit trail and display `jsImplementationNormalizedKiB`.
 
 ### Which sources count
 
 Only these sources are included in the normalized total:
 
-- First-party built chunks: `/_astro/*.js`
+- First-party built chunks: `/_astro/*.js` and other same-origin `*.js` scripts referenced by the test route
 - Astro island component and renderer chunks referenced by `component-url` / `renderer-url`
 - First-party module imports discovered from counted chunks
-- Implementation CDN scripts: only `unpkg.com` (Hyperscript) and `cdn.jsdelivr.net` (Datastar) are allowlisted. Unknown external JavaScript hosts fail stats generation loudly.
 - Inline JavaScript scripts from the built test route
 
-Excluded: CSS, JSON data scripts, dev-server artifacts (`@vite/client`, `@fs/`, `node_modules/`, source files), and non-JavaScript resources. Unknown external JavaScript hosts fail stats generation loudly so a new CDN cannot silently report as zero.
+Implementation runtimes must be local npm packages or same-origin vendored files. Prefer npm. Remote JavaScript hosts (jsDelivr, unpkg, or any other origin) fail stats generation — there is no CDN allowlist.
+
+Excluded: CSS, JSON data scripts, dev-server artifacts (`@vite/client`, `@fs/`, `node_modules/`, source files), and non-JavaScript resources.
 
 **Important:** run `npm run build` before `npm run generate-stats`. Bundle measurement reads the built `dist/` artifacts directly.
 
 ### Environment caveats
 
-- The displayed metric is not a browser transfer measurement. It normalizes decoded JavaScript with a fixed local gzip compressor (level 9) so preview-server and CDN compression differences do not introduce variance.
-- External runtime scripts are fetched during stats generation. If the CDN content changes without a version change, regenerated stats can change.
+- The displayed metric is not a browser transfer measurement. It normalizes decoded JavaScript with a fixed local gzip compressor (level 9) so preview-server compression differences do not introduce variance.
 - CSS-only should show 0 KiB implementation JS when no implementation script is shipped.
 
 Each framework entry in `src/data/framework-stats.json` stores a full `bundleMeasurement` audit trail. The card bar is filled relative to the largest incremental bundle in the comparison. Lower is better.

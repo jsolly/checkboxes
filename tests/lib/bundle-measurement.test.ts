@@ -33,7 +33,7 @@ describe("A stats generation run measures normalized JS payloads from built arti
 		assert.equal(normalizeJsBytes(""), 0);
 	});
 
-	it("discovers first-party, external, and inline scripts from built HTML", () => {
+	it("discovers first-party chunks, same-origin vendor scripts, and inline scripts from built HTML", () => {
 		const references = parseBuiltJsReferences(
 			`
 				<!doctype html>
@@ -41,7 +41,7 @@ describe("A stats generation run measures normalized JS payloads from built arti
 				<script type="module" src="/_astro/vendor.abc123.js"></script>
 				<link rel="stylesheet" href="/_astro/styles.css">
 				<script type="module" src="/_astro/page.def456.js"></script>
-				<script src="https://cdn.jsdelivr.net/npm/example@1/index.js"></script>
+				<script type="module" src="/vendor/datastar.js"></script>
 				<astro-island component-url="/_astro/Component.ghi789.js" renderer-url="/_astro/client.jkl012.js"></astro-island>
 				<script data-cmp="3 > 2" type="application/json">{"not":"js"}</script>
 				<script>window.inline = true;</script>
@@ -55,7 +55,7 @@ describe("A stats generation run measures normalized JS payloads from built arti
 			[
 				"first-party",
 				"first-party",
-				"external",
+				"first-party",
 				"first-party",
 				"first-party",
 				"inline",
@@ -63,31 +63,40 @@ describe("A stats generation run measures normalized JS payloads from built arti
 		);
 		assert.equal(references[0]?.url, "/_astro/vendor.abc123.js");
 		assert.equal(references[1]?.url, "/_astro/page.def456.js");
-		assert.equal(
-			references[2]?.url,
-			"https://cdn.jsdelivr.net/npm/example@1/index.js",
-		);
+		assert.equal(references[2]?.url, "/vendor/datastar.js");
 		assert.equal(references[3]?.url, "/_astro/Component.ghi789.js");
 		assert.equal(references[4]?.url, "/_astro/client.jkl012.js");
 		assert.equal(references[5]?.content, "window.inline = true;");
 	});
 
-	it("fails loudly when built HTML includes an uncounted external script host", () => {
-		assert.throws(
-			() =>
-				parseBuiltJsReferences(
-					`<script src="https://esm.sh/react@19"></script>`,
-					"http://localhost:4321",
-				),
-			/Uncounted external JavaScript host: esm\.sh/,
-		);
+	it("fails loudly when built HTML includes a remote script host", () => {
+		const remoteScripts = [
+			"https://esm.sh/react@19",
+			"https://cdn.jsdelivr.net/npm/example@1/index.js",
+			"https://unpkg.com/hyperscript.org@0.9.13",
+			"https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.1/bundles/datastar.js",
+			"//cdn.jsdelivr.net/npm/example@1/index.js",
+			"//unpkg.com/hyperscript.org@0.9.13",
+		] as const;
+
+		for (const url of remoteScripts) {
+			assert.throws(
+				() =>
+					parseBuiltJsReferences(
+						`<script src="${url}"></script>`,
+						"http://localhost:4321",
+					),
+				/Remote JavaScript host is not allowed/,
+			);
+		}
+
 		assert.throws(
 			() =>
 				parseBuiltJsReferences(
 					`<astro-island component-url="https://esm.sh/react@19"></astro-island>`,
 					"http://localhost:4321",
 				),
-			/Uncounted external JavaScript host: esm\.sh/,
+			/Remote JavaScript host is not allowed: esm\.sh/,
 		);
 	});
 
@@ -145,7 +154,39 @@ describe("A stats generation run measures normalized JS payloads from built arti
 		}
 	});
 
-	it("fails loudly when first-party chunks import an uncounted external host", async () => {
+	it("counts same-origin vendor scripts outside /_astro/ as first-party", async () => {
+		const dist = await fs.mkdtemp(path.join(os.tmpdir(), "checkboxes-dist-"));
+		try {
+			await fs.mkdir(path.join(dist, "test", "sample"), { recursive: true });
+			await fs.mkdir(path.join(dist, "vendor"), { recursive: true });
+			await fs.writeFile(
+				path.join(dist, "test", "sample", "index.html"),
+				`<script type="module" src="/vendor/datastar.js"></script>`,
+			);
+			await fs.writeFile(
+				path.join(dist, "vendor", "datastar.js"),
+				`console.log("vendored datastar");`,
+			);
+
+			const measurement = await measureBuiltJsPayload(dist, "/test/sample");
+
+			assert.deepEqual(
+				measurement.jsSources.map((source) => ({
+					kind: source.kind,
+					url: source.url,
+				})),
+				[{ kind: "first-party", url: "/vendor/datastar.js" }],
+			);
+			assert.equal(
+				measurement.jsRawBytes,
+				Buffer.byteLength(`console.log("vendored datastar");`, "utf8"),
+			);
+		} finally {
+			await fs.rm(dist, { recursive: true, force: true });
+		}
+	});
+
+	it("fails loudly when first-party chunks import a remote host", async () => {
 		const dist = await fs.mkdtemp(path.join(os.tmpdir(), "checkboxes-dist-"));
 		try {
 			await fs.mkdir(path.join(dist, "test", "sample"), { recursive: true });
@@ -161,7 +202,7 @@ describe("A stats generation run measures normalized JS payloads from built arti
 
 			await assert.rejects(
 				() => measureBuiltJsPayload(dist, "/test/sample"),
-				/Uncounted external JavaScript host: esm\.sh/,
+				/Remote JavaScript host is not allowed: esm\.sh/,
 			);
 		} finally {
 			await fs.rm(dist, { recursive: true, force: true });

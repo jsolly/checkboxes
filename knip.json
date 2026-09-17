@@ -12,6 +12,7 @@
 		"scripts/**/*.{mjs,js,ts}",
 		"tests/**/*.ts"
 	],
+	"ignore": ["src/vendor/**"],
 	"ignoreBinaries": ["uvx"],
 	"ignoreDependencies": [
 		"tailwindcss",

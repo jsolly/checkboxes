@@ -49,7 +49,7 @@ export const METRIC_DISPLAY: Record<MetricKey, MetricDisplay> = {
 		tooltip: "Normalized implementation JS payload above baseline (KiB).",
 		tag: "Measured",
 		blurb:
-			"JavaScript required by this implementation above a shared baseline test route, normalized with one local gzip compressor across built chunks, external runtime scripts, and inline scripts. Lower is better.",
+			"JavaScript required by this implementation above a shared baseline test route, normalized with one local gzip compressor across built chunks and inline scripts. Lower is better.",
 	},
 };
 
