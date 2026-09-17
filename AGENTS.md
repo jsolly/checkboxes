@@ -20,6 +20,12 @@ Profile delta: `https://checkboxes.xyz` redirects (308) to the canonical `www` U
 curl -sSIL https://www.checkboxes.xyz/ | rg -i '^x-release-id:'
 ```
 
+## No automatic Vercel Previews
+
+Branch pushes do **not** create Preview deployments (`vercel.json` `git.deploymentEnabled`). Production Git deploys on `main` stay on.
+
+Opt-in Preview: comment `/preview` as the first non-empty line on a same-repo PR (owner/member/collaborator User), or run **Actions → Vercel Preview** with the PR number. GitHub runs that workflow from `main`. One-shot: new commits do not rebuild until you ask again. Requires GitHub secret `VERCEL_TOKEN`. Agents must not comment `/preview` or run Actions → Vercel Preview unless John asked.
+
 ## Purpose
 
 Checkbox implementation gallery — multiple frameworks and approaches with performance metrics. See `README.md`.

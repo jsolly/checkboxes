@@ -27,7 +27,7 @@
 		"worktree:init": "bash scripts/worktree-init.sh; npm ci",
 		"test": "tsx --test --test-reporter=dot \"tests/**/*.test.ts\"",
 		"lint-staged": "lint-staged",
-		"check:actions": "bash scripts/check-actions.sh",
+		"check:actions": "bash scripts/check-actions.sh && bash scripts/vercel-preview-comment-contract.sh && bash scripts/vercel-preview-workflow-contract.sh",
 		"gate": "FLEET_DOC_FAST=0 bash .git-hooks/pre-commit"
 	},
 	"lint-staged": {
