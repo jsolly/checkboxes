@@ -75,7 +75,14 @@ export function barFillPercent(
 	return clampPercent(stats[key]);
 }
 
-export function zScoreColorClass(zScore: number): string {
+export function zScoreColorClass(
+	zScore: number,
+):
+	| "bg-red-500"
+	| "bg-orange-500"
+	| "bg-yellow-500"
+	| "bg-green-400"
+	| "bg-green-500" {
 	if (zScore >= 1.5) return "bg-red-500";
 	if (zScore >= 0.5) return "bg-orange-500";
 	if (zScore >= -0.5) return "bg-yellow-500";

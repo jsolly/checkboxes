@@ -27,6 +27,7 @@ run_step "yaml lint"   npm run check:yaml
 run_step "actionlint"             npm run check:actions
 run_step "release-id contract" npm run check:release-id
 run_step "astro check (types)" npm run check:ts
+run_step "knip"        npm run check:knip
 run_step "build"       npm run build
 
 echo "✓ pre-commit gate passed — commit will land; Vercel deploys via GitHub integration after merge to main."

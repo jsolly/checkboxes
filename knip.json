@@ -1,0 +1,22 @@
+{
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+	"entry": [
+		"src/pages/**/*.{astro,ts,js}",
+		"middleware.ts",
+		"src/styles/checkbox-demo-classes.jsx",
+		"scripts/**/*.{mjs,js,ts}",
+		"tests/**/*.test.ts"
+	],
+	"project": [
+		"src/**/*.{ts,tsx,js,jsx,mjs,astro,vue,svelte}",
+		"scripts/**/*.{mjs,js,ts}",
+		"tests/**/*.ts"
+	],
+	"ignoreBinaries": ["uvx"],
+	"ignoreDependencies": [
+		"tailwindcss",
+		"github-actionlint",
+		"markdownlint-cli2",
+		"vercel"
+	]
+}

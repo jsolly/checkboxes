@@ -19,6 +19,7 @@
 		"format": "biome format --write .",
 		"check:biome": "biome check --write . --error-on-warnings",
 		"check:ts": "astro check --minimumSeverity warning --minimumFailingSeverity warning",
+		"check:knip": "knip",
 		"check:md": "bash scripts/lint-md.sh",
 		"check:yaml": "uvx yamllint@1.38.0 -s .",
 		"check:release-id": "node scripts/check-release-id.mjs",
@@ -80,13 +81,14 @@
 		"vue": "^3.5.42"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.12",
+		"@biomejs/biome": "2.5.13",
 		"@tailwindcss/vite": "^4.3.3",
 		"@types/jquery": "^4.0.1",
 		"@types/node": "^26.5.1",
 		"@types/sortablejs": "^1.15.8",
 		"@typescript-eslint/typescript-estree": "^8.70.0",
 		"github-actionlint": "^1.7.12",
+		"knip": "^6.36.0",
 		"lint-staged": "^17.5.1",
 		"markdownlint-cli2": "^0.23.2",
 		"tsx": "^4.23.13",

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import stats from "../../src/data/framework-stats.json";
+import stats from "../../src/data/framework-stats.json" with { type: "json" };
 import type { FrameworkStats } from "../../src/types/stats";
 import { calculateStatsZScores } from "../../src/utils/calculateZScores";
 

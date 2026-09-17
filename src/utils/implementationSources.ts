@@ -10,7 +10,7 @@ export interface ImplementationSource {
 	code: string;
 }
 
-export async function readImplementationSource(
+async function readImplementationSource(
 	framework: FrameworkId,
 ): Promise<ImplementationSource> {
 	const relativePath = FRAMEWORKS[framework].implementationFile;

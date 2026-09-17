@@ -1,5 +1,5 @@
 import { FRAMEWORKS, type FrameworkId } from "../config/frameworks";
-import stats from "../data/framework-stats.json";
+import stats from "../data/framework-stats.json" with { type: "json" };
 import { SortMetric, SortOption } from "../types/sort";
 
 export const getSavedOrder = () => {

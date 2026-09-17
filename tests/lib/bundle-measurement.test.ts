@@ -17,14 +17,12 @@ describe("A stats generation run measures normalized JS payloads from built arti
 		const scripts = [
 			"console.log('vanilla');",
 			"window.frameworkReady = true;",
-		];
-		const inlineBytes = sumInlineJsBytes(scripts);
-		const scriptA = scripts[0];
-		const scriptB = scripts[1];
-		assert.ok(scriptA && scriptB);
+		] as const;
+		const inlineBytes = sumInlineJsBytes([...scripts]);
 		assert.equal(
 			inlineBytes,
-			Buffer.byteLength(scriptA, "utf8") + Buffer.byteLength(scriptB, "utf8"),
+			Buffer.byteLength(scripts[0], "utf8") +
+				Buffer.byteLength(scripts[1], "utf8"),
 		);
 	});
 

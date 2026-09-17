@@ -25,5 +25,6 @@ jobs:
       - run: npx --no-install biome ci . --error-on-warnings
       - run: npm run check:yaml
       - run: npm run check:ts
+      - run: npm run check:knip
       - run: npm test
       - run: npm run build

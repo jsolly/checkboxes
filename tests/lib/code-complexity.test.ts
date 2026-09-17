@@ -85,11 +85,14 @@ describe("Code Complexity composite analyzer", () => {
 	it("spreads scores across the current gallery implementations", async () => {
 		const implementations = await readImplementationSources();
 		const scores = Object.fromEntries(
-			(Object.keys(FRAMEWORKS) as FrameworkId[]).map((id) => [
-				id,
-				analyzeCodeComplexity(implementations[id]).score,
-			]),
-		);
+			(Object.keys(FRAMEWORKS) as FrameworkId[]).map((id) => {
+				const source = implementations[id];
+				if (!source) {
+					throw new Error(`Missing implementation source for ${id}`);
+				}
+				return [id, analyzeCodeComplexity(source).score];
+			}),
+		) as Record<FrameworkId, number>;
 
 		const values = Object.values(scores);
 		const min = Math.min(...values);

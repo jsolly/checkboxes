@@ -4,6 +4,7 @@ type AstNode = {
 	type?: string;
 	operator?: string;
 	cases?: AstNode[];
+	test?: unknown;
 	[key: string]: unknown;
 };
 

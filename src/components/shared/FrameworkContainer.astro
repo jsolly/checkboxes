@@ -1,6 +1,6 @@
 ---
 import type { FrameworkId } from "../../config/frameworks";
-import stats from "../../data/framework-stats.json";
+import stats from "../../data/framework-stats.json" with { type: "json" };
 import type { FrameworkStatsRecord } from "../../types/stats";
 import { maxBundleSize } from "../../utils/metricDisplay";
 import PerformanceBadge from "../shared/PerformanceBadge.astro";
@@ -223,6 +223,7 @@ const maxBundle = maxBundleSize(typedStats.frameworks);
 </script>
 
 <style>
+	@layer layout {
 	.framework-container.is-fullscreen {
 		position: fixed;
 		inset: 0;
@@ -241,5 +242,6 @@ const maxBundle = maxBundleSize(typedStats.frameworks);
 	.framework-container.is-fullscreen [data-framework-wrapper] {
 		max-width: 64rem;
 		margin: 0 auto;
+	}
 	}
 </style>

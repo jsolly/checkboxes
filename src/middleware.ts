@@ -1,10 +1,12 @@
-import { defineMiddleware } from "astro:middleware";
+import { defineMiddleware } from "astro/middleware";
 
 import { RELEASE_ID } from "./release-id";
+import { processEnv } from "./utils/processEnv";
 
 function resolveReleaseId(): string {
-	if (RELEASE_ID && RELEASE_ID !== "dev") return RELEASE_ID;
-	const sha = process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA || "";
+	if (RELEASE_ID !== "dev") return RELEASE_ID;
+	const sha =
+		processEnv("VERCEL_GIT_COMMIT_SHA") ?? processEnv("GITHUB_SHA") ?? "";
 	return sha ? sha.slice(0, 12) : "dev";
 }
 

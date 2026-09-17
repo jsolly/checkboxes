@@ -44,7 +44,7 @@ if (existsSync(vercelPath)) {
 	}
 }
 
-const sha = "abcdef1234567890deadbeef";
+const sha = "aaaaaaaaaaaaaaaaaaaaaaaa";
 execFileSync(
 	process.execPath,
 	[resolve(repoRoot, "scripts/gen-release-id.mjs")],
@@ -55,7 +55,7 @@ execFileSync(
 	},
 );
 const stamped = readFileSync(resolve(repoRoot, "src/release-id.ts"), "utf8");
-if (!stamped.includes(`RELEASE_ID = "${sha.slice(0, 12)}"`)) {
+if (!stamped.includes(`RELEASE_ID: string = "${sha.slice(0, 12)}"`)) {
 	console.error("FAIL: module stamp missing expected SHA");
 	process.exit(1);
 }
@@ -69,7 +69,7 @@ execFileSync(
 	},
 );
 const restored = readFileSync(resolve(repoRoot, "src/release-id.ts"), "utf8");
-if (!restored.includes('RELEASE_ID = "dev"')) {
+if (!restored.includes('RELEASE_ID: string = "dev"')) {
 	console.error("FAIL: release-id.ts stub not restored");
 	process.exit(1);
 }

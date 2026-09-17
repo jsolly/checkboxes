@@ -10,7 +10,7 @@ const behavioralSelectorPattern =
 
 export function extractScriptBlocks(code: string): string[] {
 	const scripts: string[] = [];
-	const frontmatter = code.match(/^---\s*([\s\S]*?)\s*---/);
+	const frontmatter = /^---\s*([\s\S]*?)\s*---/.exec(code);
 	if (frontmatter?.[1]) {
 		scripts.push(frontmatter[1]);
 	}

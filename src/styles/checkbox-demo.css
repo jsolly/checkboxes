@@ -1,40 +1,42 @@
-.checkbox-demo {
-	padding: 0.25rem 0.75rem;
-	border: 0;
-	margin: 0;
-	min-inline-size: 0;
-}
+@layer demo {
+	.checkbox-demo {
+		padding: 0.25rem 0.75rem;
+		border: 0;
+		margin: 0;
+		min-inline-size: 0;
+	}
 
-.checkbox-demo legend {
-	padding: 0;
-}
+	.checkbox-demo legend {
+		padding: 0;
+	}
 
-/* The label wraps its checkbox + text, so the label IS the row. */
-.checkbox-demo label {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.25rem 0.5rem;
-	border-radius: 0.5rem;
-	transition: background-color 0.15s ease;
-	font-size: 0.875rem;
-	font-weight: 500;
-	color: rgb(51 65 85);
-	cursor: pointer;
-}
+	/* The label wraps its checkbox + text, so the label IS the row. */
+	.checkbox-demo label {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.25rem 0.5rem;
+		border-radius: 0.5rem;
+		transition: background-color 0.15s ease;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: rgb(51 65 85);
+		cursor: pointer;
+	}
 
-.checkbox-demo label:hover {
-	background: rgb(241 245 249);
-}
+	.checkbox-demo label:hover {
+		background: rgb(241 245 249);
+	}
 
-.checkbox-children {
-	margin-left: 2rem;
-}
+	.checkbox-children {
+		margin-left: 2rem;
+	}
 
-.checkbox-demo input[type="checkbox"] {
-	width: 1rem;
-	height: 1rem;
-	flex-shrink: 0;
-	accent-color: rgb(37 99 235);
-	cursor: pointer;
+	.checkbox-demo input[type="checkbox"] {
+		width: 1rem;
+		height: 1rem;
+		flex-shrink: 0;
+		accent-color: rgb(37 99 235);
+		cursor: pointer;
+	}
 }

@@ -23,7 +23,7 @@ const scoreProperties = Object.fromEntries(
 	}
 >;
 
-export const vibeComplexitySchema = {
+const vibeComplexitySchema = {
 	type: "object",
 	properties: {
 		scores: {

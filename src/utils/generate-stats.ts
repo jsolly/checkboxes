@@ -16,6 +16,7 @@ import { analyzeCodeComplexity } from "./code-complexity";
 import { CODE_COMPLEXITY_VERSION } from "./code-complexity/types";
 import { evaluateVibeComplexity } from "./evaluateVibeComplexity";
 import { readImplementationSources } from "./implementationSources";
+import { processEnv } from "./processEnv";
 
 dotenv.config({ path: ".env.local" });
 dotenv.config();
@@ -150,7 +151,7 @@ async function generateStats(): Promise<void> {
 		};
 	}
 
-	const hasApiKey = !!process.env.GEMINI_API_KEY;
+	const hasApiKey = !!processEnv("GEMINI_API_KEY");
 	const shouldUpdateVibeComplexity =
 		STATS_CONFIG.UPDATE_VIBE_COMPLEXITY && hasApiKey;
 

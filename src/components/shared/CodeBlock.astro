@@ -102,8 +102,8 @@ const codeBlockId = `code-block-${crypto.randomUUID()}`;
 	type CopyStatus = keyof typeof copyLabels;
 
 	for (const block of document.querySelectorAll<HTMLElement>("[data-code-block]")) {
-		if (block.dataset.codeBlockReady === "true") continue;
-		block.dataset.codeBlockReady = "true";
+		if (block.dataset["codeBlockReady"] === "true") continue;
+		block.dataset["codeBlockReady"] = "true";
 
 		const toggle = block.querySelector<HTMLButtonElement>("[data-code-toggle]");
 		const toggleLabel = block.querySelector<HTMLElement>(

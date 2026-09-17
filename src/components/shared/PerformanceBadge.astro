@@ -63,6 +63,7 @@ const rows = METRIC_ORDER.map((key) => {
 </div>
 
 <style>
+	@layer components {
 	.metric-footer {
 		display: grid;
 		gap: 0.4rem;
@@ -152,5 +153,6 @@ const rows = METRIC_ORDER.map((key) => {
 		.metric-row {
 			grid-template-columns: 108px 1fr 60px;
 		}
+	}
 	}
 </style>
