@@ -210,6 +210,12 @@ The metrics are normalized using z-scores to provide relative performance indica
 - 🟠 Below Average (0.5 ≤ z-score < 1.5)
 - 🔴 Poor (z-score ≥ 1.5)
 
+## Production
+
+The site deploys through Vercel's Git integration when a CI-approved PR merges to `main`. Branch pushes do not create Preview deployments; comment `/preview` as the first non-empty line on a same-repo PR (or run the **Vercel Preview** workflow) for a one-shot Preview.
+
+Live site: [www.checkboxes.xyz](https://www.checkboxes.xyz)
+
 ## Demo
 
 Check out the live demo at [checkboxes.xyz](https://checkboxes.xyz)

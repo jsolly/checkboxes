@@ -1,0 +1,177 @@
+---
+name: Vercel Preview
+
+# Opt-in Preview deploys. Automatic Git Preview builds are off in vercel.json.
+# Same-repo owner/member User comments `/preview` on a pull request, or run this
+# workflow with a PR number. Requires GitHub secret VERCEL_TOKEN.
+# issue_comment runs the workflow file from the default branch.
+
+'on':
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number to deploy as a Preview
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: vercel-preview-${{ github.event.issue.number || inputs.pr_number }}
+  # Later PR comments start this workflow too; do not cancel an in-flight deploy.
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    name: preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.issue.pull_request &&
+        github.event.comment.user.type == 'User' &&
+        contains(github.event.comment.body, '/preview') &&
+        (
+          github.event.comment.author_association == 'OWNER' ||
+          github.event.comment.author_association == 'MEMBER' ||
+          github.event.comment.author_association == 'COLLABORATOR'
+        )
+      )
+    env:
+      VERCEL_ORG_ID: team_T8yHg0aDz7nCbyBgJh5a2saR
+      VERCEL_PROJECT_ID: prj_Qy2iDBHuQ0n16tuT1vBmeIrgKkxr
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+      EVENT_NAME: ${{ github.event_name }}
+      COMMENT_BODY: ${{ github.event.comment.body }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+      DISPATCH_PR: ${{ inputs.pr_number }}
+      REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Resolve the pull request head
+        id: pr
+        run: |
+          set -euo pipefail
+
+          if [[ "$EVENT_NAME" == "issue_comment" ]]; then
+            if ! printf '%s' "$COMMENT_BODY" | scripts/vercel-preview-comment.sh; then
+              echo "Comment is not an explicit /preview request; stopping."
+              echo "skip=true" >>"$GITHUB_OUTPUT"
+              exit 0
+            fi
+            pr_number="$ISSUE_NUMBER"
+          else
+            pr_number="$DISPATCH_PR"
+          fi
+          if [[ ! "$pr_number" =~ ^[1-9][0-9]*$ ]]; then
+            echo "Invalid pull request number: ${pr_number:-empty}" >&2
+            exit 1
+          fi
+
+          pr_json="$(gh api "repos/${REPO}/pulls/${pr_number}")"
+          state="$(printf '%s\n' "$pr_json" | jq -r '.state')"
+          head_sha="$(printf '%s\n' "$pr_json" | jq -r '.head.sha')"
+          head_ref="$(printf '%s\n' "$pr_json" | jq -r '.head.ref')"
+          head_repo="$(printf '%s\n' "$pr_json" | jq -r '.head.repo.full_name // empty')"
+
+          if [[ "$state" != "open" ]]; then
+            echo "PR ${pr_number} is ${state}; not deploying." >&2
+            exit 1
+          fi
+          if [[ "$head_repo" != "$REPO" ]]; then
+            echo "PR ${pr_number} head repo ${head_repo} is not ${REPO}; not deploying forks." >&2
+            exit 1
+          fi
+
+          {
+            echo "pr_number=${pr_number}"
+            echo "head_sha=${head_sha}"
+            echo "head_ref=${head_ref}"
+            echo "skip=false"
+          } >>"$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v7
+        if: ${{ steps.pr.outputs.skip != 'true' }}
+        with:
+          ref: ${{ steps.pr.outputs.head_sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v6
+        if: ${{ steps.pr.outputs.skip != 'true' }}
+        with:
+          node-version-file: .nvmrc
+
+      - name: Deploy the Preview
+        if: ${{ steps.pr.outputs.skip != 'true' }}
+        id: deploy
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
+          HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
+          HEAD_REF: ${{ steps.pr.outputs.head_ref }}
+        run: |
+          set -euo pipefail
+
+          comment() {
+            gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$1"
+          }
+
+          if [[ -z "${VERCEL_TOKEN:-}" ]]; then
+            comment "Preview deploy skipped: GitHub secret \`VERCEL_TOKEN\` is not set. Create a Vercel token with deploy access and add it as that secret, then comment \`/preview\` again."
+            exit 1
+          fi
+
+          local_sha="$(git rev-parse HEAD)"
+          if [[ "$local_sha" != "$HEAD_SHA" ]]; then
+            echo "Checked-out SHA ${local_sha} != PR head ${HEAD_SHA}" >&2
+            exit 1
+          fi
+          if [[ ! "$HEAD_SHA" =~ ^[a-f0-9]{40}$ ]]; then
+            echo "PR head SHA is not a 40-character hex commit: ${HEAD_SHA}" >&2
+            exit 1
+          fi
+
+          # --archive=tgz does not upload .git. gen-release-id and middleware need
+          # the PR SHA explicitly: Git-integration system vars are often empty
+          # on CLI deploys. x-release-id reads VERCEL_GIT_COMMIT_SHA then GITHUB_SHA.
+          preview_url="$(
+            npx --yes vercel@59.20.0 deploy --yes --archive=tgz --scope jsollys-projects \
+              --build-env "VERCEL_GIT_COMMIT_SHA=${HEAD_SHA}" \
+              --build-env "GITHUB_SHA=${HEAD_SHA}" \
+              --env "VERCEL_GIT_COMMIT_SHA=${HEAD_SHA}" \
+              --env "GITHUB_SHA=${HEAD_SHA}" \
+              --meta "githubDeployment=1" \
+              --meta "githubCommitSha=${HEAD_SHA}" \
+              --meta "githubCommitRef=${HEAD_REF}" \
+              --meta "githubCommitOrg=${REPO%%/*}" \
+              --meta "githubCommitRepo=${REPO#*/}" \
+              --meta "githubOrg=${REPO%%/*}" \
+              --meta "githubRepo=${REPO#*/}" \
+              --meta "githubPrId=${PR_NUMBER}" \
+              | tee /dev/stderr \
+              | grep -E '^https://' \
+              | tail -n 1
+          )"
+          if [[ ! "$preview_url" =~ ^https:// ]]; then
+            echo "Vercel CLI did not print a Preview URL; last line was: ${preview_url:-empty}" >&2
+            exit 1
+          fi
+          {
+            echo "url<<PREVIEW_URL_EOF"
+            printf '%s\n' "$preview_url"
+            echo "PREVIEW_URL_EOF"
+          } >>"$GITHUB_OUTPUT"
+
+          comment "$(
+            printf '%s\n\n%s\n' \
+              "Preview for \`${HEAD_REF}\` (\`${HEAD_SHA}\`): ${preview_url}" \
+              "This is a one-shot deploy. New commits do not rebuild until you comment \`/preview\` again."
+          )"

@@ -1,3 +1,13 @@
 {
-	"$schema": "https://openapi.vercel.sh/vercel.json"
+	"$schema": "https://openapi.vercel.sh/vercel.json",
+	"git": {
+		"deploymentEnabled": {
+			"main": true,
+			"*": false,
+			"*/*": false,
+			"*/*/*": false,
+			"*/*/*/*": false,
+			"**": false
+		}
+	}
 }
