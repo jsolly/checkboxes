@@ -10,15 +10,18 @@ const behavioralSelectorPattern =
 
 export function extractScriptBlocks(code: string): string[] {
 	const scripts: string[] = [];
-	const frontmatter = /^---\s*([\s\S]*?)\s*---/.exec(code);
-	if (frontmatter?.[1]) {
-		scripts.push(frontmatter[1]);
+	const frontmatter: RegExpExecArray | null = /^---\s*([\s\S]*?)\s*---/.exec(
+		code,
+	);
+	const block = frontmatter === null ? undefined : frontmatter[1];
+	if (block) {
+		scripts.push(block);
 	}
 
 	for (const match of code.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
-		const block = match[1];
-		if (block !== undefined) {
-			scripts.push(block);
+		const scriptBlock = match[1];
+		if (scriptBlock !== undefined) {
+			scripts.push(scriptBlock);
 		}
 	}
 
