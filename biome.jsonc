@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.5.13/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
@@ -32,7 +32,11 @@
 	"linter": {
 		"enabled": true,
 		"domains": {
+			// 2.5.14 catalog: types "recommended" enables ZERO rules (stable types
+			// rules are not recommended-flagged). "all" + explicit nursery/stable.
 			"types": "all",
+			// Prefer "all" (recommended is only noPrivateImports). Pair with
+			// explicit noImportCycles / noUndeclaredDependencies below.
 			"project": "all",
 			"test": "recommended",
 			"tailwind": "all",
@@ -56,7 +60,10 @@
 			"correctness": {
 				"noUnusedFunctionParameters": "error",
 				"noUnusedInstantiation": "error",
+				"noUndeclaredDependencies": "error",
+				// HOLD: Astro implicit default exports + Vite/alias resolution.
 				"noUnresolvedImports": "off",
+				// HOLD: Vite/Astro extensionless imports.
 				"useImportExtensions": "off",
 				"useJsonImportAttributes": "error"
 			},
@@ -74,10 +81,14 @@
 				"noInvalidFileInputAccept": "error",
 				"noInvalidPropertyInitValue": "error",
 				"noJsxLeakedDollar": "error",
+				"noJsonUnsafeValues": "error",
 				"noLoopFunc": "error",
+				"noObsoleteTags": "error",
 				"noMisleadingReturnType": "error",
 				"noMisusedPromises": "error",
 				"noNegationInEqualityCheck": "error",
+				"noReturnInFinally": "error",
+				"noSvelteAtDebugTags": "error",
 				"noSvelteAtHtmlTags": "error",
 				"noSvelteLegacyConst": "error",
 				"noSvelteUnnecessaryStateWrap": "error",
@@ -90,6 +101,7 @@
 				"noUselessTypeConversion": "error",
 				"noVueDeprecatedScopedSlots": "error",
 				"noVueImportCompilerMacros": "error",
+				"noVueUndeclaredDirectives": "error",
 				"noVueRefAsOperand": "error",
 				"noVueVOnNumberValues": "error",
 				"noXorAsExponentiation": "error",
@@ -97,6 +109,7 @@
 				"useAstroClientOnlyDirectiveValue": "error",
 				"useAwaitThenable": "error",
 				"useBetterDomTraversing": "error",
+				"useConsistentObjectKeys": "error",
 				"useConsistentTestIt": "error",
 				"useControlLabel": "error",
 				"useDisposables": "error",
@@ -137,12 +150,14 @@
 				}
 			},
 			"style": {
+				"useConsistentEnumValueType": "error",
 				"useErrorCause": "error",
 				"useExportType": "error",
 				"useThrowNewError": "error",
 				"useThrowOnlyError": "error"
 			},
 			"suspicious": {
+				"noDeprecatedImports": "error",
 				"noDuplicateTestHooks": "error",
 				"noExportsInTest": "error",
 				"noFocusedTests": "error",
@@ -247,7 +262,9 @@
 				},
 				"rules": {
 					"nursery": {
-						"useExpect": "off"
+						"useExpect": "off",
+						// Root enablement false-positives on RegExp.prototype.test.
+						"useValidTestTitle": "error"
 					}
 				}
 			}
