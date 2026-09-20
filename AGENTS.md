@@ -62,3 +62,11 @@ No auth — public UI only. Follow `rules/frontend-verification.md` (fleet smoke
 
 - **Dev server:** `npm run dev` (Astro; use the URL printed on start, typically <http://localhost:4321>)
 - **Auth:** none — public pages only. No `DEFAULT_USER` / `DEFAULT_PASSWORD`.
+
+## Verified-tree CI
+
+PRs run the full CI suite. Post-merge CI reuses a successful PR run only when
+its recorded checkout tree exactly matches the landed tree, using
+`scripts/ci-verified-tree.sh` from dotagents. Missing proof runs full CI;
+manual runs always validate. Job names and deployment triggers stay intact.
+Canonical contract: `~/code/dotagents/templates/github/verified-tree-ci.md`.

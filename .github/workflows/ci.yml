@@ -9,22 +9,54 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
 jobs:
   ci:
     name: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - name: Check for a validated PR tree
+        id: verified-tree
+        timeout-minutes: 1
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/ci-verified-tree.sh
       - uses: actions/setup-node@v6
+        if: steps.verified-tree.outputs.run_full != 'false'
         with:
           node-version-file: .nvmrc
           cache: npm
       - uses: astral-sh/setup-uv@v8.2.0
+        if: steps.verified-tree.outputs.run_full != 'false'
       - run: npm ci
+        if: steps.verified-tree.outputs.run_full != 'false'
       - run: npm run check:actions
+        if: steps.verified-tree.outputs.run_full != 'false'
       - run: npx --no-install biome ci . --error-on-warnings
+        if: steps.verified-tree.outputs.run_full != 'false'
       - run: npm run check:yaml
+        if: steps.verified-tree.outputs.run_full != 'false'
       - run: npm run check:ts
+        if: steps.verified-tree.outputs.run_full != 'false'
       - run: npm run check:knip
+        if: steps.verified-tree.outputs.run_full != 'false'
       - run: npm test
+        if: steps.verified-tree.outputs.run_full != 'false'
       - run: npm run build
+        if: steps.verified-tree.outputs.run_full != 'false'
+      - name: Record validated PR tree
+        if: >-
+          success() && github.event_name == 'pull_request' &&
+          steps.verified-tree.outputs.tree != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: ci-tree-v1-${{ github.job }}-${{ steps.verified-tree.outputs.tree }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ci-tree-${{ github.job }}.txt
+          if-no-files-found: error
+          retention-days: 7
