@@ -31,8 +31,7 @@
 		"gate": "FLEET_DOC_FAST=0 bash .git-hooks/pre-commit"
 	},
 	"lint-staged": {
-		".agents/**": [],
-		"!(.agents)/**/*": [
+		"**/*": [
 			"biome check --no-errors-on-unmatched --write --error-on-warnings"
 		]
 	},
