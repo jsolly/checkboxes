@@ -28,7 +28,9 @@
 		"test": "tsx --test --test-reporter=dot \"tests/**/*.test.ts\"",
 		"lint-staged": "lint-staged",
 		"check:actions": "bash scripts/check-actions.sh && bash scripts/vercel-preview-comment-contract.sh && bash scripts/vercel-preview-workflow-contract.sh",
-		"gate": "FLEET_DOC_FAST=0 bash .git-hooks/pre-commit"
+		"gate": "FLEET_DOC_FAST=0 bash .git-hooks/pre-commit",
+		"smoke:production": "node scripts/production-smoke.mjs",
+		"smoke:scenario-contract": "node --test scripts/production-smoke-scenario.test.mjs"
 	},
 	"lint-staged": {
 		"**/*": [
@@ -91,6 +93,7 @@
 		"knip": "^6.36.0",
 		"lint-staged": "^17.5.1",
 		"markdownlint-cli2": "^0.23.2",
+		"playwright": "1.63.0",
 		"tsx": "^4.23.13",
 		"typescript": "^6.0.3",
 		"vercel": "^59.17.0"

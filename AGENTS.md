@@ -63,6 +63,20 @@ No auth — public UI only. Follow `rules/frontend-verification.md` (fleet smoke
 - **Dev server:** `npm run dev` (Astro; use the URL printed on start, typically <http://localhost:4321>)
 - **Auth:** none — public pages only. No `DEFAULT_USER` / `DEFAULT_PASSWORD`.
 
+## Production smoke
+
+The **Production smoke** workflow is a separate post-deployment gate. It waits
+for the intended production release and verifies the public browser flow with
+`npm run smoke:production`. The URL is pinned in
+`scripts/production-smoke-scenario.mjs`; the workflow uses no deployment secrets.
+Vercel Git deployment and the existing PR CI checks remain unchanged.
+
+`/ship` must wait for the exact release's Production smoke run to succeed and
+record its URL. Missing, failed, cancelled, skipped or timed-out runs are not
+success. If the automatic trigger is missing, dispatch the workflow on `main`
+with the full expected release SHA and a unique request ID, then follow that
+specific run. Preserve `production-smoke-artifacts/` diagnostics when a check fails.
+
 ## Verified-tree CI
 
 PRs run the full CI suite. Post-merge CI reuses a successful PR run only when
