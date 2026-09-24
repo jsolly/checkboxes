@@ -90,7 +90,7 @@
 		"@types/sortablejs": "^1.15.8",
 		"@typescript-eslint/typescript-estree": "^8.70.0",
 		"github-actionlint": "^1.7.12",
-		"knip": "^6.36.0",
+		"knip": "^6.37.0",
 		"lint-staged": "^17.5.1",
 		"markdownlint-cli2": "^0.23.2",
 		"playwright": "1.63.0",
