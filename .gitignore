@@ -45,3 +45,6 @@ npm-debug.log*
 
 # Materialized agent config (fetched by .dotagents/bootstrap.sh; not committed)
 .seo-audit/
+
+# Production browser smoke diagnostics
+production-smoke-artifacts/
