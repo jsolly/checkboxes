@@ -59,7 +59,7 @@
 		"@astrojs/sitemap": "^3.7.4",
 		"@astrojs/svelte": "^9.0.1",
 		"@astrojs/vercel": "^11.0.10",
-		"@astrojs/vue": "^7.0.2",
+		"@astrojs/vue": "^7.0.3",
 		"@google/genai": "^2.22.0",
 		"@hotwired/stimulus": "^3.2.2",
 		"@types/alpinejs": "^3.13.11",
