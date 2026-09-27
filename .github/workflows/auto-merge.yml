@@ -62,7 +62,7 @@ jobs:
               )
             )
       )
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     env:
       HAS_APP_CREDS: ${{ secrets.APP_PRIVATE_KEY != '' && (vars.APP_CLIENT_ID != '' || secrets.APP_CLIENT_ID != '' || vars.APP_ID != '' || secrets.APP_ID != '') }}
     steps:
