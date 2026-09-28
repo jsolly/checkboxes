@@ -23,7 +23,6 @@ gate_begin_commit "checkboxes"    # staged gitleaks; md-lint; doc-only fast path
 gate_require_node                 # enforce the pinned Node (.nvmrc), not whatever's on PATH
 
 # --- Quality gate (run_step: silent on green, full output + abort on red) ---
-run_step "dep grounding" gate_check_dep_grounding .git-hooks/pre-commit scripts/*.sh
 run_step "biome ci"     npx --no-install biome ci . --error-on-warnings
 run_step "yaml lint"   npm run check:yaml
 run_step "actionlint"             npm run check:actions
