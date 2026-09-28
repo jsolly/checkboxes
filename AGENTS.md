@@ -4,9 +4,7 @@
 
 Ship profile: `vercel-static`
 
-Integration: `pr-auto-merge`
-
-The auto-merge bot waits for this repo's `ci` check because Free private repos cannot set required checks.
+**Integration: branch → PR → merge on green `CI / ci`.** `/ship` opens the PR and merges it once `ci` passes on the head — native auto-merge where the base branch's ruleset requires `ci`, otherwise a head-pinned manual squash (`~/code/dotagents/skills/ship/references/git-discipline.md` → Server-side gate). Agents never push to `main`, change rulesets, or admin-merge.
 
 CI owner: `local`
 
