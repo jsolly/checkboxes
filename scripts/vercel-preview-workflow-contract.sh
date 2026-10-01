@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Lock SHA injection on .github/workflows/vercel-preview.yml. CLI --archive=tgz
-# deploys omit .git, so gen-release-id and middleware must receive the PR head SHA.
+# Lock the safety and metadata contract of .github/workflows/vercel-preview.yml.
+# CLI --archive=tgz deploys omit .git, so the build must receive the PR head SHA.
+# Copy from templates/github/.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -21,11 +22,16 @@ require() {
 	fi
 }
 
-require '--build-env "VERCEL_GIT_COMMIT_SHA=${HEAD_SHA}"' 'pass the PR SHA as a build env'
-require '--build-env "GITHUB_SHA=${HEAD_SHA}"' 'pass the PR SHA as a CLI build fallback'
-require '--env "VERCEL_GIT_COMMIT_SHA=${HEAD_SHA}"' 'pass the PR SHA as middleware runtime env'
-require '--env "GITHUB_SHA=${HEAD_SHA}"' 'pass the PR SHA as middleware runtime fallback'
+require '--build-env "VERCEL_GIT_COMMIT_SHA=${HEAD_SHA}"' 'pass the PR SHA as a Vite build env'
 require '--meta "githubDeployment=1"' 'mark the CLI deploy as a GitHub deployment'
 require '--meta "githubCommitSha=${HEAD_SHA}"' 'attach the PR SHA as GitHub commit metadata'
+require 'jq -r '"'"'.head.sha'"'"'' 'resolve the Preview SHA from the PR head, not github.sha'
+require 'ref: ${{ steps.pr.outputs.head_sha }}' 'check out the resolved PR head SHA'
+require 'printf '"'"'%s'"'"' "$COMMENT_BODY" | bash scripts/vercel-preview-comment.sh' 'pipe comments through the exact /preview matcher'
+require 'github.event.comment.author_association == '"'"'OWNER'"'"'' 'restrict comment deploys to owner/member/collaborator'
+require 'head_repo" != "$REPO"' 'refuse fork PR heads'
+require 'persist-credentials: false' 'do not persist the Actions token on checkout'
+require 'cd "$RUNNER_TEMP" && npx --yes vercel@59.20.0 deploy --yes --archive=tgz --cwd "$GITHUB_WORKSPACE"' 'run the pinned GeoRoids CLI from outside the PR tree (npm reads no PR .npmrc or node_modules/vercel while VERCEL_TOKEN is set) with the tgz archive that omits .git'
+require 'cancel-in-progress: false' 'not cancel an in-flight /preview when a later comment lands'
 
-echo "✓ vercel-preview workflow injects the PR commit SHA"
+echo "✓ vercel-preview workflow contract holds"

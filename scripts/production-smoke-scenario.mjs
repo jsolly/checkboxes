@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 
 export const productionUrl = "https://www.checkboxes.xyz";
 
-export async function smoke({ page }) {
+export async function smoke({ page, verifyHttp }) {
 	await page
 		.getByRole("heading", { name: "Nested Checkboxes", exact: true })
 		.waitFor();
@@ -45,5 +45,6 @@ export async function smoke({ page }) {
 				`${framework}: parent clears every child`,
 			);
 		}
+		await verifyHttp(page.url());
 	}
 }

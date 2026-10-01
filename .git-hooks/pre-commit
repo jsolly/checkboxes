@@ -18,15 +18,19 @@ source "${DOTAGENTS_GATE_LIB:-$HOME/code/dotagents/gate/gate-lib.sh}" || {
 # Gate the tree being committed, not this copy's: under an absolute core.hooksPath (Claude
 # desktop worktrees) this re-execs the committing tree's own hook; it sets ROOT and cd's.
 gate_enter_committing_tree "${BASH_SOURCE[0]}"
+gate_require_lib 12  # gate_check_bash_floor
 
 gate_begin_commit "checkboxes"    # staged gitleaks; md-lint; doc-only fast path; skip on merge/amend; banner; ERR trap
+run_step "bash floor" gate_check_bash_floor   # every Bash entrypoint refuses Bash < 5
 gate_require_node                 # enforce the pinned Node (.nvmrc), not whatever's on PATH
 
 # --- Quality gate (run_step: silent on green, full output + abort on red) ---
 run_step "biome ci"     npx --no-install biome ci . --error-on-warnings
 run_step "yaml lint"   npm run check:yaml
 run_step "actionlint"             npm run check:actions
-run_step "release-id contract" npm run check:release-id
+run_step "markdown lint" npm run check:md
+run_step "smoke scenario" npm run smoke:scenario-contract
+run_step "tests" npm test
 run_step "astro check (types)" npm run check:ts
 run_step "knip"        npm run check:knip
 run_step "build"       npm run build

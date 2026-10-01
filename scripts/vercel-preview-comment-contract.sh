@@ -30,6 +30,8 @@ assert_match 'bare command' '/preview'
 assert_match 'leading blank line' $'\n\n/preview\n'
 assert_match 'trailing notes' $'/preview\n\nplease build this PR\n'
 assert_match 'windows newlines' $'/preview\r\nnext line\r\n'
+assert_match 'whitespace-only first line' $'\n  \n/preview\n'
+assert_match 'padded command' $'  /preview  \n'
 
 assert_skip 'empty' ''
 assert_skip 'prose mention' 'see /preview in AGENTS.md'

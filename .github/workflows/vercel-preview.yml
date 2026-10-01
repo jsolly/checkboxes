@@ -1,10 +1,19 @@
----
-name: Vercel Preview
-
+# GitHub Vercel Preview template — opt-in CLI Preview (automatic Git Preview is off)
+# Copy to .github/workflows/vercel-preview.yml and:
+#   1. Replace prj_Qy2iDBHuQ0n16tuT1vBmeIrgKkxr with the Vercel project id
+#   2. Copy vercel-preview-comment.sh, vercel-preview-comment-contract.sh, and
+#      vercel-preview-workflow-contract.sh into scripts/
+#   3. Merge vercel.git.deploymentEnabled.json into vercel.json
+#   4. Add GitHub secret VERCEL_TOKEN (leftover: do not invent a token)
+# VERCEL_ORG_ID is the jsolly team (team_T8yHg0aDz7nCbyBgJh5a2saR).
+# CLI pin: vercel@59.20.0 (copied from GeoRoids PR 604 — do not invent a version).
+#
 # Opt-in Preview deploys. Automatic Git Preview builds are off in vercel.json.
 # Same-repo owner/member User comments `/preview` on a pull request, or run this
 # workflow with a PR number. Requires GitHub secret VERCEL_TOKEN.
 # issue_comment runs the workflow file from the default branch.
+
+name: Vercel Preview
 
 'on':
   issue_comment:
@@ -22,7 +31,8 @@ permissions:
 
 concurrency:
   group: vercel-preview-${{ github.event.issue.number || inputs.pr_number }}
-  # Later PR comments start this workflow too; do not cancel an in-flight deploy.
+  # Ordinary PR comments also match this workflow's on: issue_comment. Cancelling
+  # in-flight runs would abort a real /preview deploy when someone later says LGTM.
   cancel-in-progress: false
 
 jobs:
@@ -63,7 +73,7 @@ jobs:
           set -euo pipefail
 
           if [[ "$EVENT_NAME" == "issue_comment" ]]; then
-            if ! printf '%s' "$COMMENT_BODY" | scripts/vercel-preview-comment.sh; then
+            if ! printf '%s' "$COMMENT_BODY" | bash scripts/vercel-preview-comment.sh; then
               echo "Comment is not an explicit /preview request; stopping."
               echo "skip=true" >>"$GITHUB_OUTPUT"
               exit 0
@@ -138,16 +148,20 @@ jobs:
             echo "PR head SHA is not a 40-character hex commit: ${HEAD_SHA}" >&2
             exit 1
           fi
+          if [[ ! "$HEAD_REF" =~ ^[A-Za-z0-9._/-]+$ ]]; then
+            echo "PR head ref is not a safe git branch name: ${HEAD_REF}" >&2
+            exit 1
+          fi
 
-          # --archive=tgz does not upload .git. gen-release-id and middleware need
-          # the PR SHA explicitly: Git-integration system vars are often empty
-          # on CLI deploys. x-release-id reads VERCEL_GIT_COMMIT_SHA then GITHUB_SHA.
+          # --archive=tgz does not upload .git. Inject the PR SHA: Git-integration
+          # system vars are often empty on CLI deploys.
+          # npx runs from $RUNNER_TEMP, outside the PR tree, so npm reads no PR
+          # .npmrc and finds no PR node_modules/vercel while VERCEL_TOKEN is in
+          # its environment; --cwd points the CLI back at the checkout.
           preview_url="$(
-            npx --yes vercel@59.20.0 deploy --yes --archive=tgz --scope jsollys-projects \
+            cd "$RUNNER_TEMP" && npx --yes vercel@59.20.0 deploy --yes --archive=tgz --cwd "$GITHUB_WORKSPACE" \
+              --scope jsollys-projects \
               --build-env "VERCEL_GIT_COMMIT_SHA=${HEAD_SHA}" \
-              --build-env "GITHUB_SHA=${HEAD_SHA}" \
-              --env "VERCEL_GIT_COMMIT_SHA=${HEAD_SHA}" \
-              --env "GITHUB_SHA=${HEAD_SHA}" \
               --meta "githubDeployment=1" \
               --meta "githubCommitSha=${HEAD_SHA}" \
               --meta "githubCommitRef=${HEAD_REF}" \
