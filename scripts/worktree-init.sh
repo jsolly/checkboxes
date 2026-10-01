@@ -8,7 +8,9 @@
 # trips Vite's server.fs.allow. cp -p preserves the 0600 mode on .env.local.
 #
 # Non-fatal by design: a missing primary, missing manifest, or zero glob matches must
-# not block the `npm ci` that follows in worktree:init. Always exits 0.
+# not block the `npm ci` that follows in worktree:init. Always exits 0, except the Bash < 5
+# refusal on its first line.
+((BASH_VERSINFO[0] >= 5)) || { echo "✗ $0 requires Bash >= 5, not $BASH_VERSION. Fix: brew install bash; rerun bash ~/code/dotagents/setup/install-local-agent-runtime.sh; open a new shell." >&2; exit 1; }
 set -uo pipefail
 
 dest="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
