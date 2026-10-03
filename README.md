@@ -182,6 +182,7 @@ Each framework implementation is evaluated on three metrics:
 
 - Measured in kibibytes (KiB)
 - Calculated from built isolated `/test/{framework}` artifacts after `npm run build`
+- Uses a separate build graph for demos, excluding shared gallery controls
 - Includes first-party built chunks and inline JavaScript (no remote CDN runtimes)
 - Represents normalized gzip-compressed implementation JavaScript above `/test/baseline`
 - Lower scores are better

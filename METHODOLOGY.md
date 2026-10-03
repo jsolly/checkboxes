@@ -127,6 +127,8 @@ When `GEMINI_API_KEY` is set, the generator can refresh Vibe Complexity (median 
 
 JS Bundle is the **normalized implementation JavaScript payload** above a shared baseline test route (`/test/baseline`). It is measured from the built isolated `/test/{framework}` artifacts — not the gallery index, which loads every framework at once, and not browser transfer behavior.
 
+The measurement build has its own entry graph and asset namespace. It uses the same demo sources and produces the `/test/*` pages served in production. Shared gallery controls cannot enter that graph; the build rejects their imports. Changes to the gallery UI therefore do not inflate framework measurements.
+
 The formula version is stored in stats metadata (`bundleMeasurementVersion`, currently `bm-3.0.0`).
 
 ### What gets measured

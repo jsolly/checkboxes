@@ -7,11 +7,11 @@
 		"tests/**/*.test.ts"
 	],
 	"project": [
-		"src/**/*.{ts,tsx,js,jsx,mjs,astro,vue,svelte}",
+		"src/**/*.{ts,tsx,js,jsx,mjs,astro,vue,svelte,css}",
 		"scripts/**/*.{mjs,js,ts}",
 		"tests/**/*.ts"
 	],
 	"ignore": ["src/vendor/**"],
 	"ignoreBinaries": ["uvx"],
-	"ignoreDependencies": ["tailwindcss", "markdownlint-cli2", "vercel"]
+	"ignoreDependencies": ["markdownlint-cli2"]
 }

@@ -24,6 +24,18 @@ Opt-in Preview: comment `/preview` as the first non-empty line on a same-repo PR
 
 Checkbox implementation gallery — multiple frameworks and approaches with performance metrics. See `README.md`.
 
+## Frontend stack
+
+Astro renders pages; shared product controls use Svelte + shadcn-svelte.
+Load `/shadcn-svelte` for new or replaced standard controls and import the
+installed defining components directly. The pinned CLI, `components.json`,
+committed generated source and lockfile make adoption reproducible.
+
+User-directed exception: the ten framework checkbox implementations remain
+comparison/teaching examples in their original frameworks, including CSS-only.
+Keep their source inputs and isolated `/test/*` benchmark payloads free of shared
+gallery UI dependencies. React/Vue/etc packages serve those retained demos.
+
 ## Commands
 
 ```shell
