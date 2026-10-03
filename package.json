@@ -64,7 +64,7 @@
 		"@types/react": "^19.0.2",
 		"@types/react-dom": "^19.3.0",
 		"alpinejs": "^3.17.3",
-		"astro": "^7.3.2",
+		"astro": "^7.3.5",
 		"clsx": "2.1.1",
 		"dotenv": "^18.0.4",
 		"hyperscript.org": "0.9.93",
