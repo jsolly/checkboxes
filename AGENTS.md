@@ -48,7 +48,7 @@ Set `AWS_PROFILE` locally in your shell or gitignored `.env.local` — never com
 
 ## Logging & shared-infra
 
-Structured logging and alarm conventions: see `~/code/shared-infra/docs/adding-a-project.md`. Canonical Node logger: `~/code/family-memory/src/shared/logging.ts` (sync via `scripts/sync-shared-logger.sh` where applicable).
+SAM onboarding and alarm wiring: see `~/code/dotagents/skills/new-solly-repo/SKILL.md`. Enrichment behavior and logging conventions: `~/code/shared-infra/docs/architecture.md`. Canonical Node logger: `~/code/shared-infra/src/shared/logging.ts`.
 
 ## Local UI verification
 
