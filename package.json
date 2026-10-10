@@ -93,7 +93,7 @@
 		"playwright": "1.63.0",
 		"tsx": "^4.23.13",
 		"typescript": "^6.0.3",
-		"vercel": "^59.17.0"
+		"vercel": "^61.1.0"
 	},
 	"allowScripts": {
 		"@google/genai@2.20.0": true,
