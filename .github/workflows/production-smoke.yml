@@ -21,12 +21,19 @@ concurrency:
   cancel-in-progress: false
 jobs:
   smoke:
-    # Replace Production with the host's production deployment environment name.
+    # Substitute the production environment, status URL prefix and host's deployment creator.
+    # Project-qualified production environments still require this project's status URL.
     if: >-
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'deployment_status' &&
        github.event.deployment_status.state == 'success' &&
-       github.event.deployment.environment == 'Production')
+       github.event.deployment.creator.login == 'vercel[bot]' &&
+       (github.event.deployment.ref == 'main' ||
+        github.event.deployment.ref == 'refs/heads/main' ||
+        github.event.deployment.ref == github.event.deployment.sha) &&
+       (github.event.deployment.environment == 'Production' ||
+        startsWith(github.event.deployment.environment, 'Production – ')) &&
+       startsWith(github.event.deployment_status.environment_url, 'https://checkboxes-'))
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 15
     env:
@@ -37,7 +44,12 @@ jobs:
         with:
           # The deployed commit's scenario, so a later merge's assertions never test an older build.
           ref: ${{ github.event.deployment.sha || inputs.release_sha }}
+          fetch-depth: 0
           persist-credentials: false
+      - name: Verify the release belongs to main
+        run: |
+          [[ "$PRODUCTION_SMOKE_RELEASE_SHA" =~ ^[0-9a-f]{40}$ ]] || exit 1
+          git merge-base --is-ancestor "$PRODUCTION_SMOKE_RELEASE_SHA" origin/main
       - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
