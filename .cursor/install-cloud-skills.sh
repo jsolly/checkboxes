@@ -27,6 +27,41 @@ set -euo pipefail
 PACKAGE_INSTALLER="templates/cloud-agent/install-cloud-package.sh"
 DOTAGENTS_REPO="jsolly/dotagents"
 
+# Bound each transport and its credential-helper process group. Python is needed
+# only on the fetch path; a local DOTAGENTS_ROOT works without it.
+fetch_command() {
+  python3 - "$@" <<'PYTHON'
+import os
+import signal
+import subprocess
+import sys
+
+try:
+    child = subprocess.Popen(sys.argv[1:], start_new_session=True)
+except OSError:
+    sys.exit(127)
+try:
+    sys.exit(child.wait(timeout=120))
+except subprocess.TimeoutExpired:
+    print("cloud-package: fetch exceeded 120 seconds", file=sys.stderr)
+    try:
+        os.killpg(child.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    try:
+        child.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        pass
+    # Kill descendants even when the transport itself honored TERM first.
+    try:
+        os.killpg(child.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    child.wait()
+    sys.exit(124)
+PYTHON
+}
+
 has_package_installer() {
   [[ -n "$1" && -f "$1/$PACKAGE_INSTALLER" ]]
 }
@@ -68,7 +103,7 @@ fetch_via_gh_tarball() {
   rm -rf "$dest"
   mkdir -p "$dest"
   tarball="$(mktemp "${clone_tmp}/tarball.XXXXXX")"
-  if ! GH_PAGER=cat gh api "repos/${DOTAGENTS_REPO}/tarball/${ref}" >"$tarball"; then
+  if ! GH_PAGER=cat fetch_command gh api "repos/${DOTAGENTS_REPO}/tarball/${ref}" >"$tarball"; then
     echo "cloud-package: gh api tarball failed for ${DOTAGENTS_REPO}@${ref}"
     return 1
   fi
@@ -85,19 +120,23 @@ fetch_via_gh_repo_clone() {
   command -v gh >/dev/null 2>&1 || return 1
   echo "cloud-package: cloning ${DOTAGENTS_REPO}@${ref} via gh repo clone (shallow)"
   rm -rf "$dest"
-  GH_PAGER=cat gh repo clone "$DOTAGENTS_REPO" "$dest" -- --depth 1 --branch "$ref"
+  GH_PAGER=cat fetch_command gh repo clone "$DOTAGENTS_REPO" "$dest" -- --depth 1 --branch "$ref"
 }
 
 fetch_via_git_clone() {
   local ref="$1" dest="$2"
   echo "cloud-package: cloning ${DOTAGENTS_REPO}@${ref} via git clone (shallow)"
   rm -rf "$dest"
-  GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=true git clone --depth 1 --branch "$ref" "https://github.com/${DOTAGENTS_REPO}.git" "$dest"
+  GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=true fetch_command git clone --depth 1 --branch "$ref" "https://github.com/${DOTAGENTS_REPO}.git" "$dest"
 }
 
 # Try gh's credentials first (tarball, then clone), then plain git clone.
 fetch_checkout() {
   local ref="$1" dest="$2"
+  command -v python3 >/dev/null 2>&1 || {
+    echo "cloud-package: ERROR — Python 3 is required for bounded package fetching; install python3 or set DOTAGENTS_ROOT to a local checkout." >&2
+    return 1
+  }
   fetch_via_gh_tarball "$ref" "$dest" || fetch_via_gh_repo_clone "$ref" "$dest" || fetch_via_git_clone "$ref" "$dest"
 }
 

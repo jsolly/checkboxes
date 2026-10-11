@@ -9,37 +9,41 @@
 # does not re-run on later agent starts.
 #
 # It also writes profile agent-host-operator for host work on
-# fleet:agent-operable=true instances (rules/agent-cloud-access.md → Agent-operable
-# hosts), used only explicitly: `AWS_PROFILE=agent-host-operator aws ssm ...`.
-# The default stays agent-readonly. Residual: on Cursor Cloud the split is a
-# convention, not a boundary. Both roles trust the same Cursor JWT (same aud/sub
-# pin) and no claim tells them apart, so any process on the VM that can mint the
-# JWT can assume either role. The laptop's separate Identity Center user is what
-# makes the split real there.
+# fleet:agent-operable=true instances, used only explicitly:
+# `AWS_PROFILE=agent-host-operator aws ssm ...`. The default stays agent-readonly.
+# On Cursor Cloud both roles trust the same JWT, so the split is a convention, not
+# a boundary (rules/agent-cloud-access.md → Agent-operable hosts).
 set -euo pipefail
 
+ACCOUNT_ID=730335616323
 REGION="${AWS_REGION:-${AWS_DEFAULT_REGION:-us-east-1}}"
 CURSOR_SOCK="${CURSOR_AGENT_SOCKET:-/run/cursor/api.sock}"
 HELPER="${HOME}/.local/bin/aws-oidc-login.sh"
+# Every role this script writes a profile for. Each must also have a case arm below,
+# which owns its ARN and session name.
+ROLES=(agent-readonly agent-host-operator)
+
+# One argv shape: no arguments (install), or --credential-process <role> (AWS CLI callback).
 CREDENTIAL_PROCESS=0
 ROLE=agent-readonly
 if [[ "${1:-}" == "--credential-process" ]]; then
   CREDENTIAL_PROCESS=1
   ROLE="${2:-}"
 fi
+
 # A literal allowlist. AWS_ROLE_ARN may repoint the read role (a Cursor
 # Environment Variable), never the host role.
 case "$ROLE" in
   agent-readonly)
-    ROLE_ARN="${AWS_ROLE_ARN:-arn:aws:iam::730335616323:role/agent-readonly}"
+    ROLE_ARN="${AWS_ROLE_ARN:-arn:aws:iam::${ACCOUNT_ID}:role/agent-readonly}"
     SESSION_NAME="${AWS_ROLE_SESSION_NAME:-cloud-agent}"
     ;;
   agent-host-operator)
-    ROLE_ARN="arn:aws:iam::730335616323:role/agent-host-operator"
+    ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/agent-host-operator"
     SESSION_NAME="cloud-agent-host"
     ;;
   *)
-    echo "aws-oidc-login: unknown role '${ROLE}' (want agent-readonly or agent-host-operator)" >&2
+    echo "aws-oidc-login: unknown role '${ROLE}' (want one of: ${ROLES[*]})" >&2
     exit 2
     ;;
 esac
@@ -50,6 +54,26 @@ log() {
   else
     echo "aws-oidc-login: $*"
   fi
+}
+
+# True when this process is root or has passwordless sudo.
+can_run_as_root() {
+  [[ "$(id -u)" -eq 0 ]] || { command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; }
+}
+# Run a command as root: directly when root, else through passwordless sudo.
+run_as_root() {
+  if [[ "$(id -u)" -eq 0 ]]; then "$@"; else sudo -n "$@"; fi
+}
+
+# Bounded downloads: a stalled connection must not hang the bootstrap.
+fetch() {
+  curl -fsSL --connect-timeout 10 --max-time 120 "$1" -o "$2"
+}
+
+verify_sha256() {
+  local file="$1" want="$2" got
+  got="$(sha256sum "$file" 2>/dev/null || shasum -a 256 "$file" 2>/dev/null || true)"
+  [[ "${got%% *}" == "$want" ]]
 }
 
 install_aws_cli() {
@@ -68,24 +92,20 @@ install_aws_cli() {
       ;;
   esac
   dest="$(mktemp -d)"
-  curl -fsSL "https://awscli.amazonaws.com/${bundle}" -o "${dest}/awscliv2.zip"
+  fetch "https://awscli.amazonaws.com/${bundle}" "${dest}/awscliv2.zip"
   unzip -q "${dest}/awscliv2.zip" -d "$dest"
-  if [[ "$(id -u)" -eq 0 ]]; then
-    "${dest}/aws/install"
-  elif command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
-    sudo "${dest}/aws/install"
+  if can_run_as_root; then
+    run_as_root "${dest}/aws/install"
   else
     mkdir -p "${HOME}/.local/bin"
     "${dest}/aws/install" -i "${HOME}/.local/aws-cli" -b "${HOME}/.local/bin"
     if [[ -d /etc/profile.d && -w /etc/profile.d ]]; then
       printf 'export PATH="%s/.local/bin:$PATH"\n' "$HOME" >/etc/profile.d/aws-local-bin.sh
     fi
-    # Non-login bash -c still misses ~/.local/bin; prefer sudo install above.
+    # Non-login bash -c still misses ~/.local/bin; prefer a root install above.
     export PATH="${HOME}/.local/bin:${PATH}"
     if [[ -w /usr/local/bin ]]; then
       ln -sfn "${HOME}/.local/bin/aws" /usr/local/bin/aws
-    elif command -v sudo >/dev/null 2>&1; then
-      sudo ln -sfn "${HOME}/.local/bin/aws" /usr/local/bin/aws || true
     fi
   fi
   rm -rf "$dest"
@@ -96,15 +116,15 @@ install_aws_cli() {
 }
 
 # `aws ssm start-session` needs AWS's Session Manager plugin. Best effort: a
-# missing plugin must not fail the read-role bootstrap, and `aws ssm
-# send-command` works without it. Pinned and sha256-checked, since it installs
-# as root; bump the version and both hashes together.
+# missing plugin never fails the credential bootstrap (it runs after it), and
+# `aws ssm send-command` works without it. Pinned and sha256-checked, since it
+# installs as root; bump the version and both hashes together.
 SSM_PLUGIN_VERSION=1.2.835.0
 install_session_manager_plugin() {
   if command -v session-manager-plugin >/dev/null 2>&1; then
     return 0
   fi
-  local arch deb dest sha got
+  local arch sha dest deb
   case "$(uname -m)" in
     aarch64 | arm64) arch="ubuntu_arm64" sha=0add94c4c8b6ca63f26e44fd655d662b0f6455a268b5b9ebebee0f462214e928 ;;
     x86_64) arch="ubuntu_64bit" sha=7c6dcad12518571cc7959a713e6a8ae1bdf6ed66fd9bee37dc189e39ca58ae03 ;;
@@ -119,16 +139,14 @@ install_session_manager_plugin() {
   fi
   dest="$(mktemp -d)"
   deb="${dest}/session-manager-plugin.deb"
-  if ! curl -fsSL "https://s3.amazonaws.com/session-manager-downloads/plugin/${SSM_PLUGIN_VERSION}/${arch}/session-manager-plugin.deb" -o "$deb"; then
+  if ! fetch "https://s3.amazonaws.com/session-manager-downloads/plugin/${SSM_PLUGIN_VERSION}/${arch}/session-manager-plugin.deb" "$deb"; then
     log "Session Manager plugin: download failed; start-session unavailable"
-  elif got="$(sha256sum "$deb" 2>/dev/null || shasum -a 256 "$deb" 2>/dev/null)"; [[ "${got%% *}" != "$sha" ]]; then
+  elif ! verify_sha256 "$deb" "$sha"; then
     log "Session Manager plugin: sha256 mismatch for ${SSM_PLUGIN_VERSION}; not installed"
-  elif [[ "$(id -u)" -eq 0 ]]; then
-    dpkg -i "$deb" >/dev/null || log "Session Manager plugin: dpkg -i failed"
-  elif command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
-    sudo dpkg -i "$deb" >/dev/null || log "Session Manager plugin: dpkg -i failed"
-  else
+  elif ! can_run_as_root; then
     log "Session Manager plugin: no root or passwordless sudo; start-session unavailable"
+  else
+    run_as_root dpkg -i "$deb" >/dev/null || log "Session Manager plugin: dpkg -i failed"
   fi
   rm -rf "$dest"
   return 0
@@ -205,28 +223,26 @@ install_helper() {
   chmod 0755 "$HELPER"
 }
 
+# credential_process so later agent starts (and calls after 1h) mint fresh STS
+# creds. [default] aliases agent-readonly for non-login bash -c that never
+# sources bashrc.
+profile_stanza() {
+  printf 'credential_process = %s --credential-process %s\nregion = %s\noutput = json\n' "$HELPER" "$1" "$REGION"
+}
+
 write_profile() {
   mkdir -p "${HOME}/.aws"
   umask 077
   rm -f "${HOME}/.aws/credentials"
-  # credential_process so later agent starts (and calls after 1h) mint fresh
-  # STS creds. [default] covers non-login bash -c that never sources bashrc.
-  cat > "${HOME}/.aws/config" <<EOF
-[default]
-credential_process = ${HELPER} --credential-process agent-readonly
-region = ${REGION}
-output = json
-
-[profile agent-readonly]
-credential_process = ${HELPER} --credential-process agent-readonly
-region = ${REGION}
-output = json
-
-[profile agent-host-operator]
-credential_process = ${HELPER} --credential-process agent-host-operator
-region = ${REGION}
-output = json
-EOF
+  {
+    printf '[default]\n'
+    profile_stanza agent-readonly
+    local role
+    for role in "${ROLES[@]}"; do
+      printf '\n[profile %s]\n' "$role"
+      profile_stanza "$role"
+    done
+  } > "${HOME}/.aws/config"
   append_aws_exports "${HOME}/.bashrc"
   append_aws_exports "${HOME}/.profile"
   prefer_oidc_chain
@@ -250,13 +266,19 @@ assume_web_identity_json() {
 
 mint_cursor_jwt() {
   local raw
-  raw="$(
-    curl --fail --silent --show-error --unix-socket "$CURSOR_SOCK" \
+  if raw="$(
+    curl --fail --silent --show-error --connect-timeout 10 --max-time 30 \
+      --unix-socket "$CURSOR_SOCK" \
       -H "Content-Type: application/json" \
       -d '{"aud":"sts.amazonaws.com"}' \
       http://localhost/v1/tokens/oidc
-  )"
-  printf '%s' "$raw" | extract_oidc_token
+  )"; then
+    printf '%s' "$raw" | extract_oidc_token
+  else
+    local status=$?
+    log "ERROR: cannot mint Cursor OIDC token (curl exit $status; 30-second deadline). Check the Cursor socket and token service." >&2
+    return "$status"
+  fi
 }
 
 wait_for_cursor_sock() {
@@ -302,7 +324,6 @@ fi
 
 if [[ -S "$CURSOR_SOCK" ]]; then
   install_aws_cli
-  install_session_manager_plugin
   log "Cursor Cloud OIDC socket at ${CURSOR_SOCK}"
   token="$(mint_cursor_jwt)"
   sub="$(jwt_sub "$token")"
@@ -323,6 +344,8 @@ if [[ -S "$CURSOR_SOCK" ]]; then
   log "assumed ${ROLE_ARN} as profile agent-readonly"
   # Not assumed here: the role may not be deployed yet, and host work is explicit.
   log "wrote profile agent-host-operator (host work only: AWS_PROFILE=agent-host-operator)"
+  # Last, so a plugin problem can never delay or fail the credentials above.
+  install_session_manager_plugin || log "Session Manager plugin: install step failed; start-session unavailable"
   exit 0
 fi
 
