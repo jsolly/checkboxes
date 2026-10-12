@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# Cursor Cloud Agent bootstrap: find or fetch a private dotagents checkout, then run that checkout's
-# templates/cloud-agent/install-cloud-package.sh, which does the install (see its header).
+# Cloud agent bootstrap: find or fetch a private dotagents checkout, then run that checkout's
+# templates/cloud-agent/install-cloud-package.sh, which does the install (see its header). Cursor runs
+# it from environment.json `install`; Claude Code's SessionStart hook (claude-settings.json) runs it
+# with --session-hook, below; any agent can run it by hand.
 # Every fleet child carries this file byte-equal as .cursor/install-cloud-skills.sh
 # (/optimize-workspaces cloud-package sync), so it knows only where the package installer lives:
 # what gets installed, and how, travels with the checkout and needs no fleet re-sync; a change to
@@ -23,6 +25,20 @@
 # The repo is fixed: a VM that needs another transport clones it first and sets DOTAGENTS_ROOT. No
 # URL here ever carries a credential, so nothing needs redacting. Never clones a public skills mirror.
 set -euo pipefail
+
+# --session-hook: Claude Code's SessionStart trigger. Log the install, bound it at 570 s (inside the
+# hook's 600 s limit), and add only the log's last two lines to the session (the installer ends with
+# its summary and where its CLOUD.md entry is), plus an exit-code line when the install failed. Exit 0
+# then: a failed install must not block the session, whose AGENTS.md Cloud skills stanza covers it.
+if [[ "${1:-}" == --session-hook ]]; then
+  log="${HOME}/.local/share/dotagents/install.log"
+  mkdir -p "${log%/*}"
+  rc=0
+  timeout 570 "$BASH" "${BASH_SOURCE[0]}" >"$log" 2>&1 || rc=$?
+  tail -n 2 "$log"
+  [[ "$rc" -eq 0 ]] || echo "dotagents package: install exited $rc (log: $log)"
+  exit 0
+fi
 
 PACKAGE_INSTALLER="templates/cloud-agent/install-cloud-package.sh"
 DOTAGENTS_REPO="jsolly/dotagents"
