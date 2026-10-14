@@ -1,24 +1,17 @@
 #!/usr/bin/env bash
+((BASH_VERSINFO[0] >= 5)) || { echo "✗ $0 requires Bash >= 5, not $BASH_VERSION. Fix: brew install bash; open a fresh shell and rerun repository setup." >&2; exit 1; }
 # Pre-commit GATE for checkboxes (gate-only — this hook does NOT deploy).
 #
-# Thin shim over the shared fleet gate library (dotagents/gate/gate-lib.sh): the
-# ~100 lines of boilerplate every repo shares — the staged secrets scan,
-# markdown-lint-on-change, the doc-only fast path, the commit-context guards,
-# and run_step (silent on green, full output on red) — live in the lib.
-# This file declares only checkboxes-specific quality steps. The gate fires on
-# every commit; production deploy is owned by Vercel's GitHub integration after
-# the commit lands on main.
+# Repository-owned gate: committing-tree selection, staged secret scans,
+# pinned runtimes and the quality checks below. Vercel owns deployment after merge.
 set -euo pipefail
 
 # shellcheck source=/dev/null
-source "${DOTAGENTS_GATE_LIB:-$HOME/code/dotagents/gate/gate-lib.sh}" || {
-  echo "✗ dotagents gate-lib not found (expected ~/code/dotagents/gate/gate-lib.sh) — re-run install-local-agent-runtime.sh." >&2
-  exit 1
-}
+_repo_owned_gate_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "$_repo_owned_gate_root/gate/gate-lib.sh"
 # Gate the tree being committed, not this copy's: under an absolute core.hooksPath (Claude
 # desktop worktrees) this re-execs the committing tree's own hook; it sets ROOT and cd's.
 gate_enter_committing_tree "${BASH_SOURCE[0]}"
-gate_require_lib 12  # gate_check_bash_floor
 
 gate_begin_commit "checkboxes"    # staged gitleaks; md-lint; doc-only fast path; skip on merge/amend; banner; ERR trap
 run_step "bash floor" gate_check_bash_floor   # every Bash entrypoint refuses Bash < 5
@@ -34,5 +27,7 @@ run_step "tests" npm test
 run_step "astro check (types)" npm run check:ts
 run_step "knip"        npm run check:knip
 run_step "build"       npm run build
+
+run_step "repository hook trust" bash scripts/repo-python.sh scripts/test-repo-hooks.py
 
 echo "✓ pre-commit gate passed — commit will land; Vercel deploys via GitHub integration after merge to main."

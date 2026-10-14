@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 # Copy the gitignored files listed in .worktreeinclude from the primary checkout into
-# the current worktree. Run by `npm run worktree:init` on the MANUAL `git worktree add`
-# path; the dotagents WorktreeCreate hook copies the same allowlist on the EnterWorktree
-# paths, so this gives manual worktrees parity.
+# the current worktree. Run by the repo-owned `npm run worktree:init` entrypoint,
+# which the committed Cursor and Codex worktree configurations both invoke.
 #
 # Copy, never symlink — a symlinked .env.local resolves outside the worktree root and
 # trips Vite's server.fs.allow. cp -p preserves the 0600 mode on .env.local.
 #
 # Non-fatal by design: a missing primary, missing manifest, or zero glob matches must
-# not block the `npm ci` that follows in worktree:init. Always exits 0, except the Bash < 5
+# not block the reviewed repository setup that follows in worktree:init. Always exits 0, except the Bash < 5
 # refusal on its first line.
-((BASH_VERSINFO[0] >= 5)) || { echo "✗ $0 requires Bash >= 5, not $BASH_VERSION. Fix: brew install bash; rerun bash ~/code/dotagents/setup/install-local-agent-runtime.sh; open a new shell." >&2; exit 1; }
+((BASH_VERSINFO[0] >= 5)) || { echo "✗ $0 requires Bash >= 5, not $BASH_VERSION. Fix: brew install bash; open a fresh shell and rerun repository setup." >&2; exit 1; }
 set -uo pipefail
 
 dest="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
@@ -29,7 +28,7 @@ while IFS= read -r line || [ -n "$line" ]; do
   line="${line#"${line%%[![:space:]]*}"}"             # trim leading whitespace
   line="${line%"${line##*[![:space:]]}"}"             # trim trailing whitespace
   [ -n "$line" ] || continue
-  # Reject absolute paths and `..` traversal (parity with the WorktreeCreate hook).
+  # Reject absolute paths and `..` traversal.
   # .worktreeinclude is repo-controlled, but `../../.ssh/id_rsa` would read outside the
   # primary AND, since the prefix-strip leaves `..` in $rel, write outside the worktree.
   case "/$line/" in

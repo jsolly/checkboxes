@@ -1,0 +1,12 @@
+{
+	"version": 1,
+	"repo": "jsolly/checkboxes",
+	"files": {
+		".git-hooks/pre-commit": 493,
+		"gate/gate-lib.sh": 420,
+		"gate/hooks/pre-commit": 493,
+		"scripts/repo-hooks.py": 493,
+		"scripts/repo-python.sh": 493,
+		"scripts/setup-agent-environment.sh": 493
+	}
+}

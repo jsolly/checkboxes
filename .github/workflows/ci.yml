@@ -132,30 +132,15 @@ jobs:
       - uses: astral-sh/setup-uv@v10.1.0
         if: steps.verified-tree.outputs.run_full != 'false'
         with:
-          version: latest-known
+          version: "0.12.22"
           enable-cache: false
       - run: npm ci
         if: steps.verified-tree.outputs.run_full != 'false'
-      - run: npm run check:actions
-        if: steps.verified-tree.outputs.run_full != 'false'
-      - run: npm run check:md
-        if: steps.verified-tree.outputs.run_full != 'false'
       - run: npx --no-install playwright install --with-deps chromium
         if: steps.verified-tree.outputs.run_full != 'false'
-      - run: npm run smoke:scenario-contract
+      - name: Run complete repository gate
         if: steps.verified-tree.outputs.run_full != 'false'
-      - run: npx --no-install biome ci . --error-on-warnings
-        if: steps.verified-tree.outputs.run_full != 'false'
-      - run: npm run check:yaml
-        if: steps.verified-tree.outputs.run_full != 'false'
-      - run: npm run check:ts
-        if: steps.verified-tree.outputs.run_full != 'false'
-      - run: npm run check:knip
-        if: steps.verified-tree.outputs.run_full != 'false'
-      - run: npm test
-        if: steps.verified-tree.outputs.run_full != 'false'
-      - run: npm run build
-        if: steps.verified-tree.outputs.run_full != 'false'
+        run: npm run gate
       - name: Record validated PR tree
         if: >-
           success() && github.event_name == 'pull_request' &&
