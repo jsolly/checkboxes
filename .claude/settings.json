@@ -6,7 +6,7 @@
 				"hooks": [
 					{
 						"type": "command",
-						"command": "[ \"$CLAUDE_CODE_REMOTE\" = true ] || exit 0; bash \"$CLAUDE_PROJECT_DIR/.cursor/install-cloud-skills.sh\" --session-hook",
+						"command": "[ \"$CLAUDE_CODE_REMOTE\" = true ] || exit 0; bash \"$CLAUDE_PROJECT_DIR/scripts/setup-agent-environment.sh\" --session-hook",
 						"timeout": 600
 					}
 				]

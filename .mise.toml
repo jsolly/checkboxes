@@ -1,0 +1,5 @@
+
+[tools]
+node = "24"
+gitleaks = "8.24.2"
+uv = "0.12.22"
