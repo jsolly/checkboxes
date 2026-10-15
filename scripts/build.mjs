@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import {
 	cp,
 	mkdir,
@@ -7,10 +8,19 @@ import {
 	readFile,
 	rm,
 	symlink,
+	writeFile,
 } from "node:fs/promises";
 import path from "node:path";
 
 const root = process.cwd();
+// One identity for the complete deployment, including both entry graphs.
+const release = process.env.VERCEL_DEPLOYMENT_ID ?? randomUUID();
+if (process.env.VERCEL && !process.env.VERCEL_DEPLOYMENT_ID) {
+	throw new Error(
+		"Production build requires its immutable Vercel deployment identity",
+	);
+}
+process.env.PUBLIC_WEBSITE_RELEASE = release;
 await mkdir(path.join(root, ".astro"), { recursive: true });
 const temporary = await mkdtemp(path.join(root, ".astro", "checkboxes-build-"));
 const productSource = path.join(temporary, "product/src");
@@ -100,6 +110,10 @@ try {
 		path.join(root, "dist"),
 		path.join(root, ".vercel/output/static"),
 	]) {
+		await writeFile(
+			path.join(destination, "release.json"),
+			JSON.stringify({ release }),
+		);
 		await copyAssets(
 			path.join(output, "_measurements"),
 			path.join(destination, "_measurements"),

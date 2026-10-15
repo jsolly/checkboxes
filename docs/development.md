@@ -86,3 +86,9 @@ and trusted hooks. Personal worktree hooks are optional.
 This app pins uv in `.mise.toml` for its pinned yamllint invocation. CI uses the
 same uv release. Vercel deployments and exact-release production smoke remain
 owned by this repo's existing workflows.
+
+## Website updates
+
+The public gallery offers deployment updates without interrupting open tabs.
+See [website updates](website-updates.md) for identity, selection confirmation,
+asset retention, migration limits and the required browser evidence.

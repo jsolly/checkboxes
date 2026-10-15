@@ -39,7 +39,7 @@ export default defineConfig({
 		react(),
 		svelte(),
 	],
-	...(measurementBuild ? {} : { adapter: vercel() }),
+	...(measurementBuild ? {} : { adapter: vercel({ skewProtection: true }) }),
 	vite: {
 		plugins: [
 			tailwindcss(),
