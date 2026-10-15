@@ -4,6 +4,7 @@ import "../styles/checkbox-demo.css";
 import "../styles/checkbox-demo-classes.jsx";
 
 interface Props {
+	release?: string;
 	title?: string;
 	description?: string;
 	/** Root-relative path to the social share image. */
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const {
+	release,
 	title = "checkboxes.xyz",
 	description = "A gallery comparing how JavaScript frameworks and CSS-only approaches implement nested parent-child checkboxes, with bundle-size and performance metrics.",
 	image = "/og-image.jpg",
@@ -30,6 +32,7 @@ const imageURL = new URL(image, Astro.site);
 			@layer theme, base, components, utilities, layout, pages, demo;
 		</style>
 		<meta charset="UTF-8" />
+		{release && <meta name="website-release" content={release} />}
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
@@ -63,6 +66,7 @@ const imageURL = new URL(image, Astro.site);
 				<a href="https://github.com/jsolly/checkboxes" target="_blank" rel="noopener noreferrer">GitHub</a>
 			</nav>
 		</header>
+		<slot name="notice" />
 		<main id="main" tabindex="-1">
 			<slot />
 		</main>

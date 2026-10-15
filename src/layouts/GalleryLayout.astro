@@ -1,0 +1,13 @@
+---
+import type { ComponentProps } from "astro/types";
+import UpdateNotice from "../components/UpdateNotice.svelte";
+import Layout from "./Layout.astro";
+
+type Props = ComponentProps<typeof Layout>;
+// biome-ignore lint/complexity/useLiteralKeys: Astro environment keys use an index signature.
+const release = import.meta.env["PUBLIC_WEBSITE_RELEASE"] ?? "";
+---
+<Layout {...Astro.props} {release}>
+ <UpdateNotice slot="notice" {release} client:load />
+ <slot />
+</Layout>
