@@ -148,6 +148,11 @@ it("Open gallery tabs choose when to reload after a deployment", async () => {
 				.first()
 				.waitFor({ state: "detached" });
 			assert.equal(
+				await page.locator('link[rel="stylesheet"]').count(),
+				0,
+				"Gallery styles remain in the loaded document across deployments",
+			);
+			assert.equal(
 				await page.getByRole("button", { name: "Update and reload" }).count(),
 				0,
 			);
@@ -334,6 +339,14 @@ it("Open gallery tabs choose when to reload after a deployment", async () => {
 				throw error;
 			});
 		assert.equal(navigations, 1);
+		assert.equal(await first.locator('link[rel="stylesheet"]').count(), 0);
+		assert.notEqual(
+			await first
+				.locator(".update-notice")
+				.evaluate((element) => getComputedStyle(element).borderTopStyle),
+			"none",
+			"The stale document retains the real notice styles",
+		);
 		assert.equal(
 			await first
 				.locator('meta[name="website-release"]')
@@ -398,6 +411,34 @@ it("Open gallery tabs choose when to reload after a deployment", async () => {
 				.locator('meta[name="website-release"]')
 				.getAttribute("content"),
 			releaseB,
+		);
+		deployed = c;
+		await focus(second);
+		await second.getByRole("button", { name: "Update and reload" }).waitFor();
+		assert.equal(await second.locator('link[rel="stylesheet"]').count(), 0);
+		if (evidence) {
+			for (const [name, width, height] of [
+				["desktop", 1280, 900],
+				["mobile", 390, 844],
+			] as const) {
+				await second.setViewportSize({ width, height });
+				for (const colorScheme of ["light", "dark"] as const) {
+					await second.emulateMedia({ colorScheme });
+					await second.screenshot({
+						path: path.join(evidence, `methodology-${name}-${colorScheme}.png`),
+					});
+				}
+			}
+		}
+		await Promise.all([
+			second.waitForEvent("load"),
+			second.getByRole("button", { name: "Update and reload" }).click(),
+		]);
+		assert.equal(
+			await second
+				.locator('meta[name="website-release"]')
+				.getAttribute("content"),
+			JSON.parse(await readFile(path.join(c, "release.json"), "utf8")).release,
 		);
 		await second.goto(`${origin}/test/vanillajs/`);
 		assert.equal(

@@ -61,3 +61,21 @@ offline and HTTP 503; any other console/page/network error fails. Set
 `UPDATE_EVIDENCE_DIR` to an existing absolute directory to capture
 desktop/mobile light/dark screenshots. The test runs in the normal `npm test`
 gate with the pinned Chromium installation.
+
+## Styles and live retention acceptance
+
+Product builds use Astro's `inlineStylesheets: "always"`. Gallery styles travel
+with the document rather than relying on static stylesheet links that omit
+Vercel deployment pins. Benchmark builds retain their existing stylesheet
+strategy, output directory and isolated entry graph. The browser test verifies
+product pages have no external stylesheet links, including a stale document
+loaded after the next deployment, and still render the notice border.
+
+The first live retention check after PR 320 failed for the previous production
+release. A real same-origin module request with its original deployment pin
+returned 404; several same-name chunks returned different deployment-specific
+bytes. That older deployment still reports READY. The provider API does not
+expose this project's actual protection maximum age or threshold, so no cause
+or retention guarantee is established by that check. Vercel settings and real
+old-module loading must be verified before marking canonical adoption complete.
+The local retained-asset fixture does not substitute for that live proof.

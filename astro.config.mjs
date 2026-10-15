@@ -29,7 +29,11 @@ export default defineConfig({
 	site: "https://www.checkboxes.xyz",
 	...(buildSource ? { srcDir: buildSource } : {}),
 	...(measurementOutput ? { outDir: measurementOutput } : {}),
-	...(measurementBuild ? { build: { assets: "_measurements" } } : {}),
+	// Static Astro stylesheet links omit adapter deployment pins. Keep product styles
+	// in the document so an open client never needs a removed CSS file.
+	build: measurementBuild
+		? { assets: "_measurements" }
+		: { inlineStylesheets: "always" },
 	integrations: [
 		// The /test/* routes are noindex demo/measurement pages — keep them out of the sitemap.
 		...(measurementBuild
