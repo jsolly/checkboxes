@@ -13,5 +13,8 @@
 	],
 	"ignore": ["src/vendor/**"],
 	"ignoreBinaries": ["uvx"],
-	"ignoreDependencies": ["markdownlint-cli2"]
+	"ignoreDependencies": ["markdownlint-cli2"],
+	"astro": {
+		"config": ["astro.config.mjs", "config/app/astro.mjs"]
+	}
 }
