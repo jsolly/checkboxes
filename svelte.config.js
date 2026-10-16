@@ -1,5 +1,3 @@
-import { vitePreprocess } from "@astrojs/svelte";
+import config from "./config/app/svelte.js";
 
-export default {
-	preprocess: vitePreprocess(),
-};
+export default config;

@@ -113,6 +113,12 @@ This repo owns `gate/gate-lib.sh` and `scripts/repo-hooks.py`. Run reviewed
 pre-commit dispatcher. Never set hooksPath to `.git-hooks`: a branch could then
 register executable hooks. See [development and release](docs/development.md).
 
+## Configuration
+
+Relocatable tracked settings live under `config/<domain>/`, with one owner per
+setting and minimal native adapters. See [configuration guidance](config/README.md)
+for the domains, native exceptions and verification. This repository owns them.
+
 ## Repository ownership
 
 This repo maintains its executable helpers, agent instructions and workflow

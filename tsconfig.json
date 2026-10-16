@@ -1,15 +1,3 @@
 {
-	"extends": ["astro/tsconfigs/strict", "./tsconfig/fleet/strict-astro.json"],
-	"include": [".astro/types.d.ts", "**/*"],
-	"exclude": ["dist"],
-	"compilerOptions": {
-		"jsx": "react-jsx",
-		"jsxImportSource": "react",
-		"types": ["sortablejs"],
-		"lib": ["DOM", "DOM.Iterable", "ESNext"],
-		"paths": {
-			"$lib": ["./src/lib"],
-			"$lib/*": ["./src/lib/*"]
-		}
-	}
+	"extends": "./config/typescript/project.json"
 }

@@ -1,0 +1,3 @@
+{
+	"**/*": ["biome check --no-errors-on-unmatched --write --error-on-warnings"]
+}

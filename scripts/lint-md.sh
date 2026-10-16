@@ -12,4 +12,4 @@ if [[ ! -x "$bin" ]]; then
   echo "lint-md: $bin not found — run 'npm ci' (or 'npm run worktree:init' in a worktree)." >&2
   exit 1
 fi
-exec "$bin" "$@" "**/*.md"
+exec "$bin" --config config/quality/.markdownlint-cli2.jsonc "$@" "**/*.md"

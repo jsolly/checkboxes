@@ -81,7 +81,7 @@ GEMINI_API_KEY=your_key_here
      npm install @astrojs/your-framework your-framework
      ```
 
-   - Update `astro.config.mjs` to add the framework integration:
+   - Update `config/app/astro.mjs` to add the framework integration:
 
      ```javascript
      import yourFramework from '@astrojs/your-framework';
@@ -130,7 +130,7 @@ GEMINI_API_KEY=your_key_here
      npm run generate-stats
      ```
 
-At this point, you could open a PR. For full framework integration, see the [Astro Framework Integration Guide](https://docs.astro.build/en/guides/integrations-guide/). This usually involves modifying the `astro.config.mjs` file to add the framework and its configuration.
+At this point, you could open a PR. For full framework integration, see the [Astro Framework Integration Guide](https://docs.astro.build/en/guides/integrations-guide/). This usually involves modifying the `config/app/astro.mjs` file to add the framework and its configuration.
 
 If you want to generate performance metrics for your new implementation, see the [Generate performance metrics](#generate-performance-metrics) section.
 
@@ -143,7 +143,7 @@ If you want to generate performance metrics for your new implementation, see the
   - You have Node.js 24+ installed
 - For framework integration issues, check:
   - Required dependencies are installed
-  - Framework is properly configured in astro.config.mjs
+  - Framework is properly configured in config/app/astro.mjs
   - TypeScript types are updated if needed
   - For stats generation issues, verify your implementation file matches the expected extension in `SUPPORTED_EXTENSIONS` within `src/config/stats.ts`
 

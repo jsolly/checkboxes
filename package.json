@@ -18,7 +18,7 @@
 		"check:ts": "astro check --minimumSeverity warning --minimumFailingSeverity warning",
 		"check:knip": "knip",
 		"check:md": "bash scripts/lint-md.sh",
-		"check:yaml": "uvx yamllint@1.38.0 -s .",
+		"check:yaml": "uvx yamllint@1.38.0 -c config/quality/yamllint.yaml -s .",
 		"generate-stats": "tsx src/utils/generate-stats.ts",
 		"worktree:init": "bash scripts/worktree-init.sh && bash scripts/setup-agent-environment.sh",
 		"test": "tsx --test --test-reporter=dot \"tests/**/*.test.ts\"",
@@ -27,11 +27,6 @@
 		"gate": "FLEET_DOC_FAST=0 bash .git-hooks/pre-commit",
 		"smoke:production": "node scripts/production-smoke.mjs",
 		"smoke:scenario-contract": "node --test scripts/production-smoke-scenario.test.mjs"
-	},
-	"lint-staged": {
-		"**/*": [
-			"biome check --no-errors-on-unmatched --write --error-on-warnings"
-		]
 	},
 	"overrides": {
 		"path-to-regexp": ">=6.3.0",
