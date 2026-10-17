@@ -1,6 +1,8 @@
 # Configuration
 
-Relocatable tracked settings have one repository-owned home under `config/<domain>/`:
+Move optional top-level tracked configuration into `config/<domain>/` or its
+existing owner, with one authoritative owner per setting. Keep nested configuration
+with its component; test configuration may live under `tests/`.
 
 - `app/astro.mjs` owns integrations, build and Vite settings. All Astro package
   commands and both build subprocesses select it explicitly. The repository stays
@@ -11,10 +13,12 @@ Relocatable tracked settings have one repository-owned home under `config/<domai
   starting the server alone does not exercise configuration reloads.
 - `app/svelte.js` owns preprocessing. Astro's Svelte integration selects this
   module through a file URL resolved beside its own configuration.
-- `typescript/project.json` owns compiler policy and source scope, extending the
-  local `strict-astro.json` and Astro's package preset. Rebased include/exclude
-  paths preserve the repository source root. The native root TypeScript file
-  owns the `$lib` alias map for the consumers described below.
+- `typescript/tsconfig.json` owns compiler policy, extending Astro's strict
+  package preset. Its empty `files` and `include` arrays prevent this nested
+  policy from claiming files by itself. Root `tsconfig.json` owns positive
+  membership, exclusions and the `$lib` aliases for the native consumers below.
+  The native policy basename also participates in Vite's compiler cache
+  invalidation; verify a physical option edit and its restoration in Astro.
 - `quality/biome.settings.jsonc` owns Biome rules, globs and overrides. Package
   commands, the committing-tree gate and lint-staged select it explicitly. Its
   VCS ignore discovery and file patterns keep their repository scope.
@@ -30,10 +34,14 @@ Relocatable tracked settings have one repository-owned home under `config/<domai
 
 ## Required native files
 
-Root `tsconfig.json` inherits compiler policy and source scope from
-`typescript/project.json` and solely owns the `$lib` alias map. Astro 7.3.2 loads
-this native file and resolves inherited aliases from its directory. The pinned
-shadcn-svelte 1.3.0 component generator instead resolves ordinary inherited paths
+Root `tsconfig.json` inherits compiler policy from `typescript/tsconfig.json`
+and solely owns repository-wide membership (`.astro/types.d.ts`, `**/*`), the
+`dist` exclusion and the `$lib` alias map. TypeScript resolves relative patterns
+from their declaring file; the pinned Vite resolver interprets inherited patterns
+from the discovered native file. Keeping positive membership at the root gives
+both consumers the intended scope. Astro 7.3.8 loads this native file and resolves
+its aliases from the repository root. The pinned shadcn-svelte 1.3.0 component
+generator instead resolves ordinary inherited paths
 from their declaring file and rejects `${configDir}` substitutions without
 `baseUrl`. TypeScript 6 rejects that deprecated option. Keeping relative aliases
 in the native root file gives these active consumers the same source paths
@@ -57,7 +65,11 @@ Executable helpers, application source configuration, framework comparison demos
 fixtures, generated statistics and ignored local secrets/state keep their owners.
 Create only used domains. Preserve roots, scopes, plugin imports, generated assets,
 measurement isolation and deployment behavior when moving settings. Verify resolved
-configuration and selected inputs against the baseline, then run `npm run gate`.
+configuration, selected inputs and actual emitted compiler effects against the
+baseline, including excluded `dist` files, nearer owners and both copied product
+and measurement source trees. A compiler-folder file must fall through the empty
+policy to the broad root owner. Exercise physical compiler-policy and app-owner
+edits and restoration through Astro's normal caches, then run `npm run gate`.
 Vercel remains production-main-only; verify the intended production READY deployment
 and exact-release public checkbox smoke after merge. No external configuration
 checkout, home links, generation prerequisite or automatic synchronization is required.
