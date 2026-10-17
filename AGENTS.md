@@ -115,9 +115,10 @@ register executable hooks. See [development and release](docs/development.md).
 
 ## Configuration
 
-Relocatable tracked settings live under `config/<domain>/`, with one owner per
-setting. CLI commands select the owners explicitly; native adapters require a
-named active consumer. See [configuration guidance](config/README.md)
+Move optional top-level tracked configuration into `config/<domain>/` or its
+existing owner, with one authoritative owner per setting. Keep nested configuration
+with its component; test configuration may live under `tests/`. CLI commands select
+owners explicitly; native adapters require a named active consumer. See [configuration guidance](config/README.md)
 for the domains, native exceptions and verification. This repository owns them.
 
 ## Repository ownership
