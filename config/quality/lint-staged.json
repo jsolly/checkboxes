@@ -1,3 +1,5 @@
 {
-	"**/*": ["biome check --no-errors-on-unmatched --write --error-on-warnings"]
+	"**/*": [
+		"biome check --config-path=config/quality/biome.settings.jsonc --no-errors-on-unmatched --write --error-on-warnings"
+	]
 }

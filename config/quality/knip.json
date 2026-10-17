@@ -15,6 +15,9 @@
 	"ignoreBinaries": ["uvx"],
 	"ignoreDependencies": ["markdownlint-cli2"],
 	"astro": {
-		"config": ["astro.config.mjs", "config/app/astro.mjs"]
-	}
+		"config": ["config/app/astro.mjs"]
+	},
+	"svelte": { "entry": ["config/app/svelte.js"] },
+	"biome": { "config": ["config/quality/biome.settings.jsonc"] },
+	"lint-staged": { "config": ["config/quality/lint-staged.json"] }
 }

@@ -2,6 +2,7 @@
 
 import { createRequire } from "node:module";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import react from "@astrojs/react";
 
@@ -41,7 +42,9 @@ export default defineConfig({
 			: [sitemap({ filter: (page) => !page.includes("/test/") })]),
 		vue(),
 		react(),
-		svelte(),
+		svelte({
+			configFile: fileURLToPath(new URL("./svelte.js", import.meta.url)),
+		}),
 	],
 	...(measurementBuild ? {} : { adapter: vercel({ skewProtection: true }) }),
 	vite: {

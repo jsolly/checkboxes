@@ -25,7 +25,8 @@ FILES = {
     'scripts/repo-python.sh': 0o755,
     'scripts/setup-agent-environment.sh': 0o755,
 }
-MANIFEST = '.repo-independent.json'
+MANIFEST = 'config/agents/repository.json'
+LEGACY_MANIFEST = '.repo-independent.json'
 CONTEXT = {'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR',
            'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES',
            'GIT_CEILING_DIRECTORIES', 'GIT_NAMESPACE'}
@@ -80,27 +81,30 @@ def regular(root: Path, rel: str, mode: int) -> bytes:
     return path.read_bytes()
 
 
+def unique_pairs(items):
+    result = {}
+    for key, value in items:
+        if key in result:
+            raise ValueError('Duplicate manifest key')
+        result[key] = value
+    return result
+
+
 def manifest(data: bytes, slug: str) -> dict:
-    def pairs(items):
-        result = {}
-        for key, value in items:
-            if key in result:
-                raise ValueError('Duplicate manifest key')
-            result[key] = value
-        return result
-    value = json.loads(data, object_pairs_hook=pairs)
+    value = json.loads(data, object_pairs_hook=unique_pairs)
     if value != {'version': 1, 'repo': slug, 'files': FILES}:
         raise ValueError('Unknown manifest, repository identity or file allowlist')
     return value
 
 
-def bundle(root: Path, slug: str, ref: str | None = None) -> tuple[str, dict[str, bytes]]:
+def _bundle(root: Path, slug: str, manifest_path: str, ref: str | None = None) -> tuple[str, dict[str, bytes]]:
+    """Read one fixed format; historical reads are limited to installed snapshots/ref proof."""
     if ref is None:
-        raw = regular(root, MANIFEST, 0o644)
+        raw = regular(root, manifest_path, 0o644)
         manifest(raw, slug)
         payload = {rel: regular(root, rel, mode) for rel, mode in FILES.items()}
     else:
-        raw = git(root, 'show', f'{ref}:{MANIFEST}', binary=True)
+        raw = git(root, 'show', f'{ref}:{manifest_path}', binary=True)
         manifest(raw, slug)
         payload = {}
         for rel, mode in FILES.items():
@@ -108,12 +112,33 @@ def bundle(root: Path, slug: str, ref: str | None = None) -> tuple[str, dict[str
             if not tree.startswith(f'{0o100000 | mode:o} blob '):
                 raise ValueError('Reviewed bundle file missing or has wrong mode: ' + rel)
             payload[rel] = git(root, 'show', f'{ref}:{rel}', binary=True)
-    payload[MANIFEST] = raw
+        tree = str(git(root, 'ls-tree', ref, '--', manifest_path))
+        if not tree.startswith('100644 blob '):
+            raise ValueError('Reviewed manifest missing or has wrong mode')
+    payload[manifest_path] = raw
     rows = [{'path': rel, 'mode': FILES.get(rel, 0o644),
              'sha256': hashlib.sha256(data).hexdigest()} for rel, data in sorted(payload.items())]
     digest = hashlib.sha256(json.dumps({'repo': slug, 'files': rows},
                                       sort_keys=True, separators=(',', ':')).encode()).hexdigest()
     return digest, payload
+
+
+def bundle(root: Path, slug: str, ref: str | None = None) -> tuple[str, dict[str, bytes]]:
+    retired = root / LEGACY_MANIFEST
+    if (ref is None and (retired.exists() or retired.is_symlink())) or (ref is not None and git(root, 'ls-tree', ref, '--', LEGACY_MANIFEST)):
+        raise ValueError('Retired root manifest; migrate to config/agents/repository.json in a reviewed change')
+    try:
+        return _bundle(root, slug, MANIFEST, ref)
+    except FileNotFoundError as error:
+        raise ValueError('Missing config/agents/repository.json; run reviewed repository setup/upgrade') from error
+
+
+def approved(root: Path, digest: str) -> bool:
+    try:
+        values = str(git(root, 'config', '--local', '--no-includes', '--get-all', 'repo.trustedGateBundle'))
+    except ValueError:
+        return False
+    return digest in values.splitlines()
 
 
 def trusted(root: Path, slug: str, digest: str) -> bool:
@@ -123,11 +148,7 @@ def trusted(root: Path, slug: str, digest: str) -> bool:
             return True
     except (ValueError, FileNotFoundError):
         pass
-    try:
-        approved = str(git(root, 'config', '--local', '--no-includes', '--get-all', 'repo.trustedGateBundle'))
-    except ValueError:
-        return False
-    return digest in approved.splitlines()
+    return approved(root, digest)
 
 
 @contextlib.contextmanager
@@ -154,7 +175,7 @@ def snapshot(parent: Path, digest: str, payload: dict[str, bytes], slug: str) ->
     if dest.exists() or dest.is_symlink():
         if dest.is_symlink() or not dest.is_dir():
             raise ValueError('Unsafe existing snapshot')
-        if bundle(dest, slug)[0] != digest:
+        if snapshot_bundle(dest, slug) != (digest, MANIFEST):
             raise ValueError('Installed snapshot is corrupt')
         return dest
     staging = Path(tempfile.mkdtemp(prefix='.install-', dir=parent))
@@ -169,7 +190,8 @@ def snapshot(parent: Path, digest: str, payload: dict[str, bytes], slug: str) ->
             target.chmod(FILES.get(rel, 0o644))
         if bundle(staging, slug)[0] != digest:
             raise ValueError('Snapshot verification failed')
-        (staging / 'installation.json').write_text(json.dumps({'repo': slug, 'digest': digest}))
+        (staging / 'installation.json').write_text(json.dumps({'version': 2, 'manifest': MANIFEST, 'repo': slug, 'digest': digest}))
+        (staging / 'installation.json').chmod(0o600)
         (staging / 'hooks').mkdir(mode=0o700)
         (staging / 'hooks/pre-commit').write_bytes(payload['gate/hooks/pre-commit'])
         (staging / 'hooks/pre-commit').chmod(0o755)
@@ -181,7 +203,29 @@ def snapshot(parent: Path, digest: str, payload: dict[str, bytes], slug: str) ->
     return dest
 
 
-def verify_installed(common: Path, slug: str) -> Path:
+def snapshot_bundle(version: Path, slug: str, *, allow_legacy: bool = False) -> tuple[str, str]:
+    info = json.loads(regular(version, 'installation.json', 0o644), object_pairs_hook=unique_pairs)
+    digest = version.name
+    if not re.fullmatch('[0-9a-f]{64}', digest):
+        raise ValueError('Installed hook digest is invalid')
+    if info == {'repo': slug, 'digest': digest}:
+        if not allow_legacy:
+            raise ValueError('Legacy installed snapshot; review the new bundle and run approve-upgrade --digest <exact digest>, then install')
+        manifest_path = LEGACY_MANIFEST
+        if (version / MANIFEST).exists() or (version / MANIFEST).is_symlink():
+            raise ValueError('Legacy snapshot contains a second manifest')
+    elif info == {'version': 2, 'manifest': MANIFEST, 'repo': slug, 'digest': digest}:
+        manifest_path = MANIFEST
+        if (version / LEGACY_MANIFEST).exists() or (version / LEGACY_MANIFEST).is_symlink():
+            raise ValueError('Snapshot contains a retired manifest')
+    else:
+        raise ValueError('Installed hook identity/format mismatch')
+    if _bundle(version, slug, manifest_path)[0] != digest:
+        raise ValueError('Installed hook snapshot is corrupt')
+    return digest, manifest_path
+
+
+def verify_installed(common: Path, slug: str, *, allow_legacy: bool = False) -> Path:
     configured = str(git(common, 'config', '--local', '--no-includes', '--get', 'core.hooksPath'))
     hookdir = Path(configured)
     base = common / 'repo-hooks' / 'versions'
@@ -190,17 +234,45 @@ def verify_installed(common: Path, slug: str) -> Path:
     version = hookdir.parent
     if any(p.is_symlink() for p in (common / 'repo-hooks', base, version, hookdir)):
         raise ValueError('Symlinked installed hooks refused')
-    info = json.loads((version / 'installation.json').read_bytes())
-    if info.get('repo') != slug or info.get('digest') != version.name:
-        raise ValueError('Installed hook identity mismatch')
-    if bundle(version, slug)[0] != version.name:
-        raise ValueError('Installed hook snapshot is corrupt')
-    if stat.S_IMODE((hookdir / 'pre-commit').stat().st_mode) != 0o755 or (hookdir / 'pre-commit').read_bytes() != (version / 'gate/hooks/pre-commit').read_bytes():
+    snapshot_bundle(version, slug, allow_legacy=allow_legacy)
+    verify_dispatcher(version)
+    return version
+
+
+def verify_dispatcher(version: Path):
+    hookdir = version / 'hooks'
+    if hookdir.is_symlink() or not hookdir.is_dir():
+        raise ValueError('Unsafe installed dispatcher directory')
+    dispatcher = regular(version, 'hooks/pre-commit', 0o755)
+    if stat.S_IMODE((hookdir / 'pre-commit').stat().st_mode) != 0o755 or dispatcher != regular(version, 'gate/hooks/pre-commit', 0o755):
         raise ValueError('Installed dispatcher differs from its verified snapshot')
     for path in hookdir.iterdir():
         if path.name != 'pre-commit' or path.is_symlink() or not path.is_file():
             raise ValueError('Unexpected hook in installed dispatcher directory')
-    return version
+
+
+def approve_upgrade(root: Path, common: Path, slug: str, digest: str):
+    installed = verify_installed(common, slug, allow_legacy=True)
+    old_digest, format_path = snapshot_bundle(installed, slug, allow_legacy=True)
+    if format_path == MANIFEST:
+        if old_digest == digest and trusted(root, slug, digest):
+            print('Current repository bundle already installed and trusted')
+            return
+        raise ValueError('Installed format is current; use ordinary exact-digest approve')
+    authorized = approved(root, old_digest)
+    if not authorized:
+        try:
+            ref = str(git(root, 'show-ref', '--verify', '--hash', 'refs/remotes/origin/main'))
+            if git(root, 'ls-tree', ref, '--', MANIFEST):
+                raise ValueError('Protected source no longer has the historical format')
+            authorized = _bundle(root, slug, LEGACY_MANIFEST, ref)[0] == old_digest
+        except (ValueError, OSError):
+            pass
+    if not authorized:
+        raise ValueError('Legacy installed bundle is not refreshed reviewed origin/main or an existing exact approval; no approval changed')
+    if not approved(root, digest):
+        git(root, 'config', '--local', '--add', 'repo.trustedGateBundle', digest)
+    print('Approved exact repository upgrade bundle: ' + digest)
 
 
 def install(root: Path, common: Path, slug: str, digest: str, payload: dict[str, bytes]):
@@ -211,14 +283,10 @@ def install(root: Path, common: Path, slug: str, digest: str, payload: dict[str,
     versions = storage / 'versions'
     version = snapshot(versions, digest, payload, slug)
     hooks = version / 'hooks'
-    directory(hooks)
-    target = hooks / 'pre-commit'
-    if not target.exists():
-        with target.open('xb') as stream:
-            stream.write(payload['gate/hooks/pre-commit'])
-        target.chmod(0o755)
-    if target.is_symlink() or target.read_bytes() != payload['gate/hooks/pre-commit']:
-        raise ValueError('Installed dispatcher mismatch')
+    # Validate the entire destination before making it live, including an existing
+    # digest directory left by a partial or interrupted installation.
+    snapshot_bundle(version, slug)
+    verify_dispatcher(version)
     git(root, 'config', '--local', 'core.hooksPath', str(hooks))
     for row in str(git(root, 'worktree', 'list', '--porcelain')).splitlines():
         if not row.startswith('worktree '):
@@ -268,7 +336,7 @@ def dispatch(root: Path, common: Path, slug: str, digest: str, payload: dict[str
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['install', 'dispatch', 'verify', 'digest', 'approve'])
+    parser.add_argument('command', choices=['install', 'dispatch', 'verify', 'digest', 'approve', 'approve-upgrade'])
     parser.add_argument('--root', type=Path, default=Path.cwd())
     parser.add_argument('--digest')
     args = parser.parse_args()
@@ -279,12 +347,16 @@ def main() -> int:
         digest, payload = bundle(root, slug)
         if args.command == 'digest':
             print(digest)
-        elif args.command == 'approve':
-            verify_installed(common, slug)
+        elif args.command in {'approve', 'approve-upgrade'}:
             if args.digest != digest or not re.fullmatch('[0-9a-f]{64}', args.digest or ''):
                 raise ValueError('Approval requires the exact reviewed current bundle digest')
-            git(root, 'config', '--local', '--add', 'repo.trustedGateBundle', digest)
-            print('Approved exact repository bundle: ' + digest)
+            if args.command == 'approve-upgrade':
+                approve_upgrade(root, common, slug, digest)
+            else:
+                verify_installed(common, slug)
+                if not approved(root, digest):
+                    git(root, 'config', '--local', '--add', 'repo.trustedGateBundle', digest)
+                print('Approved exact repository bundle: ' + digest)
         elif args.command == 'install':
             install(root, common, slug, digest, payload)
         elif args.command == 'verify':

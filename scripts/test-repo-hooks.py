@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Exercise this repository's hook trust with real Git and an isolated home."""
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -9,9 +10,10 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 SOURCE = Path(__file__).resolve().parent.parent
-BUNDLE = ('.repo-independent.json', 'gate/gate-lib.sh', 'gate/hooks/pre-commit',
+BUNDLE = ('config/agents/repository.json', 'gate/gate-lib.sh', 'gate/hooks/pre-commit',
           'scripts/repo-hooks.py', 'scripts/repo-python.sh', 'scripts/setup-agent-environment.sh')
 
 
@@ -35,7 +37,7 @@ class HookTrust(unittest.TestCase):
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(SOURCE / name, target)
-        slug = json.loads((self.root / '.repo-independent.json').read_text())['repo']
+        slug = json.loads((self.root / 'config/agents/repository.json').read_text())['repo']
         self.git('remote', 'add', 'origin', 'https://github.com/' + slug + '.git')
         (self.root / '.git-hooks').mkdir()
         floor = (SOURCE / '.git-hooks/pre-commit').read_text().splitlines()[1]
@@ -115,7 +117,7 @@ fi
         self.assertEqual(self.dispatch().returncode, 0)
         self.git('remote', 'set-url', 'origin', 'https://github.com/foreign/fixture.git')
         self.assertNotEqual(self.dispatch().returncode, 0)
-        slug = json.loads((self.root / '.repo-independent.json').read_text())['repo']
+        slug = json.loads((self.root / 'config/agents/repository.json').read_text())['repo']
         self.git('remote', 'set-url', 'origin', 'https://github.com/' + slug + '.git')
         self.assertEqual(self.dispatch().returncode, 0)
         hook = self.root / '.git-hooks/pre-commit'
@@ -136,6 +138,189 @@ fi
                 (self.root / 'content.txt').write_text('safe updated ' + str(options) + '\n')
                 result = self.git('commit', '-m', 'safe commit', *options, check=False)
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+
+    def legacy_upgrade_fixture(self):
+        """Install the frozen real pre-migration helper, then prepare a new candidate."""
+        candidate = (self.root / 'scripts/repo-hooks.py').read_bytes()
+        marker = self.root / 'config/agents/repository.json'
+        legacy = self.root / '.repo-independent.json'
+        marker.rename(legacy)
+        (self.root / 'scripts/repo-hooks.py').write_bytes((SOURCE / 'scripts/fixtures/repo-hooks-legacy.py').read_bytes())
+        self.git('add', '-A')
+        self.git('-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'reviewed old format')
+        self.git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+        self.tool('install', check=True)
+        self.hooks = Path(self.git('config', '--get', 'core.hooksPath').stdout.strip())
+        self.installed = self.hooks.parent / 'scripts/repo-hooks.py'
+        legacy.rename(marker)
+        (self.root / 'scripts/repo-hooks.py').write_bytes(candidate)
+        return self.tool('digest', check=True).stdout.strip()
+
+    def test_actual_legacy_installation_upgrades_by_exact_reviewed_approval(self):
+        digest = self.legacy_upgrade_fixture()
+        self.assertNotEqual(self.tool('approve', '--digest', digest).returncode, 0)
+        self.assertNotEqual(self.tool('install').returncode, 0)
+        self.assertNotEqual(self.tool('approve-upgrade', '--digest', '0' * 64).returncode, 0)
+        self.tool('approve-upgrade', '--digest', digest, check=True)
+        self.tool('approve-upgrade', '--digest', digest, check=True)
+        values = self.git('config', '--get-all', 'repo.trustedGateBundle').stdout.splitlines()
+        self.assertEqual(values.count(digest), 1)
+        self.tool('install', check=True)
+        self.tool('verify', check=True)
+        self.tool('approve-upgrade', '--digest', digest, check=True)
+        self.hooks = Path(self.git('config', '--get', 'core.hooksPath').stdout.strip())
+        self.assertEqual(self.dispatch().returncode, 0)
+
+    def test_upgrade_reauthorizes_old_snapshot_and_preserves_failed_approval(self):
+        digest = self.legacy_upgrade_fixture()
+        self.git('update-ref', '-d', 'refs/remotes/origin/main')
+        result = self.tool('approve-upgrade', '--digest', digest)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Legacy installed bundle is not', result.stderr)
+        self.assertNotEqual(self.git('config', '--get-all', 'repo.trustedGateBundle', check=False).returncode, 0)
+        old_digest = self.hooks.parent.name
+        self.git('config', '--local', '--add', 'repo.trustedGateBundle', old_digest)
+        self.tool('approve-upgrade', '--digest', digest, check=True)
+        self.tool('install', check=True)
+
+    def test_upgrade_refuses_snapshot_metadata_dispatcher_and_bundle_tamper(self):
+        digest = self.legacy_upgrade_fixture()
+        version = self.hooks.parent
+        for rel in ('installation.json', 'hooks/pre-commit', 'gate/gate-lib.sh'):
+            with self.subTest(path=rel):
+                path = version / rel
+                original = path.read_bytes()
+                path.write_bytes(original + b'\n# tamper\n')
+                self.assertNotEqual(self.tool('approve-upgrade', '--digest', digest).returncode, 0)
+                path.write_bytes(original)
+        self.git('remote', 'set-url', 'origin', 'https://github.com/other/fixture.git')
+        self.assertNotEqual(self.tool('approve-upgrade', '--digest', digest).returncode, 0)
+
+    def test_legacy_upgrade_refuses_unsafe_modes_without_changing_trust(self):
+        digest = self.legacy_upgrade_fixture()
+        version = self.hooks.parent
+        self.git('config', '--local', '--add', 'repo.trustedGateBundle', version.name)
+        config = self.root / '.git/config'
+        before_config = config.read_bytes()
+        before_approvals = self.git('config', '--get-all', 'repo.trustedGateBundle').stdout
+        before_hooks = self.git('config', '--get', 'core.hooksPath').stdout
+        cases = (('.repo-independent.json', 0o755),
+                 ('installation.json', 0o666),
+                 ('hooks/pre-commit', 0o744))
+        for rel, unsafe_mode in cases:
+            with self.subTest(path=rel, mode=oct(unsafe_mode)):
+                path = version / rel
+                original_mode = stat.S_IMODE(path.stat().st_mode)
+                original_bytes = path.read_bytes()
+                try:
+                    path.chmod(unsafe_mode)
+                    result = self.tool('approve-upgrade', '--digest', digest)
+                    self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                    self.assertEqual(config.read_bytes(), before_config)
+                    self.assertEqual(self.git('config', '--get-all', 'repo.trustedGateBundle').stdout,
+                                     before_approvals)
+                    self.assertEqual(self.git('config', '--get', 'core.hooksPath').stdout, before_hooks)
+                    self.assertEqual(path.read_bytes(), original_bytes)
+                finally:
+                    path.chmod(original_mode)
+        # Each independent mode mutation is restored; the valid snapshot still upgrades.
+        self.tool('approve-upgrade', '--digest', digest, check=True)
+        self.tool('install', check=True)
+        self.tool('verify', check=True)
+
+    def test_existing_destination_with_extra_hook_is_refused_before_reconfiguration(self):
+        digest = self.legacy_upgrade_fixture()
+        self.tool('approve-upgrade', '--digest', digest, check=True)
+        before = self.git('config', '--get', 'core.hooksPath').stdout
+        spec = importlib.util.spec_from_file_location('candidate_hooks', self.root / 'scripts/repo-hooks.py')
+        candidate = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(candidate)
+        _, common, slug = candidate.context(self.root)
+        actual_digest, payload = candidate.bundle(self.root, slug)
+        self.assertEqual(actual_digest, digest)
+        destination = candidate.snapshot(common / 'repo-hooks/versions', digest, payload, slug)
+        extra = destination / 'hooks/post-checkout'
+        extra.write_text('#!/bin/sh\ntouch "' + str(self.root / 'unreviewed-hook-ran') + '"\n')
+        extra.chmod(0o755)
+        result = self.tool('install')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Unexpected hook', result.stderr)
+        self.assertEqual(self.git('config', '--get', 'core.hooksPath').stdout, before)
+        self.git('checkout', '-q', '--detach', 'HEAD')
+        self.assertFalse((self.root / 'unreviewed-hook-ran').exists())
+
+    def test_current_layout_refuses_old_missing_and_symlinked_manifest_owners(self):
+        marker = self.root / 'config/agents/repository.json'
+        original = marker.read_bytes()
+        marker.unlink()
+        result = self.tool('digest')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Missing config/agents/repository.json', result.stderr)
+        marker.write_bytes(original)
+        retired = self.root / '.repo-independent.json'
+        retired.symlink_to('missing')
+        self.assertNotEqual(self.tool('digest').returncode, 0)
+        retired.unlink()
+        marker.unlink(); marker.symlink_to(self.root / 'outside-manifest')
+        self.assertNotEqual(self.tool('digest').returncode, 0)
+
+    def test_protected_new_source_installs_over_old_snapshot_without_approval(self):
+        self.legacy_upgrade_fixture()
+        self.git('add', '-A')
+        self.git('-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'reviewed new format')
+        self.git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+        self.tool('install', check=True)
+        self.tool('verify', check=True)
+        self.assertNotEqual(self.git('config', '--get-all', 'repo.trustedGateBundle', check=False).returncode, 0)
+
+    def test_install_metadata_is_private_under_each_supported_umask(self):
+        hook = self.root / '.git-hooks/pre-commit'
+        for mask in (0o000, 0o022, 0o077):
+            with self.subTest(umask=oct(mask)):
+                hook.write_text(hook.read_text() + '\n# fresh snapshot for umask ' + oct(mask) + '\n')
+                digest = self.tool('digest', check=True).stdout.strip()
+                self.git('config', '--local', '--add', 'repo.trustedGateBundle', digest)
+                for _ in range(2):
+                    result = subprocess.run([sys.executable, '-I', str(self.root / 'scripts/repo-hooks.py'),
+                                             'install', '--root', str(self.root)], cwd=self.root,
+                                            env=self.env, capture_output=True, text=True, umask=mask)
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    self.tool('verify', check=True)
+                configured = subprocess.check_output(['git', '-C', str(self.root), 'config', '--local',
+                                                      '--get', 'core.hooksPath'], env=self.env, text=True).strip()
+                metadata = Path(configured).parent / 'installation.json'
+                self.assertEqual(stat.S_IMODE(metadata.stat().st_mode), 0o600)
+
+    def test_install_rejects_invalid_fresh_snapshot_before_registration(self):
+        spec = importlib.util.spec_from_file_location('fixture_current_hooks', self.root / 'scripts/repo-hooks.py')
+        current = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(current)
+        root, common, slug = current.context(self.root)
+        original_snapshot = current.snapshot
+        hook = self.root / '.git-hooks/pre-commit'
+        for failure in ('unsafe-mode', 'malformed-json'):
+            with self.subTest(failure=failure):
+                hook.write_text(hook.read_text() + '\n# new snapshot failure ' + failure + '\n')
+                digest, payload = current.bundle(root, slug)
+                self.git('config', '--local', '--add', 'repo.trustedGateBundle', digest)
+                config = common / 'config'
+                before = config.read_bytes()
+
+                def corrupt_publication(parent, selected_digest, selected_payload, selected_slug):
+                    version = original_snapshot(parent, selected_digest, selected_payload, selected_slug)
+                    metadata = version / 'installation.json'
+                    if failure == 'unsafe-mode':
+                        metadata.chmod(0o666)
+                    else:
+                        metadata.write_text('{invalid-json')
+                    return version
+
+                with patch.object(current, 'snapshot', side_effect=corrupt_publication):
+                    with self.assertRaises(ValueError):
+                        current.install(root, common, slug, digest, payload)
+                self.assertEqual(config.read_bytes(), before)
+
 
 
 
