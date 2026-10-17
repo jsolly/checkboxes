@@ -47,6 +47,25 @@ repo-local. Revoke explicit approvals with `git config --local --unset-all
 repo.trustedGateBundle`; current reviewed main remains trusted. Changing origin
 invalidates the bundle identity. No environment variable selects another library.
 
+The authoritative identity manifest is `config/agents/repository.json`. Current
+checkouts refuse a retired root `.repo-independent.json`, including dangling links.
+An installed snapshot from before this relocation needs the explicit upgrade flow.
+After reviewing the complete candidate hook bundle, run from its repository root:
+
+```bash
+digest="$(bash scripts/repo-python.sh scripts/repo-hooks.py digest)" &&
+  bash scripts/repo-python.sh scripts/repo-hooks.py approve-upgrade --digest "$digest" &&
+  bash scripts/repo-python.sh scripts/repo-hooks.py install &&
+  bash scripts/repo-python.sh scripts/repo-hooks.py verify
+```
+
+The upgrade reauthorizes the exact old installed snapshot against protected
+`origin/main` or an existing repo-local approval, verifies its origin, files, modes,
+digest and dispatcher, then approves only the reviewed new digest. It does not
+trust an old manifest in the candidate checkout. Once reviewed main has the new
+layout, ordinary setup installs it directly, including over a valid old snapshot.
+Older checkouts must merge the reviewed migration before rerunning setup.
+
 ## Review and integration
 
 Work from fresh main on an isolated branch. Review the actual final diff for bugs,

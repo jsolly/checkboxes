@@ -18,7 +18,7 @@ run_step "bash floor" gate_check_bash_floor   # every Bash entrypoint refuses Ba
 gate_require_node                 # enforce the pinned Node (.nvmrc), not whatever's on PATH
 
 # --- Quality gate (run_step: silent on green, full output + abort on red) ---
-run_step "biome ci"     npx --no-install biome ci . --error-on-warnings
+run_step "biome ci"     npx --no-install biome ci --config-path=config/quality/biome.settings.jsonc . --error-on-warnings
 run_step "yaml lint"   npm run check:yaml
 run_step "actionlint"             npm run check:actions
 run_step "markdown lint" npm run check:md
