@@ -6,10 +6,6 @@
 		"jsx": "react-jsx",
 		"jsxImportSource": "react",
 		"types": ["sortablejs"],
-		"lib": ["DOM", "DOM.Iterable", "ESNext"],
-		"paths": {
-			"$lib": ["${configDir}/src/lib"],
-			"$lib/*": ["${configDir}/src/lib/*"]
-		}
+		"lib": ["DOM", "DOM.Iterable", "ESNext"]
 	}
 }
