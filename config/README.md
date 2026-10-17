@@ -8,9 +8,10 @@ Relocatable tracked settings have one repository-owned home under `config/<domai
   package resolution and deployment behavior are preserved.
 - `app/svelte.js` owns preprocessing. Astro's Svelte integration selects this
   module through a file URL resolved beside its own configuration.
-- `typescript/project.json` owns compiler scope and aliases, extending the local
-  `strict-astro.json` and Astro's package preset. Rebased include/exclude paths and
-  `${configDir}` aliases preserve the repository source root.
+- `typescript/project.json` owns compiler policy and source scope, extending the
+  local `strict-astro.json` and Astro's package preset. Rebased include/exclude
+  paths preserve the repository source root. The native root TypeScript file
+  owns the `$lib` alias map for the consumers described below.
 - `quality/biome.settings.jsonc` owns Biome rules, globs and overrides. Package
   commands, the committing-tree gate and lint-staged select it explicitly. Its
   VCS ignore discovery and file patterns keep their repository scope.
@@ -26,11 +27,19 @@ Relocatable tracked settings have one repository-owned home under `config/<domai
 
 ## Required native files
 
-Root `tsconfig.json` remains a minimal adapter for Astro 7's root TypeScript loader
-and its Vite alias resolver. Astro's `--config` selects the app settings but does
-not redirect that loader. Removing this adapter makes the actual app build fail
-on `$lib` imports. Selecting the nested project alone also changes `${configDir}`
-alias roots. `npm run check:ts` and `npm run build` exercise these active consumers.
+Root `tsconfig.json` inherits compiler policy and source scope from
+`typescript/project.json` and solely owns the `$lib` alias map. Astro 7.3.2 loads
+this native file and resolves inherited aliases from its directory. The pinned
+shadcn-svelte 1.3.0 component generator instead resolves ordinary inherited paths
+from their declaring file and rejects `${configDir}` substitutions without
+`baseUrl`. TypeScript 6 rejects that deprecated option. Keeping relative aliases
+in the native root file gives these active consumers the same source paths
+without duplicate settings or a custom loader.
+
+Astro's `--config` selects the app settings but does not redirect its TypeScript
+loader. Removing root `tsconfig.json` makes the app build fail on `$lib` imports.
+Verify native TypeScript checking, `npm run check:ts`, both phases of
+`npm run build`, and the pinned component generator when changing these aliases.
 
 Package manifests/lockfiles, `.npmrc`, `.nvmrc`, `.mise.toml`, Git files, `.github/`,
 native agent registrations and `vercel.json` keep their required locations.
