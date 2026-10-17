@@ -89,7 +89,7 @@
 		"tailwind-variants": "^3.3.1",
 		"tsx": "^4.23.13",
 		"typescript": "^6.0.3",
-		"vercel": "^59.17.0"
+		"vercel": "^64.0.2"
 	},
 	"allowScripts": {
 		"@google/genai@2.20.0": true,
