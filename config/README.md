@@ -6,6 +6,9 @@ Relocatable tracked settings have one repository-owned home under `config/<domai
   commands and both build subprocesses select it explicitly. The repository stays
   the project root; product and measurement source/output roots, public assets,
   package resolution and deployment behavior are preserved.
+  Its `addWatchFile` registration reloads Astro's configuration when this
+  physical file changes. Verify an actual setting change and its restoration;
+  starting the server alone does not exercise configuration reloads.
 - `app/svelte.js` owns preprocessing. Astro's Svelte integration selects this
   module through a file URL resolved beside its own configuration.
 - `typescript/project.json` owns compiler policy and source scope, extending the

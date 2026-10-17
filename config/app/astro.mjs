@@ -36,6 +36,14 @@ export default defineConfig({
 		? { assets: "_measurements" }
 		: { inlineStylesheets: "always" },
 	integrations: [
+		{
+			name: "checkboxes-config-watch",
+			hooks: {
+				"astro:config:setup": ({ addWatchFile }) => {
+					addWatchFile(new URL("./astro.mjs", import.meta.url));
+				},
+			},
+		},
 		// The /test/* routes are noindex demo/measurement pages — keep them out of the sitemap.
 		...(measurementBuild
 			? []
