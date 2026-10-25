@@ -23,10 +23,11 @@
 		"worktree:init": "bash scripts/worktree-init.sh && bash scripts/setup-agent-environment.sh",
 		"test": "tsx --test --test-reporter=dot \"tests/**/*.test.ts\"",
 		"lint-staged": "lint-staged --config config/quality/lint-staged.json",
-		"check:actions": "bash scripts/check-actions.sh && bash scripts/vercel-preview-comment-contract.sh && bash scripts/vercel-preview-workflow-contract.sh",
+		"check:actions": "bash scripts/check-actions.sh && bash scripts/vercel-preview-comment-contract.sh && bash scripts/vercel-preview-workflow-contract.sh && npm run test:preview-workflow",
 		"gate": "FLEET_DOC_FAST=0 bash .git-hooks/pre-commit",
 		"smoke:production": "node scripts/production-smoke.mjs",
-		"smoke:scenario-contract": "node --test scripts/production-smoke-scenario.test.mjs"
+		"smoke:scenario-contract": "node --test scripts/production-smoke-scenario.test.mjs",
+		"test:preview-workflow": "vitest run --config config/testing/vitest.preview.mjs"
 	},
 	"overrides": {
 		"path-to-regexp": ">=6.3.0",
@@ -89,7 +90,8 @@
 		"tailwind-variants": "^3.3.1",
 		"tsx": "^4.23.13",
 		"typescript": "^6.0.3",
-		"vercel": "^64.0.2"
+		"vercel": "^64.0.2",
+		"vitest": "5.0.5"
 	},
 	"allowScripts": {
 		"@google/genai@2.20.0": true,

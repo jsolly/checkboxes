@@ -14,7 +14,7 @@ bash scripts/setup-agent-environment.sh
 ```
 
 Setup installs repo-owned hooks outside the working tree, provisions the pinned
-tools and lockfile dependencies, and installs pinned Chromium when this repo uses
+tools (including jq for Preview workflow tests) and lockfile dependencies, and installs pinned Chromium when this repo uses
 Playwright. Run the repo's documented quality gate with its pinned tools:
 
 ```bash
@@ -79,6 +79,26 @@ personal review skills may help, but they are not prerequisites for this flow.
 Preserve existing code-only Deploy, production-main-only Vercel and opt-in Preview
 rules. Never trigger a preview merely to validate this migration. Verify the
 intended deployment and exact-release smoke when the repository requires them.
+
+## Opt-in Preview workflow
+
+Production Git deploys remain limited to `main`. An explicit `/preview` comment
+or manual Vercel Preview dispatch makes a one-shot deployment. A same-repo PR's
+`preview` label opts into redeploys on pushes, using one stable project/PR URL
+and one edited comment. Removing the label stops those redeploys. Preview runs
+do not replace full CI, including for draft PRs, or production smoke.
+
+Automatic label events use `pull_request_target` for main-targeted PRs, so the workflow definition and tooling come from the default branch. Manual dispatch is restricted to that branch. The PR head is resolved after acquiring the deployment slot, so out-of-order pending jobs still deploy the latest eligible head. Node setup
+runs before the isolated PR checkout without deployment tokens or a restored
+package cache. Only the deployment step receives `VERCEL_TOKEN`; the pinned CLI
+runs outside PR sources with its own npm cache and without the GitHub token.
+Executable Vercel source configs are refused. Current head, open state and label
+are checked before deployment and again before changing the stable alias.
+
+`npm run check:actions` includes hermetic Vitest execution of the real workflow scripts
+with stand-in API responses and deployment commands, real jq comment selection and real Git config inventories. It checks stale/closed/removed-label races,
+single-comment updates, isolated credentials and failure behavior. It never
+creates a deployment. Test live Preview behavior only when John explicitly asks.
 
 ## Infrastructure and access
 

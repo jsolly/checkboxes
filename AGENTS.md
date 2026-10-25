@@ -18,7 +18,7 @@ Local gate before push: `npm run gate`.
 
 Branch pushes do **not** create Preview deployments (`vercel.json` `git.deploymentEnabled`). Production Git deploys on `main` stay on.
 
-Opt-in Preview: comment `/preview` as the first non-empty line on a same-repo PR (owner/member/collaborator User), or run **Actions → Vercel Preview** with the PR number. GitHub runs that workflow from `main`. One-shot: new commits do not rebuild until you ask again. Requires GitHub secret `VERCEL_TOKEN`. Agents must not comment `/preview` or run Actions → Vercel Preview unless John asked.
+Opt-in Preview: comment `/preview` as the first non-empty line on a same-repo PR (owner/member/collaborator User), or run **Actions → Vercel Preview** with the PR number. These are one-shot requests. Add the `preview` label to redeploy on every push until it is removed. Labeled requests share one protected project/PR URL and one comment updated to the current head. Closed, moved or unlabeled requests cannot replace that URL after a build. Requires GitHub secret `VERCEL_TOKEN`. Agents must not request a Preview, apply the label or dispatch the workflow unless John asked. Full CI still runs on PRs, including drafts; the label does not defer quality checks.
 
 ## Purpose
 
