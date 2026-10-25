@@ -1,23 +1,16 @@
-# GitHub Vercel Preview template — opt-in CLI Preview (automatic Git Preview is off)
-# Copy to .github/workflows/vercel-preview.yml and:
-#   1. Replace prj_Qy2iDBHuQ0n16tuT1vBmeIrgKkxr with the Vercel project id
-#   2. Copy vercel-preview-comment.sh, vercel-preview-comment-contract.sh, and
-#      vercel-preview-workflow-contract.sh into scripts/
-#   3. Merge vercel.git.deploymentEnabled.json into vercel.json
-#   4. Add GitHub secret VERCEL_TOKEN (leftover: do not invent a token)
-# VERCEL_ORG_ID is the jsolly team (team_T8yHg0aDz7nCbyBgJh5a2saR).
-# CLI pin: vercel@59.20.0 (copied from GeoRoids PR 604 — do not invent a version).
-#
-# Opt-in Preview deploys. Automatic Git Preview builds are off in vercel.json.
-# Same-repo owner/member User comments `/preview` on a pull request, or run this
-# workflow with a PR number. Requires GitHub secret VERCEL_TOKEN.
-# issue_comment runs the workflow file from the default branch.
+# Repository-owned opt-in Vercel Previews. Automatic branch Git deployments stay off.
+# /preview comments and manual dispatch are one-shot; the preview label opts a PR
+# into redeploys on every push. Agents trigger Preview deployments only when asked.
+# Workflow tooling is loaded from main; PR sources never select credential-bearing code.
 
 name: Vercel Preview
 
 'on':
   issue_comment:
     types: [created]
+  pull_request_target:
+    branches: [main]
+    types: [labeled, synchronize]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -29,19 +22,26 @@ permissions:
   contents: read
   pull-requests: write
 
-concurrency:
-  group: vercel-preview-${{ github.event.issue.number || inputs.pr_number }}
-  # Ordinary PR comments also match this workflow's on: issue_comment. Cancelling
-  # in-flight runs would abort a real /preview deploy when someone later says LGTM.
-  cancel-in-progress: false
-
 jobs:
-  preview:
-    name: preview
+  # Decides whether this event is a real deploy request and resolves the PR
+  # number. It holds no token and no concurrency group, so an LGTM
+  # comment, a quoted `/preview` or an unrelated label never displaces a
+  # pending deploy.
+  resolve:
+    name: resolve
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 15
+    timeout-minutes: 5
     if: >-
-      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_dispatch' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) ||
+      (
+        github.event_name == 'pull_request_target' &&
+        github.event.pull_request.base.ref == github.event.repository.default_branch &&
+        github.event.pull_request.state == 'open' &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.actor != 'dependabot[bot]' &&
+        contains(github.event.pull_request.labels.*.name, 'preview') &&
+        (github.event.action != 'labeled' || github.event.label.name == 'preview')
+      ) ||
       (
         github.event.issue.pull_request &&
         github.event.comment.user.type == 'User' &&
@@ -53,21 +53,20 @@ jobs:
         )
       )
     env:
-      VERCEL_ORG_ID: team_T8yHg0aDz7nCbyBgJh5a2saR
-      VERCEL_PROJECT_ID: prj_Qy2iDBHuQ0n16tuT1vBmeIrgKkxr
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      GH_TOKEN: ${{ github.token }}
       EVENT_NAME: ${{ github.event_name }}
       COMMENT_BODY: ${{ github.event.comment.body }}
-      ISSUE_NUMBER: ${{ github.event.issue.number }}
-      DISPATCH_PR: ${{ inputs.pr_number }}
+      EVENT_PR: ${{ github.event.issue.number || github.event.pull_request.number || inputs.pr_number }}
       REPO: ${{ github.repository }}
+    outputs:
+      skip: ${{ steps.pr.outputs.skip }}
+      pr_number: ${{ steps.pr.outputs.pr_number }}
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
 
-      - name: Resolve the pull request head
+      - name: Validate the Preview request
         id: pr
         run: |
           set -euo pipefail
@@ -78,27 +77,89 @@ jobs:
               echo "skip=true" >>"$GITHUB_OUTPUT"
               exit 0
             fi
-            pr_number="$ISSUE_NUMBER"
-          else
-            pr_number="$DISPATCH_PR"
           fi
+          pr_number="$EVENT_PR"
           if [[ ! "$pr_number" =~ ^[1-9][0-9]*$ ]]; then
             echo "Invalid pull request number: ${pr_number:-empty}" >&2
             exit 1
           fi
 
+          {
+            echo "pr_number=${pr_number}"
+            echo "skip=false"
+          } >>"$GITHUB_OUTPUT"
+
+  preview:
+    name: preview
+    needs: resolve
+    if: ${{ needs.resolve.outputs.skip == 'false' }}
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    # Only real deploys reach this group. Cancelling in-flight runs would abort
+    # a deploy mid-upload. Resolve the current head only after acquiring this
+    # slot: even an older resolver that replaces a pending job deploys the
+    # latest eligible head, rather than dropping that head as stale.
+    concurrency:
+      group: vercel-preview-${{ needs.resolve.outputs.pr_number }}
+      cancel-in-progress: false
+    env:
+      VERCEL_ORG_ID: team_T8yHg0aDz7nCbyBgJh5a2saR
+      VERCEL_PROJECT_ID: prj_Qy2iDBHuQ0n16tuT1vBmeIrgKkxr
+      REPO: ${{ github.repository }}
+      EVENT_NAME: ${{ github.event_name }}
+      PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
+      EVENT_PR: ${{ needs.resolve.outputs.pr_number }}
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+    steps:
+      # Keep PR-controlled package-manager files out of setup-node's cwd. A
+      # yarnPath can execute during yarn --version even with caching disabled.
+      - name: Check out workflow tooling
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          path: tooling
+          persist-credentials: false
+
+      - name: Resolve the pull request head
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          pr_number="$EVENT_PR"
           pr_json="$(gh api "repos/${REPO}/pulls/${pr_number}")"
           state="$(printf '%s\n' "$pr_json" | jq -r '.state')"
           head_sha="$(printf '%s\n' "$pr_json" | jq -r '.head.sha')"
           head_ref="$(printf '%s\n' "$pr_json" | jq -r '.head.ref')"
+          base_ref="$(printf '%s\n' "$pr_json" | jq -r '.base.ref')"
           head_repo="$(printf '%s\n' "$pr_json" | jq -r '.head.repo.full_name // empty')"
+          # GitHub's contains() in the job `if:` ignores case; match it.
+          labeled="$(printf '%s\n' "$pr_json" | jq -r 'any(.labels[]; (.name | ascii_downcase) == "preview")')"
 
           if [[ "$state" != "open" ]]; then
             echo "PR ${pr_number} is ${state}; not deploying." >&2
             exit 1
           fi
+          if [[ "$base_ref" != "$DEFAULT_BRANCH" ]]; then
+            echo "PR targets ${base_ref}, not ${DEFAULT_BRANCH}; not deploying." >&2
+            exit 1
+          fi
+          if [[ "$EVENT_NAME" == "pull_request_target" && "$labeled" != "true" ]]; then
+            echo "The preview label was removed; stopping."
+            echo "skip=true" >>"$GITHUB_OUTPUT"
+            exit 0
+          fi
           if [[ "$head_repo" != "$REPO" ]]; then
             echo "PR ${pr_number} head repo ${head_repo} is not ${REPO}; not deploying forks." >&2
+            exit 1
+          fi
+          if [[ ! "$head_sha" =~ ^[a-f0-9]{40}$ ]]; then
+            echo "PR head SHA is not a 40-character hex commit: ${head_sha}" >&2
+            exit 1
+          fi
+          if [[ ! "$head_ref" =~ ^[A-Za-z0-9._/-]+$ ]]; then
+            echo "PR head ref is not a safe git branch name: ${head_ref}" >&2
             exit 1
           fi
 
@@ -106,50 +167,102 @@ jobs:
             echo "pr_number=${pr_number}"
             echo "head_sha=${head_sha}"
             echo "head_ref=${head_ref}"
+            echo "labeled=${labeled}"
             echo "skip=false"
           } >>"$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v7
-        if: ${{ steps.pr.outputs.skip != 'true' }}
+      # No package-manager cache: the label path's cache scope is one PR code
+      # writes in CI, and a restored ~/.npm could plant the npx vercel package
+      # or an untracked vercel.* config in this token-holding job.
+      - uses: actions/setup-node@v6
+        if: ${{ steps.pr.outputs.skip == 'false' }}
+        with:
+          node-version-file: tooling/.nvmrc
+          package-manager-cache: false
+
+      - name: Check out PR sources
+        if: ${{ steps.pr.outputs.skip == 'false' }}
+        uses: actions/checkout@v7
         with:
           ref: ${{ steps.pr.outputs.head_sha }}
+          path: source
           persist-credentials: false
 
-      - uses: actions/setup-node@v6
-        if: ${{ steps.pr.outputs.skip != 'true' }}
-        with:
-          node-version-file: .nvmrc
-
       - name: Deploy the Preview
-        if: ${{ steps.pr.outputs.skip != 'true' }}
+        if: ${{ steps.pr.outputs.skip == 'false' }}
         id: deploy
+        working-directory: ${{ runner.temp }}
         env:
-          PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_DIR: ${{ github.workspace }}/source
           HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
           HEAD_REF: ${{ steps.pr.outputs.head_ref }}
+          LABELED: ${{ steps.pr.outputs.labeled }}
         run: |
           set -euo pipefail
 
-          comment() {
-            gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$1"
+          # A labeled PR keeps one Preview comment, edited in place, so it does
+          # not gain one per push. A one-shot request gets a new comment, which
+          # notifies the requester.
+          marker='<!-- vercel-preview -->'
+          upsert_comment() {
+            local body="$1"$'\n\n'"$marker" id
+            id="$(
+              gh api --paginate "repos/${REPO}/issues/${PR_NUMBER}/comments" \
+                --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | contains(\"${marker}\"))) | .id" \
+                | tail -n 1
+            )"
+            if [[ -n "$id" && "$LABELED" == "true" ]]; then
+              gh api --method PATCH "repos/${REPO}/issues/comments/${id}" -f body="$body" >/dev/null
+            else
+              gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$body"
+            fi
           }
 
           if [[ -z "${VERCEL_TOKEN:-}" ]]; then
-            comment "Preview deploy skipped: GitHub secret \`VERCEL_TOKEN\` is not set. Create a Vercel token with deploy access and add it as that secret, then comment \`/preview\` again."
+            upsert_comment "Preview deploy skipped: GitHub secret \`VERCEL_TOKEN\` is not set. Create a Vercel token with deploy access and add it as that secret, then comment \`/preview\` or push to a \`preview\`-labeled PR."
             exit 1
           fi
 
-          local_sha="$(git rev-parse HEAD)"
+          # Every trigger stands down if the PR moved while this run waited.
+          # A later trigger deploys a newer head; a one-shot can be repeated.
+          # The label path also deploys only while the PR remains labeled.
+          pr_json="$(gh api "repos/${REPO}/pulls/${PR_NUMBER}")"
+          current_sha="$(printf '%s\n' "$pr_json" | jq -r '.head.sha')"
+          if [[ "$(printf '%s\n' "$pr_json" | jq -r '.state')" != "open" ]]; then
+            echo "PR closed while this run waited; not deploying."
+            exit 0
+          fi
+          if [[ "$current_sha" != "$HEAD_SHA" ]]; then
+            echo "PR head moved from ${HEAD_SHA} to ${current_sha}; the newer run deploys it."
+            exit 0
+          fi
+          if [[ "$EVENT_NAME" == "pull_request_target" ]] &&
+            [[ "$(printf '%s\n' "$pr_json" | jq -r 'any(.labels[]; (.name | ascii_downcase) == "preview")')" != "true" ]]; then
+            echo "The preview label was removed; not deploying."
+            exit 0
+          fi
+
+          local_sha="$(git -C "$SOURCE_DIR" rev-parse HEAD)"
           if [[ "$local_sha" != "$HEAD_SHA" ]]; then
             echo "Checked-out SHA ${local_sha} != PR head ${HEAD_SHA}" >&2
             exit 1
           fi
-          if [[ ! "$HEAD_SHA" =~ ^[a-f0-9]{40}$ ]]; then
-            echo "PR head SHA is not a 40-character hex commit: ${HEAD_SHA}" >&2
-            exit 1
-          fi
-          if [[ ! "$HEAD_REF" =~ ^[A-Za-z0-9._/-]+$ ]]; then
-            echo "PR head ref is not a safe git branch name: ${HEAD_REF}" >&2
+
+          # The CLI compiles and runs a vercel.{ts,mts,js,mjs,cjs} config, at the
+          # root or in the project's server-side Root Directory, in a child
+          # process that inherits VERCEL_TOKEN, so PR code would hold the token;
+          # on the label path that happens on every push with no human step.
+          # Fleet repos configure through vercel.json only, so refuse any
+          # config at any depth, tracked or not.
+          configs="$(
+            git -C "$SOURCE_DIR" ls-files --cached --others -- ':(glob)**/vercel.ts' ':(glob)**/vercel.mts' \
+              ':(glob)**/vercel.js' ':(glob)**/vercel.mjs' ':(glob)**/vercel.cjs' \
+              | tr '\n' ' '
+          )"
+          if [[ -n "$configs" ]]; then
+            upsert_comment "Preview deploy refused: the Vercel CLI would execute \`${configs% }\` with \`VERCEL_TOKEN\` in its environment. Configure the project through \`vercel.json\` instead."
             exit 1
           fi
 
@@ -157,9 +270,12 @@ jobs:
           # system vars are often empty on CLI deploys.
           # npx runs from $RUNNER_TEMP, outside the PR tree, so npm reads no PR
           # .npmrc and finds no PR node_modules/vercel while VERCEL_TOKEN is in
-          # its environment; --cwd points the CLI back at the checkout.
+          # its environment; --cwd points the CLI back at the checkout. The CLI
+          # needs no GitHub token, so GH_TOKEN is dropped from its environment,
+          # and it gets a fresh npm cache that no earlier run could have seeded.
           preview_url="$(
-            cd "$RUNNER_TEMP" && npx --yes vercel@59.20.0 deploy --yes --archive=tgz --cwd "$GITHUB_WORKSPACE" \
+            cd "$RUNNER_TEMP" && unset GH_TOKEN && export NPM_CONFIG_CACHE="$RUNNER_TEMP/npm-cache" &&
+              npx --yes vercel@59.20.0 deploy --yes --archive=tgz --cwd "$SOURCE_DIR" \
               --scope jsollys-projects \
               --build-env "VERCEL_GIT_COMMIT_SHA=${HEAD_SHA}" \
               --meta "githubDeployment=1" \
@@ -178,14 +294,44 @@ jobs:
             echo "Vercel CLI did not print a Preview URL; last line was: ${preview_url:-empty}" >&2
             exit 1
           fi
+          # Keep one protected URL per project/PR. A completed older build
+          # must not replace the alias or comment after the PR head moves.
+          pr_json="$(gh api "repos/${REPO}/pulls/${PR_NUMBER}")"
+          if [[ "$(printf '%s\n' "$pr_json" | jq -r '.state')" != "open" ]] ||
+            [[ "$(printf '%s\n' "$pr_json" | jq -r '.head.sha')" != "$HEAD_SHA" ]]; then
+            echo "PR closed or moved during the build; leaving its Preview URL unchanged."
+            exit 0
+          fi
+          if [[ "$EVENT_NAME" == "pull_request_target" ]] &&
+            [[ "$(printf '%s\n' "$pr_json" | jq -r 'any(.labels[]; (.name | ascii_downcase) == "preview")')" != "true" ]]; then
+            echo "The preview label was removed during the build; leaving its URL unchanged."
+            exit 0
+          fi
+          if [[ ! "$VERCEL_PROJECT_ID" =~ ^prj_[A-Za-z0-9]+$ ]]; then
+            echo "Invalid Vercel project ID; refusing to assign a Preview alias." >&2
+            exit 1
+          fi
+          preview_alias="pr-${PR_NUMBER}-${VERCEL_PROJECT_ID#prj_}.vercel.app"
+          preview_alias="${preview_alias,,}"
+          (
+            cd "$RUNNER_TEMP" && unset GH_TOKEN &&
+              NPM_CONFIG_CACHE="$RUNNER_TEMP/npm-cache" npx --yes vercel@59.20.0 alias set "$preview_url" "$preview_alias" --scope jsollys-projects
+          )
+          deployment_url="$preview_url"
+          preview_url="https://${preview_alias}"
           {
             echo "url<<PREVIEW_URL_EOF"
             printf '%s\n' "$preview_url"
             echo "PREVIEW_URL_EOF"
           } >>"$GITHUB_OUTPUT"
 
-          comment "$(
+          if [[ "$LABELED" == "true" ]]; then
+            note="Redeploys on every push while this PR has the \`preview\` label. Remove the label to stop."
+          else
+            note="This is a one-shot deploy. New commits do not rebuild until you comment \`/preview\` again, or add the \`preview\` label to redeploy on every push."
+          fi
+          upsert_comment "$(
             printf '%s\n\n%s\n' \
-              "Preview for \`${HEAD_REF}\` (\`${HEAD_SHA}\`): ${preview_url}" \
-              "This is a one-shot deploy. New commits do not rebuild until you comment \`/preview\` again."
+              "Preview for \`${HEAD_REF}\` (\`${HEAD_SHA}\`): ${preview_url} (build: ${deployment_url})" \
+              "$note"
           )"
