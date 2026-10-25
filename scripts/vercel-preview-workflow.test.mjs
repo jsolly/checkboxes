@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import {
 	chmodSync,
+	closeSync,
 	copyFileSync,
 	mkdirSync,
 	mkdtempSync,
+	openSync,
 	readFileSync,
 	realpathSync,
 	rmSync,
@@ -170,15 +172,32 @@ if (kind === "gh") {
 		...config.env,
 	};
 	function execute(step, source = workflow) {
-		return spawnSync(
-			"bash",
-			["-euo", "pipefail", "-c", runBlock(step, source)],
-			{
-				cwd: root,
-				env,
-				encoding: "utf8",
-			},
-		);
+		// Node's captured stderr is a socket on Linux. Unlike a pipe or file,
+		// it cannot be opened through /dev/stderr by the real workflow's tee.
+		const stderrPath = join(root, "stderr");
+		const stderrFd = openSync(stderrPath, "w");
+		try {
+			const result = spawnSync(
+				"bash",
+				[
+					"--noprofile",
+					"--norc",
+					"-euo",
+					"pipefail",
+					"-c",
+					runBlock(step, source),
+				],
+				{
+					cwd: root,
+					env,
+					encoding: "utf8",
+					stdio: ["ignore", "pipe", stderrFd],
+				},
+			);
+			return { ...result, stderr: readFileSync(stderrPath, "utf8") };
+		} finally {
+			closeSync(stderrFd);
+		}
 	}
 	function calls(kind) {
 		return readFileSync(join(root, "calls"), "utf8")
@@ -268,6 +287,7 @@ it("a labeled Preview uses isolated CLI commands and edits one stable comment", 
 	const f = fixture(t);
 	const result = f.execute("Deploy the Preview");
 	assert.equal(result.status, 0, result.stderr);
+	assert.match(result.stderr, /https:\/\/immutable\.vercel\.app/);
 	const commands = f.calls("npx");
 	assert.equal(commands.length, 2);
 	for (const call of commands) {
