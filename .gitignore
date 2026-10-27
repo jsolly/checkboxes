@@ -43,7 +43,7 @@ npm-debug.log*
 !.cursor/aws-oidc-login.sh
 
 
-# Materialized agent config (fetched by .dotagents/bootstrap.sh; not committed)
+# SEO audit output
 .seo-audit/
 
 # Production browser smoke diagnostics
