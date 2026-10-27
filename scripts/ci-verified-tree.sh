@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Canonical source: jsolly/dotagents templates/github/ci-verified-tree.sh.
+# Starter from jsolly/dotagents skills/engineering/new-solly-repo/templates/github/ci-verified-tree.sh; the consuming repository owns its copy.
 # Run right after the checkout and the secrets scan, before validation mutates files.
 # Evidence is an artifact name from the latest PR run of this same workflow.
 # Any missing/ambiguous evidence means full validation, never an unproven skip.

@@ -1,4 +1,4 @@
-// Canonical source: dotagents/templates/github/production-smoke.mjs
+// Starter from jsolly/dotagents skills/engineering/new-solly-repo/templates/github/production-smoke.mjs; the consuming repository owns its copy.
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";

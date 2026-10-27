@@ -8,11 +8,9 @@
 # outside the pins changes the lint: actionlint's pyflakes rule stays off, and a
 # caller's SHELLCHECK_OPTS is dropped.
 #
-# Copy byte-identical into each workflow repo as scripts/check-actions.sh, then:
-#   "check:actions": "bash scripts/check-actions.sh"
-# in package.json, plus `run_step "actionlint" npm run check:actions` in
-# .git-hooks/pre-commit. Every templates/github/ci-*.yml already runs
-# `npm run check:actions` after actions/checkout. No npm dependency.
+# This repository owns this helper at scripts/check-actions.sh. package.json
+# selects it with check:actions, .git-hooks/pre-commit runs that command, and CI
+# runs it through npm run gate. No npm dependency.
 set -euo pipefail
 unset SHELLCHECK_OPTS
 
