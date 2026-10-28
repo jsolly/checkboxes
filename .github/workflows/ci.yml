@@ -141,6 +141,16 @@ jobs:
       - name: Run complete repository gate
         if: steps.verified-tree.outputs.run_full != 'false'
         run: npm run gate
+      - name: Audit built pages with axe-core
+        if: steps.verified-tree.outputs.run_full != 'false'
+        run: npm run check:a11y
+      - name: Save accessibility findings
+        if: always() && steps.verified-tree.outputs.run_full != 'false'
+        uses: actions/upload-artifact@v7
+        with:
+          name: accessibility-results
+          path: accessibility-results.json
+          if-no-files-found: ignore
       - name: Record validated PR tree
         if: >-
           success() && github.event_name == 'pull_request' &&

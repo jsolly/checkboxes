@@ -68,6 +68,7 @@ const imageURL = new URL(image, Astro.site);
 		</header>
 		<slot name="notice" />
 		<main id="main" tabindex="-1">
+			{noindex && <h1>{title}</h1>}
 			<slot />
 		</main>
 		<footer class="group flex justify-center mt-5 mb-16">
