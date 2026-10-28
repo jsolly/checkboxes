@@ -27,7 +27,8 @@
 		"gate": "FLEET_DOC_FAST=0 bash .git-hooks/pre-commit",
 		"smoke:production": "node scripts/production-smoke.mjs",
 		"smoke:scenario-contract": "node --test scripts/production-smoke-scenario.test.mjs",
-		"test:preview-workflow": "vitest run --config config/testing/vitest.preview.mjs"
+		"test:preview-workflow": "vitest run --config config/testing/vitest.preview.mjs",
+		"check:a11y": "node scripts/check-accessibility.mjs"
 	},
 	"overrides": {
 		"path-to-regexp": ">=6.3.0",
@@ -83,6 +84,7 @@
 		"@types/node": "^26.6.1",
 		"@types/sortablejs": "^1.15.8",
 		"@typescript-eslint/typescript-estree": "^8.70.0",
+		"axe-core": "^4.14.0",
 		"knip": "^6.38.0",
 		"lint-staged": "^17.6.0",
 		"markdownlint-cli2": "^0.23.2",
