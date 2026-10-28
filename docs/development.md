@@ -102,14 +102,18 @@ creates a deployment. Test live Preview behavior only when John explicitly asks.
 
 ## Infrastructure and access
 
-Use existing scoped identities. Agents do not recover credentials, broaden grants
-or run destructive infrastructure/database operations. Keep read-only checks on
-the read-only role, including the repo-owned credential-isolation wrapper.
-`check:infra-pending` reports merged infrastructure inputs not yet deployed; AWS
-CloudFormation drift detection separately reports manual live-resource changes.
-Infrastructure apply and protection changes remain a concrete handoff to the
-human owner, with exact repository commands. A successful code deploy does not
-prove infrastructure adoption. Never bypass a dirty-infrastructure deploy refusal.
+This application deploys through Vercel and has no AWS stack or AWS CLI checks.
+Repository setup uses public tools only; it does not log in to AWS, mint agent
+credentials or write AWS profiles. The unused vendor OIDC bootstrap is removed
+from source. Do not restore a credential-export helper for this application.
+
+Separately authorized agent AWS work uses the provider desktop app's native
+`aws_mcp` connection as `agent@jsolly.com` / `AgentMcp`, with AWS Core retained
+for knowledge tools. Native OAuth credentials never enter repository scripts.
+Named human administrators, Vercel credentials and application environment files
+remain separate. Source cleanup does not retire installed helper copies, cached
+sessions, saved cloud environments or live IAM trust; those require the existing
+capability/provider-isolation acceptance and retirement work.
 
 Repository instructions and access rules are maintained here. Personal home
 configuration and optional global skills remain separate and are not installed,

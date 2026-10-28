@@ -40,7 +40,6 @@ npm-debug.log*
 !.cursor/CLOUD.md
 !.cursor/environment.json
 !.cursor/install-cloud-skills.sh
-!.cursor/aws-oidc-login.sh
 
 
 # SEO audit output
