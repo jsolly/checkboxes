@@ -78,7 +78,7 @@
 		"vue": "^3.5.43"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.14",
+		"@biomejs/biome": "2.5.15",
 		"@tailwindcss/vite": "^4.3.3",
 		"@types/jquery": "^4.0.1",
 		"@types/node": "^26.6.1",
