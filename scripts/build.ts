@@ -30,7 +30,7 @@ const output = path.join(temporary, "dist");
 function build(env: NodeJS.ProcessEnv): void {
 	const result = spawnSync(
 		path.join(root, "node_modules/.bin/astro"),
-		["build", "--config", "config/app/astro.mjs"],
+		["build", "--config", "config/app/astro.ts"],
 		{ cwd: root, env, stdio: "inherit" },
 	);
 	if (result.error) throw result.error;
