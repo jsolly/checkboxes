@@ -1,0 +1,26 @@
+{
+	"version": 1,
+	"assets": [
+		{
+			"path": "/favicon.ico",
+			"sha256": "c29ab6ab560404c87179a15b394ccfee4883f09a939fdf827cdc198a49495a46",
+			"bytes": 4286,
+			"contentType": "image/x-icon",
+			"key": "sha256/c29ab6ab560404c87179a15b394ccfee4883f09a939fdf827cdc198a49495a46/favicon.ico"
+		},
+		{
+			"path": "/favicon.svg",
+			"sha256": "f73083689a058f7b0d0ffabe90df48fb04be3a4fb8e8a693b8fa95a7124cf171",
+			"bytes": 826,
+			"contentType": "image/svg+xml",
+			"key": "sha256/f73083689a058f7b0d0ffabe90df48fb04be3a4fb8e8a693b8fa95a7124cf171/favicon.svg"
+		},
+		{
+			"path": "/og-image.jpg",
+			"sha256": "1da27b34d676e19894075713c9b7585f00c40b7b4c2214c0b80ffad1b67d2882",
+			"bytes": 50622,
+			"contentType": "image/jpeg",
+			"key": "sha256/1da27b34d676e19894075713c9b7585f00c40b7b4c2214c0b80ffad1b67d2882/og-image.jpg"
+		}
+	]
+}

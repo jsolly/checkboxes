@@ -102,7 +102,10 @@ creates a deployment. Test live Preview behavior only when John explicitly asks.
 
 ## Infrastructure and access
 
-This application deploys through Vercel and has no AWS stack or AWS CLI checks.
+This application deploys through Vercel. The repository-owned [static media
+stack preparation](aws-static-assets.md) is not applied; infrastructure apply,
+upload authority and production cutover remain human-owned. Normal build/gate
+checks use local media and make no AWS calls.
 Repository setup uses public tools only; it does not log in to AWS, mint agent
 credentials or write AWS profiles. The unused vendor OIDC bootstrap is removed
 from source. Do not restore a credential-export helper for this application.
