@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"dev": "astro dev --config config/app/astro.mjs",
-		"build": "node scripts/build.mjs",
+		"build": "node scripts/build.ts",
 		"preview": "astro preview --config config/app/astro.mjs",
 		"astro": "astro --config config/app/astro.mjs",
 		"lint": "biome lint --config-path=config/quality/biome.settings.jsonc .",
@@ -27,8 +27,8 @@
 		"gate": "FLEET_DOC_FAST=0 bash .git-hooks/pre-commit",
 		"smoke:production": "node scripts/production-smoke.mjs",
 		"smoke:scenario-contract": "node --test scripts/production-smoke-scenario.test.mjs",
-		"test:preview-workflow": "vitest run --config config/testing/vitest.preview.mjs",
-		"check:a11y": "node scripts/check-accessibility.mjs"
+		"test:preview-workflow": "vitest run --config config/testing/vitest.preview.ts",
+		"check:a11y": "node scripts/check-accessibility.ts"
 	},
 	"overrides": {
 		"path-to-regexp": ">=6.3.0",

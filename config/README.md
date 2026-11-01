@@ -27,7 +27,7 @@ with its component; test configuration may live under `tests/`.
   preserving plugin, dependency and entry-point discovery.
 - `quality/yamllint.yaml` and `quality/.markdownlint-cli2.jsonc` are selected by
   the repository's YAML command and root-anchored Markdown helper.
-- `testing/vitest.preview.mjs` selects the Preview workflow fixture suite from
+- `testing/vitest.preview.ts` selects the Preview workflow fixture suite from
   the repository root. `test:preview-workflow` and `check:actions` select it explicitly.
 - `agents/repository.json` owns hook identity and its fixed trusted-bundle roster.
   Current checkouts refuse a retired root `.repo-independent.json`, including a
