@@ -1,5 +1,3 @@
-// @ts-check
-
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -40,7 +38,7 @@ export default defineConfig({
 			name: "checkboxes-config-watch",
 			hooks: {
 				"astro:config:setup": ({ addWatchFile }) => {
-					addWatchFile(new URL("./astro.mjs", import.meta.url));
+					addWatchFile(new URL("./astro.ts", import.meta.url));
 				},
 			},
 		},
@@ -51,7 +49,7 @@ export default defineConfig({
 		vue(),
 		react(),
 		svelte({
-			configFile: fileURLToPath(new URL("./svelte.js", import.meta.url)),
+			configFile: fileURLToPath(new URL("./svelte.ts", import.meta.url)),
 		}),
 	],
 	...(measurementBuild ? {} : { adapter: vercel({ skewProtection: true }) }),

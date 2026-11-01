@@ -4,14 +4,14 @@ Move optional top-level tracked configuration into `config/<domain>/` or its
 existing owner, with one authoritative owner per setting. Keep nested configuration
 with its component; test configuration may live under `tests/`.
 
-- `app/astro.mjs` owns integrations, build and Vite settings. All Astro package
+- `app/astro.ts` owns integrations, build and Vite settings. All Astro package
   commands and both build subprocesses select it explicitly. The repository stays
   the project root; product and measurement source/output roots, public assets,
   package resolution and deployment behavior are preserved.
   Its `addWatchFile` registration reloads Astro's configuration when this
   physical file changes. Verify an actual setting change and its restoration;
   starting the server alone does not exercise configuration reloads.
-- `app/svelte.js` owns preprocessing. Astro's Svelte integration selects this
+- `app/svelte.ts` owns preprocessing. Astro's Svelte integration selects this
   module through a file URL resolved beside its own configuration.
 - `typescript/tsconfig.json` owns compiler policy, extending Astro's strict
   package preset. Its empty `files` and `include` arrays prevent this nested
