@@ -14,20 +14,20 @@ import path from "node:path";
 
 const root = process.cwd();
 // One identity for the complete deployment, including both entry graphs.
-const release = process.env.VERCEL_DEPLOYMENT_ID ?? randomUUID();
-if (process.env.VERCEL && !process.env.VERCEL_DEPLOYMENT_ID) {
+const release = process.env["VERCEL_DEPLOYMENT_ID"] ?? randomUUID();
+if (process.env["VERCEL"] && !process.env["VERCEL_DEPLOYMENT_ID"]) {
 	throw new Error(
 		"Production build requires its immutable Vercel deployment identity",
 	);
 }
-process.env.PUBLIC_WEBSITE_RELEASE = release;
+process.env["PUBLIC_WEBSITE_RELEASE"] = release;
 await mkdir(path.join(root, ".astro"), { recursive: true });
 const temporary = await mkdtemp(path.join(root, ".astro", "checkboxes-build-"));
 const productSource = path.join(temporary, "product/src");
 const measurementSource = path.join(temporary, "measurements/src");
 const output = path.join(temporary, "dist");
 
-function build(env) {
+function build(env: NodeJS.ProcessEnv): void {
 	const result = spawnSync(
 		path.join(root, "node_modules/.bin/astro"),
 		["build", "--config", "config/app/astro.mjs"],
@@ -38,7 +38,10 @@ function build(env) {
 		throw new Error(`Astro build failed (${result.status ?? result.signal})`);
 }
 
-async function copyAssets(directory, destination) {
+async function copyAssets(
+	directory: string,
+	destination: string,
+): Promise<void> {
 	await mkdir(destination, { recursive: true });
 	for (const entry of await readdir(directory, { withFileTypes: true })) {
 		const from = path.join(directory, entry.name);
@@ -46,11 +49,16 @@ async function copyAssets(directory, destination) {
 		if (entry.isDirectory()) {
 			await copyAssets(from, to);
 		} else {
-			let existing;
+			let existing: Buffer | undefined;
 			try {
 				existing = await readFile(to);
 			} catch (error) {
-				if (error.code !== "ENOENT") throw error;
+				if (
+					!(error instanceof Error) ||
+					!("code" in error) ||
+					error.code !== "ENOENT"
+				)
+					throw error;
 			}
 			const contents = await readFile(from);
 			if (existing && !contents.equals(existing))
@@ -60,7 +68,10 @@ async function copyAssets(directory, destination) {
 	}
 }
 
-async function createSource(source, measurement) {
+async function createSource(
+	source: string,
+	measurement: boolean,
+): Promise<void> {
 	await mkdir(path.join(source, "pages"), { recursive: true });
 	await symlink(
 		path.join(root, "node_modules"),

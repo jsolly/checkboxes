@@ -7,7 +7,7 @@ their timer; focus events are throttled. A notice offers **Update and reload**
 and **Later**. Checks never reload tabs. The benchmark routes intentionally
 exclude this shared gallery control.
 
-`scripts/build.mjs` uses the immutable Vercel deployment ID for production, and
+`scripts/build.ts` uses the immutable Vercel deployment ID for production, and
 one UUID for each local fixture build. It embeds that identity in page metadata
 and the notice's initial props. It writes the same identity to
 `dist/release.json` and Vercel's static output after both entry graphs succeed.
