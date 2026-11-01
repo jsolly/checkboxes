@@ -1,0 +1,229 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "checkboxes published immutable image storage; human-owned apply, no DNS or IAM changes",
+	"Resources": {
+		"MediaBucket": {
+			"Type": "AWS::S3::Bucket",
+			"DeletionPolicy": "Retain",
+			"UpdateReplacePolicy": "Retain",
+			"Properties": {
+				"BucketEncryption": {
+					"ServerSideEncryptionConfiguration": [
+						{
+							"ServerSideEncryptionByDefault": {
+								"SSEAlgorithm": "AES256"
+							}
+						}
+					]
+				},
+				"VersioningConfiguration": {
+					"Status": "Enabled"
+				},
+				"OwnershipControls": {
+					"Rules": [
+						{
+							"ObjectOwnership": "BucketOwnerEnforced"
+						}
+					]
+				},
+				"PublicAccessBlockConfiguration": {
+					"BlockPublicAcls": true,
+					"IgnorePublicAcls": true,
+					"BlockPublicPolicy": true,
+					"RestrictPublicBuckets": true
+				},
+				"Tags": [
+					{
+						"Key": "project",
+						"Value": "checkboxes"
+					},
+					{
+						"Key": "purpose",
+						"Value": "published-static-images"
+					}
+				]
+			}
+		},
+		"OriginAccess": {
+			"Type": "AWS::CloudFront::OriginAccessControl",
+			"Properties": {
+				"OriginAccessControlConfig": {
+					"Name": {
+						"Fn::Sub": "${AWS::StackName}-s3"
+					},
+					"OriginAccessControlOriginType": "s3",
+					"SigningBehavior": "always",
+					"SigningProtocol": "sigv4"
+				}
+			}
+		},
+		"MediaCache": {
+			"Type": "AWS::CloudFront::CachePolicy",
+			"Properties": {
+				"CachePolicyConfig": {
+					"Name": {
+						"Fn::Sub": "${AWS::StackName}-immutable-images"
+					},
+					"MinTTL": 0,
+					"DefaultTTL": 0,
+					"MaxTTL": 31536000,
+					"ParametersInCacheKeyAndForwardedToOrigin": {
+						"CookiesConfig": {
+							"CookieBehavior": "none"
+						},
+						"HeadersConfig": {
+							"HeaderBehavior": "none"
+						},
+						"QueryStringsConfig": {
+							"QueryStringBehavior": "none"
+						},
+						"EnableAcceptEncodingGzip": false,
+						"EnableAcceptEncodingBrotli": false
+					}
+				}
+			}
+		},
+		"MediaHeaders": {
+			"Type": "AWS::CloudFront::ResponseHeadersPolicy",
+			"Properties": {
+				"ResponseHeadersPolicyConfig": {
+					"Name": {
+						"Fn::Sub": "${AWS::StackName}-images"
+					},
+					"SecurityHeadersConfig": {
+						"ContentTypeOptions": {
+							"Override": true
+						},
+						"StrictTransportSecurity": {
+							"AccessControlMaxAgeSec": 31536000,
+							"IncludeSubdomains": false,
+							"Preload": false,
+							"Override": true
+						}
+					}
+				}
+			}
+		},
+		"MediaDistribution": {
+			"Type": "AWS::CloudFront::Distribution",
+			"Properties": {
+				"DistributionConfig": {
+					"Enabled": true,
+					"Comment": "checkboxes immutable published images; no custom domain",
+					"HttpVersion": "http2and3",
+					"IPV6Enabled": true,
+					"PriceClass": "PriceClass_100",
+					"ViewerCertificate": {
+						"CloudFrontDefaultCertificate": true
+					},
+					"Origins": [
+						{
+							"Id": "private-s3",
+							"DomainName": {
+								"Fn::GetAtt": ["MediaBucket", "RegionalDomainName"]
+							},
+							"OriginAccessControlId": {
+								"Ref": "OriginAccess"
+							},
+							"S3OriginConfig": {
+								"OriginAccessIdentity": ""
+							}
+						}
+					],
+					"DefaultCacheBehavior": {
+						"TargetOriginId": "private-s3",
+						"ViewerProtocolPolicy": "https-only",
+						"AllowedMethods": ["GET", "HEAD"],
+						"CachedMethods": ["GET", "HEAD"],
+						"Compress": false,
+						"CachePolicyId": {
+							"Ref": "MediaCache"
+						},
+						"ResponseHeadersPolicyId": {
+							"Ref": "MediaHeaders"
+						}
+					},
+					"CustomErrorResponses": [
+						{
+							"ErrorCode": 403,
+							"ErrorCachingMinTTL": 0
+						},
+						{
+							"ErrorCode": 404,
+							"ErrorCachingMinTTL": 0
+						}
+					]
+				}
+			}
+		},
+		"MediaBucketPolicy": {
+			"Type": "AWS::S3::BucketPolicy",
+			"DeletionPolicy": "Retain",
+			"UpdateReplacePolicy": "Retain",
+			"Properties": {
+				"Bucket": {
+					"Ref": "MediaBucket"
+				},
+				"PolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [
+						{
+							"Sid": "OnlyThisDistributionReadsPublishedImages",
+							"Effect": "Allow",
+							"Principal": {
+								"Service": "cloudfront.amazonaws.com"
+							},
+							"Action": "s3:GetObject",
+							"Resource": {
+								"Fn::Sub": "${MediaBucket.Arn}/sha256/*"
+							},
+							"Condition": {
+								"StringEquals": {
+									"AWS:SourceArn": {
+										"Fn::Sub": "arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${MediaDistribution}"
+									}
+								}
+							}
+						},
+						{
+							"Sid": "RequireTLS",
+							"Effect": "Deny",
+							"Principal": "*",
+							"Action": "s3:*",
+							"Resource": [
+								{
+									"Fn::GetAtt": ["MediaBucket", "Arn"]
+								},
+								{
+									"Fn::Sub": "${MediaBucket.Arn}/*"
+								}
+							],
+							"Condition": {
+								"Bool": {
+									"aws:SecureTransport": "false"
+								}
+							}
+						}
+					]
+				}
+			}
+		}
+	},
+	"Outputs": {
+		"BucketName": {
+			"Value": {
+				"Ref": "MediaBucket"
+			}
+		},
+		"DistributionId": {
+			"Value": {
+				"Ref": "MediaDistribution"
+			}
+		},
+		"DeliveryOrigin": {
+			"Value": {
+				"Fn::Sub": "https://${MediaDistribution.DomainName}"
+			}
+		}
+	}
+}
