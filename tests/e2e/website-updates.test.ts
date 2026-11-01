@@ -10,7 +10,7 @@ import { chromium } from "playwright";
 it("Open gallery tabs choose when to reload after a deployment", async () => {
 	const fixture = await mkdtemp(path.join(tmpdir(), "checkboxes-updates-"));
 	const build = async (name: string) => {
-		const result = spawnSync(process.execPath, ["scripts/build.mjs"], {
+		const result = spawnSync(process.execPath, ["scripts/build.ts"], {
 			encoding: "utf8",
 		});
 		assert.equal(result.status, 0, result.stdout + result.stderr);
