@@ -140,7 +140,7 @@ If you want to generate performance metrics for your new implementation, see the
   - Your GEMINI_API_KEY is valid and properly set in `.env` (only if refreshing Vibe Complexity)
   - You've run `npm run build` before running `npm run generate-stats`
   - Built test routes must not load implementation JavaScript from remote hosts (no jsDelivr/unpkg allowlist)
-  - You have Node.js 24+ installed
+  - You have Node.js 26+ installed
 - For framework integration issues, check:
   - Required dependencies are installed
   - Framework is properly configured in config/app/astro.ts
@@ -227,6 +227,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Prerequisites
 
-- Node.js 24+
+- Node.js 26+
 - npm
 - A Gemini API key (optional; only needed to refresh Vibe Complexity)
