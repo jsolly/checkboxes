@@ -81,7 +81,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.15",
-		"@tailwindcss/vite": "^4.3.3",
+		"@tailwindcss/vite": "^4.3.4",
 		"@types/jquery": "^4.0.1",
 		"@types/node": "^26.6.1",
 		"@types/sortablejs": "^1.15.8",
