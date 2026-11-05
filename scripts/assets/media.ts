@@ -39,7 +39,9 @@ export function parseManifest(value: unknown): AssetManifest {
 		!isRecord(value) ||
 		value["version"] !== 1 ||
 		!Array.isArray(value["assets"]) ||
-		Object.keys(value).sort().join(",") !== "assets,version" ||
+		Object.keys(value)
+			.sort((left, right) => left.localeCompare(right))
+			.join(",") !== "assets,version" ||
 		value["assets"].length === 0
 	)
 		throw new Error("Invalid asset manifest");
@@ -48,8 +50,9 @@ export function parseManifest(value: unknown): AssetManifest {
 	for (const row of rows) {
 		if (
 			!isRecord(row) ||
-			Object.keys(row).sort().join(",") !==
-				"bytes,contentType,key,path,sha256" ||
+			Object.keys(row)
+				.sort((left, right) => left.localeCompare(right))
+				.join(",") !== "bytes,contentType,key,path,sha256" ||
 			typeof row["path"] !== "string" ||
 			!PUBLIC_PATH.test(row["path"]) ||
 			typeof row["sha256"] !== "string" ||
