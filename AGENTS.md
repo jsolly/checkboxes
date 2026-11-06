@@ -97,14 +97,13 @@ Canonical contract: [local CI helper](scripts/ci-verified-tree.sh).
 
 ## Dependabot CI
 
-Dependabot PR events allocate no validation runners until an explicitly
-authorized maintenance run applies the `ow-ci` label. Only the `labeled`
-event that adds `ow-ci` runs the real `ci` check. A later Dependabot push to the
-PR defers again until a drain re-kicks the new head (remove, then re-add
-`ow-ci`). Deferred runs
-report `ci-deferred` and cannot satisfy the required `ci` check. Skipped or
-absent checks never authorize a dependency merge. See the Dependabot CI kick in
-the repository CI workflow and local release instructions.
+Dependabot pull requests run the same required `ci` job as every other pull
+request on `opened`, `synchronize`, and `reopened`. That job is the secrets
+scan, the complete repository gate, and the accessibility audit. A `labeled`
+event runs that job only when the added label is `ow-ci`; every other label
+defers and reports `ci-deferred`, which cannot satisfy the required `ci` check.
+Do not apply `ow-ci` in place of those events. Skipped or absent checks never
+authorize a dependency merge.
 
 ## Git hooks
 
