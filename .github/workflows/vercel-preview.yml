@@ -294,7 +294,7 @@ jobs:
             echo "Vercel CLI did not print a Preview URL; last line was: ${preview_url:-empty}" >&2
             exit 1
           fi
-          # Keep one protected URL per project/PR. A completed older build
+          # Keep one stable URL per repository branch. A completed older build
           # must not replace the alias or comment after the PR head moves.
           pr_json="$(gh api "repos/${REPO}/pulls/${PR_NUMBER}")"
           if [[ "$(printf '%s\n' "$pr_json" | jq -r '.state')" != "open" ]] ||
@@ -307,12 +307,18 @@ jobs:
             echo "The preview label was removed during the build; leaving its URL unchanged."
             exit 0
           fi
-          if [[ ! "$VERCEL_PROJECT_ID" =~ ^prj_[A-Za-z0-9]+$ ]]; then
-            echo "Invalid Vercel project ID; refusing to assign a Preview alias." >&2
-            exit 1
+          # One DNS label per repository and branch under the team's wildcard
+          # preview certificate: reduce it to [a-z0-9-] and cap it at 63 characters.
+          preview_label="${REPO#*/}-${HEAD_REF}"
+          preview_label="$(printf '%s' "${preview_label,,}" | LC_ALL=C tr -cs 'a-z0-9' '-')"
+          preview_label="${preview_label#-}"
+          preview_label="${preview_label%-}"
+          if ((${#preview_label} > 63)); then
+            ref_hash="$(printf '%08x' "$(printf '%s' "$HEAD_REF" | cksum | cut -d ' ' -f 1)")"
+            preview_label="${preview_label:0:54}"
+            preview_label="${preview_label%-}-${ref_hash}"
           fi
-          preview_alias="pr-${PR_NUMBER}-${VERCEL_PROJECT_ID#prj_}.vercel.app"
-          preview_alias="${preview_alias,,}"
+          preview_alias="${preview_label}.preview.jsolly.com"
           (
             cd "$RUNNER_TEMP" && unset GH_TOKEN &&
               NPM_CONFIG_CACHE="$RUNNER_TEMP/npm-cache" npx --yes vercel@59.20.0 alias set "$preview_url" "$preview_alias" --scope jsollys-projects
