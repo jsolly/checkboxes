@@ -76,15 +76,14 @@ Merge only when the required CI validates the exact current head. Never push to
 the default branch, weaken rulesets, bypass checks or use an admin merge. Optional
 personal review skills may help, but they are not prerequisites for this flow.
 
-Preserve existing code-only Deploy and production-main-only Vercel rules.
+Preserve existing code-only Deploy and main-only Production rules.
 Never push a `preview/` branch merely to validate this migration. Verify the
 intended deployment and exact-release smoke when the repository requires them.
 
 ## Vercel Previews
 
-**Vercel Previews only for `preview/` branches.** Production Git deploys stay on `main`. Vercel's Git integration builds a Preview for a pushed branch named `preview/**` (`vercel.ts` `git.deploymentEnabled`); every other branch builds nothing. The branch's stable Vercel URL tracks its latest push. Agents create or push a `preview/` branch only when John asks, through `/preview-link`.
-
-A Preview does not replace full CI or production smoke.
+Previews build only for `preview/**` branches; see the Vercel Previews rule in
+[AGENTS.md](../AGENTS.md). A Preview does not replace full CI or production smoke.
 
 ## Infrastructure and access
 

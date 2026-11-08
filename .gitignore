@@ -24,7 +24,7 @@ npm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# vercel (local CLI state; the hook passes VERCEL_ORG_ID/VERCEL_PROJECT_ID)
+# vercel (local build output)
 .vercel
 # editor (local symlinks to ~/.agents rules — machine-specific)
 
