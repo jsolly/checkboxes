@@ -307,24 +307,41 @@ jobs:
             echo "The preview label was removed during the build; leaving its URL unchanged."
             exit 0
           fi
-          # One DNS label per repository and branch under the team's wildcard
-          # preview certificate: reduce it to [a-z0-9-] and cap it at 63 characters.
-          preview_label="${REPO#*/}-${HEAD_REF}"
-          preview_label="$(printf '%s' "${preview_label,,}" | LC_ALL=C tr -cs 'a-z0-9' '-')"
-          preview_label="${preview_label#-}"
-          preview_label="${preview_label%-}"
-          if ((${#preview_label} > 63)); then
-            ref_hash="$(printf '%08x' "$(printf '%s' "$HEAD_REF" | cksum | cut -d ' ' -f 1)")"
-            preview_label="${preview_label:0:54}"
-            preview_label="${preview_label%-}-${ref_hash}"
-          fi
-          preview_alias="${preview_label}.preview.jsolly.com"
-          (
-            cd "$RUNNER_TEMP" && unset GH_TOKEN &&
-              NPM_CONFIG_CACHE="$RUNNER_TEMP/npm-cache" npx --yes vercel@59.20.0 alias set "$preview_url" "$preview_alias" --scope jsollys-projects
-          )
+          # One DNS label per repository and branch under the team's wildcard preview
+          # certificate. A plain lowercase branch keeps its name, with each / written
+          # as --. Any other branch, or a label over 63 characters, ends in a hash of
+          # the exact ref, so two branches never share a link. A branch that reduces
+          # to main keeps its build URL, because that alias is the main snapshot's.
           deployment_url="$preview_url"
-          preview_url="https://${preview_alias}"
+          preview_ref="$(printf '%s' "${HEAD_REF,,}" | LC_ALL=C tr -cs 'a-z0-9' '-')"
+          preview_ref="${preview_ref#-}"
+          preview_ref="${preview_ref%-}"
+          if [[ "$preview_ref" == main ]]; then
+            echo "Branch ${HEAD_REF} reduces to main, whose alias is reserved; keeping the build URL."
+          else
+            plain_ref='^[a-z0-9]+([-/][a-z0-9]+)*$'
+            hash_tail='-[0-9a-f]{8}$'
+            preview_label="${REPO#*/}"
+            preview_label="$(printf '%s' "${preview_label,,}" | LC_ALL=C tr -cs 'a-z0-9' '-')"
+            hash_ref=false
+            if [[ "$HEAD_REF" =~ $plain_ref ]] && [[ ! "$HEAD_REF" =~ $hash_tail ]]; then
+              preview_label+="-${HEAD_REF//\//--}"
+            else
+              preview_label+="-${preview_ref}"
+              hash_ref=true
+            fi
+            if [[ "$hash_ref" == true ]] || ((${#preview_label} > 63)); then
+              preview_label="${preview_label:0:54}"
+              while [[ "$preview_label" == *- ]]; do preview_label="${preview_label%-}"; done
+              preview_label+="-$(printf '%s' "$HEAD_REF" | sha256sum | cut -c 1-8)"
+            fi
+            preview_alias="${preview_label}.preview.jsolly.com"
+            (
+              cd "$RUNNER_TEMP" && unset GH_TOKEN &&
+                NPM_CONFIG_CACHE="$RUNNER_TEMP/npm-cache" npx --yes vercel@59.20.0 alias set "$preview_url" "$preview_alias" --scope jsollys-projects
+            )
+            preview_url="https://${preview_alias}"
+          fi
           {
             echo "url<<PREVIEW_URL_EOF"
             printf '%s\n' "$preview_url"

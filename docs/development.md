@@ -84,9 +84,13 @@ intended deployment and exact-release smoke when the repository requires them.
 
 Production Git deploys remain limited to `main`. An explicit `/preview` comment
 or manual Vercel Preview dispatch makes a one-shot deployment. A same-repo PR's
-`preview` label opts into redeploys on pushes, using one stable
-`<repository>-<branch>.preview.jsolly.com` URL and one edited comment. Removing the label stops those redeploys. Preview runs
-do not replace full CI, including for draft PRs, or production smoke.
+`preview` label opts into redeploys on pushes, using one stable URL and one
+edited comment. The URL is `<repository>-<branch>.preview.jsolly.com`, with
+each `/` written as `--`. A branch with other characters, or one too long for a
+DNS label, gets a short hash of its exact name, so no two branches share a link.
+A branch that reduces to `main` keeps only its build URL, because that link
+belongs to the main snapshot. Removing the label stops those redeploys. Preview
+runs do not replace full CI, including for draft PRs, or production smoke.
 
 Automatic label events use `pull_request_target` for main-targeted PRs, so the workflow definition and tooling come from the default branch. Manual dispatch is restricted to that branch. The PR head is resolved after acquiring the deployment slot, so out-of-order pending jobs still deploy the latest eligible head. Node setup
 runs before the isolated PR checkout without deployment tokens or a restored
