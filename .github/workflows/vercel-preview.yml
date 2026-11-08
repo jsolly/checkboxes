@@ -338,7 +338,7 @@ jobs:
             if ((${#preview_label} > label_limit)); then
               preview_label="${preview_label:0:54}"
               while [[ "$preview_label" == *- ]]; do preview_label="${preview_label%-}"; done
-              preview_label+="-$(printf '%s' "$HEAD_REF" | { sha256sum 2>/dev/null || shasum -a 256; } | cut -c 1-8)"
+              preview_label+="-$(printf '%s' "$HEAD_REF" | shasum -a 256 | cut -c 1-8)"
             fi
             preview_alias="${preview_label}.preview.jsolly.com"
             (

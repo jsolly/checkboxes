@@ -18,7 +18,7 @@ Local gate before push: `npm run gate`.
 
 Branch pushes do **not** create Preview deployments (`vercel.json` `git.deploymentEnabled`). Production Git deploys on `main` stay on.
 
-Opt-in Preview: comment `/preview` as the first non-empty line on a same-repo PR (owner/member/collaborator User), or run **Actions → Vercel Preview** with the PR number. These are one-shot requests. Add the `preview` label to redeploy on every push until it is removed. Labeled requests share one stable `<repository>-<branch>.preview.jsolly.com` URL (see `docs/development.md`) and one comment updated to the current head. A closed, moved or unlabeled request cannot point that URL at its build. Reusing a branch name after the PR closes reuses its URL. Requires GitHub secret `VERCEL_TOKEN`. Agents must not request a Preview, apply the label or dispatch the workflow unless John asked. Full CI still runs on PRs, including drafts; the label does not defer quality checks.
+Opt-in Preview: comment `/preview` as the first non-empty line on a same-repo PR (owner/member/collaborator User), or run **Actions → Vercel Preview** with the PR number. These are one-shot requests. Add the `preview` label to redeploy on every push until it is removed. Labeled requests share one stable, protected `<repository>-<branch>.preview.jsolly.com` URL (see `docs/development.md`) and one comment updated to the current head. A closed, moved or unlabeled request cannot point that URL at its build. Reusing a branch name after the PR closes reuses its URL. Requires GitHub secret `VERCEL_TOKEN`. Agents must not request a Preview, apply the label or dispatch the workflow unless John asked. Full CI still runs on PRs, including drafts; the label does not defer quality checks.
 
 ## Purpose
 
