@@ -213,7 +213,7 @@ The metrics are normalized using z-scores to provide relative performance indica
 
 ## Production
 
-The site deploys through Vercel's Git integration when a CI-approved PR merges to `main`. Branch pushes do not create Preview deployments; comment `/preview` as the first non-empty line on a same-repo PR (or run the **Vercel Preview** workflow) for a one-shot Preview.
+The site deploys through Vercel's Git integration when a CI-approved PR merges to `main`. Only pushed branches named `preview/**` build a Vercel Preview; every other branch builds nothing.
 
 Live site: [www.checkboxes.xyz](https://www.checkboxes.xyz)
 

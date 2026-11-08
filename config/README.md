@@ -27,8 +27,6 @@ with its component; test configuration may live under `tests/`.
   preserving plugin, dependency and entry-point discovery.
 - `quality/yamllint.yaml` and `quality/.markdownlint-cli2.jsonc` are selected by
   the repository's YAML command and root-anchored Markdown helper.
-- `testing/vitest.preview.ts` selects the Preview workflow fixture suite from
-  the repository root. `test:preview-workflow` and `check:actions` select it explicitly.
 - `agents/repository.json` owns hook identity and its fixed trusted-bundle roster.
   Current checkouts refuse a retired root `.repo-independent.json`, including a
   dangling link. [Hook trust](../docs/development.md#hook-trust) describes the
@@ -55,7 +53,9 @@ Verify native TypeScript checking, `npm run check:ts`, both phases of
 `npm run build`, and the pinned component generator when changing these aliases.
 
 Package manifests/lockfiles, `.npmrc`, `.nvmrc`, `.mise.toml`, Git files, `.github/`,
-native agent registrations and `vercel.json` keep their required locations.
+native agent registrations and `vercel.ts` keep their required locations.
+`vercel.ts` is handwritten strict TypeScript: root `tsconfig.json`, Biome and
+Knip (as an entry file) cover it like any other source.
 Root `.worktreeinclude` is the native ignored-file selection manifest for
 [Claude Code worktrees](https://code.claude.com/docs/en/worktrees#copy-gitignored-files-into-worktrees);
 the repository's `worktree:init` provisioning also reads it.
@@ -72,6 +72,6 @@ baseline, including excluded `dist` files, nearer owners and both copied product
 and measurement source trees. A compiler-folder file must fall through the empty
 policy to the broad root owner. Exercise physical compiler-policy and app-owner
 edits and restoration through Astro's normal caches, then run `npm run gate`.
-Vercel remains production-main-only; verify the intended production READY deployment
+Vercel builds Previews only for `preview/**` branches and Production only from `main`; verify the intended production READY deployment
 and exact-release public checkbox smoke after merge. No external configuration
 checkout, home links, generation prerequisite or automatic synchronization is required.
