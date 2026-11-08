@@ -310,30 +310,35 @@ jobs:
           # One DNS label per repository and branch under the team's wildcard preview
           # certificate. A plain lowercase branch keeps its name, with each / written
           # as --. Any other branch, or a label over 63 characters, ends in a hash of
-          # the exact ref, so two branches never share a link. A branch that reduces
-          # to main keeps its build URL, because that alias is the main snapshot's.
+          # the exact ref, so two branches of one repository never share a link. A
+          # branch that reduces to main keeps its build URL, because that alias is the
+          # main snapshot's.
           deployment_url="$preview_url"
-          preview_ref="$(printf '%s' "${HEAD_REF,,}" | LC_ALL=C tr -cs 'a-z0-9' '-')"
-          preview_ref="${preview_ref#-}"
-          preview_ref="${preview_ref%-}"
+          preview_slug() {
+            local slug
+            slug="$(printf '%s' "${1,,}" | LC_ALL=C tr -cs 'a-z0-9' '-')"
+            slug="${slug#-}"
+            printf '%s' "${slug%-}"
+          }
+          preview_ref="$(preview_slug "$HEAD_REF")"
           if [[ "$preview_ref" == main ]]; then
             echo "Branch ${HEAD_REF} reduces to main, whose alias is reserved; keeping the build URL."
+            preview_line="Preview for \`${HEAD_REF}\` (\`${HEAD_SHA}\`): ${preview_url} (no stable link: this branch name reduces to \`main\`, which is reserved for the main snapshot)"
           else
             plain_ref='^[a-z0-9]+([-/][a-z0-9]+)*$'
             hash_tail='-[0-9a-f]{8}$'
-            preview_label="${REPO#*/}"
-            preview_label="$(printf '%s' "${preview_label,,}" | LC_ALL=C tr -cs 'a-z0-9' '-')"
-            hash_ref=false
-            if [[ "$HEAD_REF" =~ $plain_ref ]] && [[ ! "$HEAD_REF" =~ $hash_tail ]]; then
+            preview_label="$(preview_slug "${REPO#*/}")"
+            if [[ "$HEAD_REF" =~ $plain_ref && ! "-$HEAD_REF" =~ $hash_tail ]]; then
               preview_label+="-${HEAD_REF//\//--}"
+              label_limit=63
             else
               preview_label+="-${preview_ref}"
-              hash_ref=true
+              label_limit=0
             fi
-            if [[ "$hash_ref" == true ]] || ((${#preview_label} > 63)); then
+            if ((${#preview_label} > label_limit)); then
               preview_label="${preview_label:0:54}"
               while [[ "$preview_label" == *- ]]; do preview_label="${preview_label%-}"; done
-              preview_label+="-$(printf '%s' "$HEAD_REF" | sha256sum | cut -c 1-8)"
+              preview_label+="-$(printf '%s' "$HEAD_REF" | { sha256sum 2>/dev/null || shasum -a 256; } | cut -c 1-8)"
             fi
             preview_alias="${preview_label}.preview.jsolly.com"
             (
@@ -341,6 +346,7 @@ jobs:
                 NPM_CONFIG_CACHE="$RUNNER_TEMP/npm-cache" npx --yes vercel@59.20.0 alias set "$preview_url" "$preview_alias" --scope jsollys-projects
             )
             preview_url="https://${preview_alias}"
+            preview_line="Preview for \`${HEAD_REF}\` (\`${HEAD_SHA}\`): ${preview_url} (build: ${deployment_url})"
           fi
           {
             echo "url<<PREVIEW_URL_EOF"
@@ -355,6 +361,6 @@ jobs:
           fi
           upsert_comment "$(
             printf '%s\n\n%s\n' \
-              "Preview for \`${HEAD_REF}\` (\`${HEAD_SHA}\`): ${preview_url} (build: ${deployment_url})" \
+              "$preview_line" \
               "$note"
           )"

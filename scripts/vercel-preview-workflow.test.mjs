@@ -314,6 +314,7 @@ it("a labeled Preview uses isolated CLI commands and edits one stable comment", 
 		patch[0].args.some(
 			(arg) =>
 				arg.includes(head) &&
+				arg.includes("(build: https://immutable.vercel.app)") &&
 				arg.includes("<!-- vercel-preview -->") &&
 				arg.includes("https://repo-feature--preview.preview.jsolly.com"),
 		),
@@ -340,6 +341,17 @@ describe("every branch gets its own Preview alias inside one DNS label", () => {
 		["fix-deadbeef", "repo-fix-deadbeef-4df4b325"],
 		[".github", "repo-github-bdcc6a2a"],
 		["caf\u00e9", "repo-caf-850f7dc4"],
+		["d2e2adf7", "repo-d2e2adf7-f33c7397"],
+		["_", "repo-d2e2adf7"],
+		["release/1.2", "repo-release-1-2-bacdc8a6"],
+		[
+			"dependabot/npm_and_yarn/svelte-5.57.3",
+			"repo-dependabot-npm-and-yarn-svelte-5-57-3-a4dc08e7",
+		],
+		["feat/", "repo-feat-8424921f"],
+		["-x", "repo-x-a4209624"],
+		[`${"a".repeat(48)}-${"b".repeat(30)}`, `repo-${"a".repeat(48)}-71c7d635`],
+		[`${"a".repeat(47)}/${"b".repeat(30)}`, `repo-${"a".repeat(47)}-c9508718`],
 		[A58, `repo-${A58}`],
 		[
 			`${A58}a`,
@@ -375,10 +387,54 @@ describe("a branch that reduces to main never takes the main snapshot alias", ()
 			const result = f.execute("Deploy the Preview");
 			assert.equal(result.status, 0, result.stderr);
 			assert.equal(f.calls("npx").length, 1);
+			const comment =
+				f
+					.calls("gh")
+					.find((call) => call.args.includes("PATCH"))
+					?.args.join(" ") ?? "";
+			assert.match(comment, /immutable\.vercel\.app \(no stable link:/u);
+			assert.doesNotMatch(comment, /\(build:/u);
 			assert.match(
 				readFileSync(f.env.GITHUB_OUTPUT, "utf8"),
 				/^https:\/\/immutable\.vercel\.app$/mu,
 			);
+		});
+	}
+});
+
+// Seven full deploy-step runs; allow for a loaded runner.
+it("branches that differ only in punctuation or case get distinct links", (t) => {
+	const hosts = [
+		"feat/x",
+		"feat--x",
+		"feat-x",
+		"feat_x",
+		"Feat-X",
+		"Feature",
+		"feature",
+	].map((ref) => {
+		const f = fixture(t, { env: { HEAD_REF: ref } });
+		const result = f.execute("Deploy the Preview");
+		assert.equal(result.status, 0, result.stderr);
+		const host = f.calls("npx")[1]?.args[5] ?? "";
+		assert.match(host, /^[a-z0-9-]{1,63}\.preview\.jsolly\.com$/u);
+		return host;
+	});
+	assert.equal(new Set(hosts).size, hosts.length, hosts.join(" "));
+}, 30_000);
+
+const REPO_CASES = [
+	["jsolly/Learn.The_Far", "learn-the-far-feat--x"],
+	["jsolly/.github", "github-feat--x"],
+];
+
+describe("the repository name reduces the same way as the branch", () => {
+	for (const [repo, label] of REPO_CASES) {
+		it(`${repo} -> ${label}`, (t) => {
+			const f = fixture(t, { env: { REPO: repo, HEAD_REF: "feat/x" } });
+			const result = f.execute("Deploy the Preview");
+			assert.equal(result.status, 0, result.stderr);
+			assert.equal(f.calls("npx")[1]?.args[5], `${label}.preview.jsolly.com`);
 		});
 	}
 });
