@@ -23,11 +23,10 @@
 		"worktree:init": "bash scripts/worktree-init.sh && bash scripts/setup-agent-environment.sh",
 		"test": "tsx --test --test-reporter=dot \"tests/**/*.test.ts\" && npm run test:assets",
 		"lint-staged": "lint-staged --config config/quality/lint-staged.json",
-		"check:actions": "bash scripts/check-actions.sh && bash scripts/vercel-preview-comment-contract.sh && bash scripts/vercel-preview-workflow-contract.sh && npm run test:preview-workflow",
+		"check:actions": "bash scripts/check-actions.sh",
 		"gate": "FLEET_DOC_FAST=0 bash .git-hooks/pre-commit",
 		"smoke:production": "node scripts/production-smoke.mjs",
 		"smoke:scenario-contract": "node --test scripts/production-smoke-scenario.test.mjs",
-		"test:preview-workflow": "vitest run --config config/testing/vitest.preview.ts",
 		"check:a11y": "node scripts/check-accessibility.ts",
 		"assets": "node --use-env-proxy --import tsx scripts/assets/cli.ts",
 		"test:assets": "vitest run --config config/testing/vitest.assets.mjs"
@@ -86,6 +85,7 @@
 		"@types/node": "^26.6.1",
 		"@types/sortablejs": "^1.15.8",
 		"@typescript-eslint/typescript-estree": "^8.70.0",
+		"@vercel/config": "0.14.1",
 		"axe-core": "^4.14.0",
 		"knip": "^6.38.0",
 		"lint-staged": "^17.6.0",
@@ -94,7 +94,6 @@
 		"tailwind-variants": "^3.3.1",
 		"tsx": "^4.23.15",
 		"typescript": "^6.0.3",
-		"vercel": "^64.0.2",
 		"vitest": "5.0.5"
 	},
 	"allowScripts": {
