@@ -1,8 +1,9 @@
 name: Auto-merge
 
 # Arm GitHub's native squash auto-merge for non-draft pull requests opened by
-# solly-agent, jsolly, or cursor[bot] whose head branch is in this repository. A half-hour
-# sweep re-arms that, and squash-merges with --match-head-commit once the
+# solly-agent, jsolly, cursor[bot], or app/cursor whose head branch is in this
+# repository. A half-hour sweep re-arms that, and squash-merges with
+# --match-head-commit once the
 # ci and security check-runs are green. The solly-agent token fires push
 # workflows, so this file does not dispatch them. It never checks out code.
 on:
@@ -123,8 +124,9 @@ jobs:
             [[ "$state" == "open" ]] || return 1
             [[ "$draft" == "false" ]] || return 1
             # Brackets in cursor[bot] are literal. Unescaped case patterns treat them as a class.
+            # pull_request reports cursor[bot]; gh pr view reports app/cursor.
             case "$login" in
-              solly-agent|jsolly|cursor\[bot\]) ;;
+              solly-agent|jsolly|cursor\[bot\]|app/cursor) ;;
               *) return 1 ;;
             esac
             [[ "$head_repo" == "$REPOSITORY" && "$base_repo" == "$REPOSITORY" ]] || return 1
@@ -283,7 +285,7 @@ jobs:
                 echo "::error::could not list open pull requests" >&2
                 exit 1
               fi
-              listed="$(jq -r '[.[][] | select(.state == "open" and (.user.login == "solly-agent" or .user.login == "jsolly" or .user.login == "cursor[bot]")) | .number] | unique | .[]' <<<"$GH_BODY")" || exit 1
+              listed="$(jq -r '[.[][] | select(.state == "open" and (.user.login == "solly-agent" or .user.login == "jsolly" or .user.login == "cursor[bot]" or .user.login == "app/cursor")) | .number] | unique | .[]' <<<"$GH_BODY")" || exit 1
               if [[ -z "$listed" ]]; then
                 record "no open pull requests"
                 exit 0
