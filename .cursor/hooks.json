@@ -1,0 +1,13 @@
+{
+	"version": 1,
+	"hooks": {
+		"beforeShellExecution": [
+			{
+				"command": "bash scripts/cursor-gitleaks-gate.sh",
+				"failClosed": true,
+				"matcher": "git commit|git push",
+				"timeout": 120
+			}
+		]
+	}
+}

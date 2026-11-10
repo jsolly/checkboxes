@@ -28,7 +28,8 @@ that the gate ran. No setup command deploys the application or infrastructure.
 ## Hook trust
 
 The dispatcher lives in this clone's Git common directory, shared only by its
-linked worktrees. It registers pre-commit only. The complete hook/library/setup
+linked worktrees. It registers pre-commit and pre-push. Pre-push runs Semgrep
+and osv-scanner. The complete hook/library/setup
 bundle must match current reviewed `origin/main`, or a deliberately approved exact
 bundle digest. Missing files, symlinks, unreviewed modes and a foreign origin fail
 closed. The dispatcher executes a verified snapshot, then runs quality scripts in

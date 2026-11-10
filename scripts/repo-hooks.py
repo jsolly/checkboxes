@@ -193,8 +193,14 @@ def snapshot(parent: Path, digest: str, payload: dict[str, bytes], slug: str) ->
         (staging / 'installation.json').write_text(json.dumps({'version': 2, 'manifest': MANIFEST, 'repo': slug, 'digest': digest}))
         (staging / 'installation.json').chmod(0o600)
         (staging / 'hooks').mkdir(mode=0o700)
-        (staging / 'hooks/pre-commit').write_bytes(payload['gate/hooks/pre-commit'])
+        # The same reviewed dispatcher is registered for both Git events. Its
+        # basename selects pre-commit or pre-push when it calls dispatch.
+        # The literal hooks/pre-push path is the marker verify_dispatcher requires.
+        dispatcher_bytes = payload['gate/hooks/pre-commit']
+        (staging / 'hooks/pre-commit').write_bytes(dispatcher_bytes)
         (staging / 'hooks/pre-commit').chmod(0o755)
+        (staging / 'hooks/pre-push').write_bytes(dispatcher_bytes)
+        (staging / 'hooks/pre-push').chmod(0o755)
         # Rename publishes all bytes at once. Old configured versions remain usable.
         staging.rename(dest)
     finally:
@@ -243,12 +249,21 @@ def verify_dispatcher(version: Path):
     hookdir = version / 'hooks'
     if hookdir.is_symlink() or not hookdir.is_dir():
         raise ValueError('Unsafe installed dispatcher directory')
-    dispatcher = regular(version, 'hooks/pre-commit', 0o755)
-    if stat.S_IMODE((hookdir / 'pre-commit').stat().st_mode) != 0o755 or dispatcher != regular(version, 'gate/hooks/pre-commit', 0o755):
-        raise ValueError('Installed dispatcher differs from its verified snapshot')
+    expected = regular(version, 'gate/hooks/pre-commit', 0o755)
+    # Snapshots installed before pre-push do not contain this path. A snapshot
+    # whose installer writes hooks/pre-push has to keep that file; deleting it
+    # cannot be hidden by editing the installer, because that breaks the digest.
+    installer = regular(version, 'scripts/repo-hooks.py', 0o755)
+    names = {'pre-commit', 'pre-push'} if b'hooks/pre-push' in installer else {'pre-commit'}
+    seen = set()
     for path in hookdir.iterdir():
-        if path.name != 'pre-commit' or path.is_symlink() or not path.is_file():
+        if path.name not in names or path.is_symlink() or not path.is_file():
             raise ValueError('Unexpected hook in installed dispatcher directory')
+        if stat.S_IMODE(path.stat().st_mode) != 0o755 or path.read_bytes() != expected:
+            raise ValueError('Installed dispatcher differs from its verified snapshot')
+        seen.add(path.name)
+    if seen != names:
+        raise ValueError('Installed dispatcher differs from its verified snapshot')
 
 
 def approve_upgrade(root: Path, common: Path, slug: str, digest: str):
@@ -302,7 +317,9 @@ def install(root: Path, common: Path, slug: str, digest: str, payload: dict[str,
     print('Repository-owned hooks installed: ' + str(hooks))
 
 
-def dispatch(root: Path, common: Path, slug: str, digest: str, payload: dict[str, bytes]):
+def dispatch(root: Path, common: Path, slug: str, digest: str, payload: dict[str, bytes], hook: str):
+    if hook not in {'pre-commit', 'pre-push'}:
+        raise ValueError('Unknown hook')
     installed = verify_installed(common, slug)
     for rel in ['scripts/repo-hooks.py', 'scripts/repo-python.sh', 'gate/hooks/pre-commit']:
         if (installed / rel).read_bytes() != payload[rel]:
@@ -329,9 +346,11 @@ def dispatch(root: Path, common: Path, slug: str, digest: str, payload: dict[str
         if index.parent != gitdir or not (index.name in {'index', 'index.lock'} or re.fullmatch(r'next-index-[0-9]+\.lock', index.name)):
             raise ValueError('Committing index is outside this worktree Git directory')
         env['GIT_INDEX_FILE'] = str(index)
-    # Snapshot shim sources snapshot library; quality scripts run in the committing root.
+    # One reviewed shim handles both events. argv selects pre-commit or pre-push
+    # so the bundle file list stays the historical allowlist.
     os.chdir(root)
-    os.execve(str(snap / '.git-hooks/pre-commit'), [str(snap / '.git-hooks/pre-commit')], env)
+    target = snap / '.git-hooks/pre-commit'
+    os.execve(str(target), [str(target), hook], env)
 
 
 def main() -> int:
@@ -339,6 +358,7 @@ def main() -> int:
     parser.add_argument('command', choices=['install', 'dispatch', 'verify', 'digest', 'approve', 'approve-upgrade'])
     parser.add_argument('--root', type=Path, default=Path.cwd())
     parser.add_argument('--digest')
+    parser.add_argument('--hook', default='pre-commit')
     args = parser.parse_args()
     if sys.version_info < (3, 11):
         raise ValueError('Python >= 3.11 is required before installing repository hooks')
@@ -367,7 +387,7 @@ def main() -> int:
                 raise ValueError('Current source bundle is not trusted')
             print('Repository-owned hooks verified')
         else:
-            dispatch(root, common, slug, digest, payload)
+            dispatch(root, common, slug, digest, payload, args.hook)
     return 0
 
 

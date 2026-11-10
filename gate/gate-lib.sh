@@ -28,14 +28,18 @@ fi
 
     gate_is_hooks_dispatcher() {
       local selected="$1"
-      [[ "$selected" == "$GATE_HOOKS_DIR"/versions/*/hooks && -f "$selected/pre-commit" ]]
+      [[ "$selected" == "$GATE_HOOKS_DIR"/versions/*/hooks && -f "$selected/pre-commit" && -f "$selected/pre-push" ]]
     }
     gate_dispatch_hook() {
-      local common selected
+      local common selected hook="${1:-pre-commit}"
+      case "$hook" in
+        pre-commit|pre-push) ;;
+        *) echo 'Repository hook name is not pre-commit or pre-push.' >&2; exit 1 ;;
+      esac
       common="$(env -u GIT_DIR -u GIT_WORK_TREE -u GIT_COMMON_DIR -u GIT_INDEX_FILE git rev-parse --path-format=absolute --git-common-dir)" || exit 1
       selected="$(git config --local --type=path --get core.hooksPath)" || exit 1
-      [[ "$selected" == "$common/repo-hooks"/versions/*/hooks ]] || { echo 'Repository-owned hooks are not installed; run reviewed repository setup.' >&2; exit 1; }
-      exec "$selected/pre-commit"
+      [[ "$selected" == "$common/repo-hooks"/versions/*/hooks && -f "$selected/$hook" ]] || { echo 'Repository-owned hooks are not installed; run reviewed repository setup.' >&2; exit 1; }
+      exec "$selected/$hook"
     }
 
     # === Committing tree =============================================================
@@ -55,7 +59,7 @@ gate_enter_committing_tree() { # <shim path>
         ROOT="$cwd_root"
       fi
       if [[ "$shim_root" != "$ROOT" && "$shim_root" != "$GATE_HOOKS_DIR"/bundles/* ]]; then
-        gate_dispatch_hook
+        gate_dispatch_hook "$(basename "$1")"
       fi
       cd "$ROOT"
       GATE_COMMITTING_TREE="$ROOT"
@@ -65,6 +69,7 @@ gate_enter_committing_tree() { # <shim path>
 # The gate fires at COMMIT time, not push time: every worktree commit runs the
 # full quality gate, and GitHub Actions CI is the server-side
 # backstop for anything a `git commit -n` bypass or a skipped merge/rebase lets past.
+# Semgrep and osv-scanner run from .git-hooks/pre-push, not from this commit gate.
 # Secrets, markdown-lint-on-change, docs-only fast path, banner + failure trap are
 # keyed off `git diff --cached` (the staged index). DEFINITIONS ONLY — no side
 # effects on source.
