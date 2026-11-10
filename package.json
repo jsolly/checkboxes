@@ -85,7 +85,7 @@
 		"shiki": "^4.4.3",
 		"sortablejs": "^1.15.6",
 		"svelte": "^5.57.3",
-		"tailwind-merge": "3.6.0",
+		"tailwind-merge": "3.7.0",
 		"tailwindcss": "^4.3.2",
 		"vue": "^3.5.43"
 	},
