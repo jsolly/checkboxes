@@ -40,7 +40,7 @@ jobs:
       PRODUCTION_SMOKE_RELEASE_SHA: ${{ github.event.deployment.sha || inputs.release_sha }}
       PRODUCTION_SMOKE_REQUEST_ID: ${{ github.event.deployment.id || inputs.request_id }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           # The deployed commit's scenario, so a later merge's assertions never test an older build.
           ref: ${{ github.event.deployment.sha || inputs.release_sha }}
@@ -50,7 +50,7 @@ jobs:
         run: |
           [[ "$PRODUCTION_SMOKE_RELEASE_SHA" =~ ^[0-9a-f]{40}$ ]] || exit 1
           git merge-base --is-ancestor "$PRODUCTION_SMOKE_RELEASE_SHA" origin/main
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -58,7 +58,7 @@ jobs:
       - run: npx --no-install playwright install --with-deps chromium
       - run: npm run smoke:scenario-contract
       - run: node scripts/production-smoke.mjs
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
           name: production-smoke-${{ env.PRODUCTION_SMOKE_REQUEST_ID }}

@@ -94,6 +94,19 @@ fi
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn('fixture-root=' + str(linked), result.stdout)
 
+    def test_pre_push_dispatcher_is_registered_and_required(self):
+        self.assertEqual((self.hooks / 'pre-push').read_bytes(), (self.hooks / 'pre-commit').read_bytes())
+        (self.hooks / 'pre-push').unlink()
+        result = self.tool('verify', installed=True)
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('dispatcher', result.stderr)
+
+    def test_dispatch_rejects_an_unknown_hook_name(self):
+        result = self.tool('dispatch', '--hook', 'post-checkout', installed=True)
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('Unknown hook', result.stderr)
+        self.assertEqual((self.root / 'content.txt').read_text(), 'safe baseline\n')
+
     def test_unreviewed_library_is_not_executed_or_installed(self):
         lib = self.root / 'gate/gate-lib.sh'
         marker = self.scratch / 'untrusted-executed'

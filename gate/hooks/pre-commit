@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 ((BASH_VERSINFO[0] >= 5)) || { echo "✗ $0 requires Bash >= 5, not $BASH_VERSION. Fix: brew install bash; open a fresh shell and rerun repository setup." >&2; exit 1; }
 set -euo pipefail
-# Installed outside the working tree. Only this pre-commit entry is registered.
+# Installed outside the working tree. Git runs this same dispatcher as pre-commit or pre-push.
 base="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-exec bash "$base/scripts/repo-python.sh" "$base/scripts/repo-hooks.py" dispatch
+hook="$(basename "${BASH_SOURCE[0]}")"
+case "$hook" in
+  pre-commit|pre-push) ;;
+  *) echo "repo-hooks: unexpected hook name: $hook" >&2; exit 1 ;;
+esac
+exec bash "$base/scripts/repo-python.sh" "$base/scripts/repo-hooks.py" dispatch --hook "$hook"

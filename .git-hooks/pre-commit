@@ -13,6 +13,38 @@ source "$_repo_owned_gate_root/gate/gate-lib.sh"
 # desktop worktrees) this re-execs the committing tree's own hook; it sets ROOT and cd's.
 gate_enter_committing_tree "${BASH_SOURCE[0]}"
 
+# The trusted dispatcher passes pre-commit or pre-push. A direct `npm run gate`
+# leaves the argument empty and runs the commit gate.
+case "${1:-pre-commit}" in
+  pre-push)
+    trap 'echo "✗ pre-push security scan failed — push aborted" >&2' ERR
+    if [[ -t 0 ]]; then
+      echo "✗ pre-push hook expects git's ref list on stdin" >&2
+      exit 1
+    fi
+    new_commits=0
+    while IFS=' ' read -r _local_ref local_sha _remote_ref _remote_sha; do
+      [[ -n "${local_sha:-}" ]] || continue
+      [[ "$local_sha" =~ ^0+$ ]] && continue
+      new_commits=1
+    done
+    if [[ "$new_commits" -eq 0 ]]; then
+      echo "▶ pre-push: no new commits — skipping Semgrep and osv-scanner"
+      exit 0
+    fi
+    echo "▶ pre-push security (checkboxes)"
+    run_step "semgrep" bash scripts/security-scanners.sh semgrep
+    run_step "osv-scanner" bash scripts/security-scanners.sh osv
+    echo "✓ pre-push security scan passed"
+    exit 0
+    ;;
+  pre-commit) ;;
+  *)
+    echo "✗ unknown repository hook: $1" >&2
+    exit 1
+    ;;
+esac
+
 gate_begin_commit "checkboxes"    # staged gitleaks; md-lint; doc-only fast path; skip on merge/amend; banner; ERR trap
 run_step "bash floor" gate_check_bash_floor   # every Bash entrypoint refuses Bash < 5
 gate_require_node                 # enforce the pinned Node (.nvmrc), not whatever's on PATH
@@ -20,7 +52,9 @@ gate_require_node                 # enforce the pinned Node (.nvmrc), not whatev
 # --- Quality gate (run_step: silent on green, full output + abort on red) ---
 run_step "biome ci"     npx --no-install biome ci --config-path=config/quality/biome.settings.jsonc . --error-on-warnings
 run_step "yaml lint"   npm run check:yaml
+run_step "cfn-lint" bash scripts/security-scanners.sh cfn-lint
 run_step "actionlint"             npm run check:actions
+run_step "zizmor" bash scripts/security-scanners.sh zizmor
 run_step "markdown lint" npm run check:md
 run_step "smoke scenario" npm run smoke:scenario-contract
 run_step "tests" npm test
