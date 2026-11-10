@@ -219,7 +219,9 @@ cmd_osv() {
   local bin
   [[ -f package-lock.json ]] || { echo "✗ missing package-lock.json" >&2; return 1; }
   bin="$(resolve_binary osv-scanner "$OSV_VERSION" osv-scanner)"
-  "$bin" scan source --lockfile "$ROOT/package-lock.json"
+  # Dispositions live in the Python checker. It passes an empty config so a
+  # branch-supplied osv-scanner ignore file cannot hide findings.
+  bash scripts/repo-python.sh scripts/osv-dispositions.py --scanner "$bin"
 }
 
 cmd_gitleaks_range() {
