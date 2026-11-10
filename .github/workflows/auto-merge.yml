@@ -1,0 +1,302 @@
+name: Auto-merge
+
+# Arm GitHub's native squash auto-merge for non-draft pull requests opened by
+# solly-agent or jsolly whose head branch is in this repository. A half-hour
+# sweep re-arms that, and squash-merges with --match-head-commit once the
+# ci and security check-runs are green. The solly-agent token fires push
+# workflows, so this file does not dispatch them. It never checks out code.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+# gh uses AUTO_MERGE_TOKEN. The workflow token gets no permissions.
+permissions: {}
+
+concurrency:
+  group: auto-merge-${{ github.event.pull_request.number || 'sweep' }}
+  cancel-in-progress: false
+
+jobs:
+  auto-merge:
+    name: auto-merge
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - name: Arm native auto-merge
+        env:
+          GH_PROMPT_DISABLED: "1"
+          GH_NO_UPDATE_NOTIFIER: "1"
+          EVENT_NAME: ${{ github.event_name }}
+          REPOSITORY: ${{ github.repository }}
+          AUTO_MERGE_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
+        run: |
+          set -euo pipefail
+          : "${EVENT_NAME:?}"
+          : "${REPOSITORY:?}"
+          : "${GITHUB_EVENT_PATH:?}"
+
+          if [[ -z "${AUTO_MERGE_TOKEN:-}" ]]; then
+            echo "::error::AUTO_MERGE_TOKEN is not set. Refusing to fall back to GITHUB_TOKEN." >&2
+            exit 1
+          fi
+          if [[ ! "$REPOSITORY" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+            echo "::error::refusing unexpected repository name" >&2
+            exit 1
+          fi
+
+          unset GITHUB_TOKEN
+          export GH_TOKEN="$AUTO_MERGE_TOKEN"
+          export GH_REPO="$REPOSITORY"
+          MODE=""
+          GH_BODY=""
+          GH_STATUS=0
+
+          record() {
+            printf '%s\n' "$*"
+            if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+              printf '%s\n' "$*" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          }
+
+          report_refusal() {
+            local message="$*"
+            message="${message//$'\n'/ }"
+            echo "::notice::${message}"
+            record "$message"
+          }
+
+          auth_failure() {
+            grep -Eiq \
+              -e 'HTTP 401' \
+              -e 'HTTP 403' \
+              -e 'Bad credentials' \
+              -e 'Requires authentication' \
+              -e 'Resource not accessible' \
+              <<<"$1"
+          }
+
+          benign_merge_message() {
+            grep -Eiq \
+              -e 'already enabled' \
+              -e 'already merged' \
+              -e 'clean status' \
+              -e 'is clean' \
+              <<<"$1"
+          }
+
+          reject_disabled_auto_merge() {
+            grep -Eiq \
+              -e 'auto-merge is not allowed' \
+              -e 'auto merge is not allowed' \
+              <<<"$1"
+          }
+
+          gh_api() {
+            set +e
+            GH_BODY="$(gh api "$@")"
+            GH_STATUS=$?
+            set -e
+            if [[ "$GH_STATUS" -ne 0 ]] && auth_failure "$GH_BODY"; then
+              echo "::error::AUTO_MERGE_TOKEN was rejected by GitHub" >&2
+              exit 1
+            fi
+          }
+
+          read_pr_fields() {
+            state="$(jq -r '.state // ""' <<<"$GH_BODY")" || exit 1
+            draft="$(jq -r 'if .draft == false then "false" else "true" end' <<<"$GH_BODY")" || exit 1
+            login="$(jq -r '.user.login // ""' <<<"$GH_BODY")" || exit 1
+            sha="$(jq -r '.head.sha // ""' <<<"$GH_BODY")" || exit 1
+            head_repo="$(jq -r '.head.repo.full_name // ""' <<<"$GH_BODY")" || exit 1
+            base_repo="$(jq -r '.base.repo.full_name // ""' <<<"$GH_BODY")" || exit 1
+            armed="$(jq -r 'if .auto_merge == null then "no" else "yes" end' <<<"$GH_BODY")" || exit 1
+            merged="$(jq -r 'if .merged == true then "yes" else "no" end' <<<"$GH_BODY")" || exit 1
+          }
+
+          pr_eligible() {
+            [[ "$state" == "open" ]] || return 1
+            [[ "$draft" == "false" ]] || return 1
+            case "$login" in
+              solly-agent|jsolly) ;;
+              *) return 1 ;;
+            esac
+            [[ "$head_repo" == "$REPOSITORY" && "$base_repo" == "$REPOSITORY" ]] || return 1
+            [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || return 1
+          }
+
+          check_line() {
+            local sha="$1" name="$2"
+            CHECK_LINE=""
+            gh_api --paginate --slurp "repos/${REPOSITORY}/commits/${sha}/check-runs?per_page=100"
+            if [[ "$GH_STATUS" -ne 0 ]]; then
+              return 1
+            fi
+            CHECK_LINE="$(jq -r --arg name "$name" '
+              [.[].check_runs[] | select(.name == $name)]
+              | sort_by(.id)
+              | last
+              | if . == null then "" else [.status, (.conclusion // "")] | @tsv end
+            ' <<<"$GH_BODY")" || return 1
+          }
+
+          checks_green() {
+            local sha="$1" ci security
+            check_line "$sha" ci || return 1
+            ci="$CHECK_LINE"
+            check_line "$sha" security || return 1
+            security="$CHECK_LINE"
+            [[ "$ci" == $'completed\tsuccess' && "$security" == $'completed\tsuccess' ]]
+          }
+
+          arm_merge() {
+            local number="$1" url="$2" output status oneline
+            set +e
+            output="$(gh pr merge --auto --squash "$url" 2>&1)"
+            status=$?
+            set -e
+            printf '%s\n' "$output"
+            if [[ "$status" -eq 0 ]] || benign_merge_message "$output"; then
+              if grep -Eiq -e 'Squashed and merged' -e 'already merged' <<<"$output"; then
+                record "PR #${number}: merged"
+              else
+                record "PR #${number}: native auto-merge armed"
+              fi
+              return 0
+            fi
+            if auth_failure "$output"; then
+              echo "::error::AUTO_MERGE_TOKEN was rejected by GitHub" >&2
+              exit 1
+            fi
+            if reject_disabled_auto_merge "$output"; then
+              echo "::error::GitHub auto-merge is not allowed on ${REPOSITORY}. Enable Allow auto-merge and rerun." >&2
+              exit 1
+            fi
+            oneline="${output//$'\n'/ }"
+            if [[ "$MODE" == "event" ]]; then
+              echo "::error::PR #${number}: could not arm auto-merge: ${oneline}" >&2
+              exit 1
+            fi
+            report_refusal "PR #${number}: could not arm auto-merge: ${oneline}"
+          }
+
+          direct_merge() {
+            local number="$1" sha="$2" url="$3" output status oneline
+            set +e
+            output="$(gh pr merge --squash --match-head-commit "$sha" "$url" 2>&1)"
+            status=$?
+            set -e
+            printf '%s\n' "$output"
+            if [[ "$status" -eq 0 ]] || benign_merge_message "$output"; then
+              record "PR #${number}: squash-merged at ${sha}"
+              return 0
+            fi
+            if auth_failure "$output"; then
+              echo "::error::AUTO_MERGE_TOKEN was rejected by GitHub" >&2
+              exit 1
+            fi
+            oneline="${output//$'\n'/ }"
+            report_refusal "PR #${number}: merge refused: ${oneline}"
+          }
+
+          load_pr() {
+            local number="$1"
+            gh_api "repos/${REPOSITORY}/pulls/${number}"
+            if [[ "$GH_STATUS" -ne 0 ]]; then
+              return 1
+            fi
+            read_pr_fields
+          }
+
+          sweep_one() {
+            local number="$1" url verified
+            if ! load_pr "$number"; then
+              report_refusal "PR #${number}: could not read pull request"
+              return 0
+            fi
+            if ! pr_eligible; then
+              echo "skip PR #${number}: author=${login:-unknown} draft=${draft} state=${state} head=${head_repo:-unknown}"
+              return 0
+            fi
+            url="https://github.com/${REPOSITORY}/pull/${number}"
+            if [[ "$armed" != "yes" ]]; then
+              arm_merge "$number" "$url"
+              if ! load_pr "$number"; then
+                report_refusal "PR #${number}: could not re-read pull request after arming"
+                return 0
+              fi
+              if [[ "$merged" == "yes" || "$state" != "open" ]]; then
+                record "PR #${number}: merged"
+                return 0
+              fi
+              if ! pr_eligible; then
+                echo "skip PR #${number}: no longer eligible"
+                return 0
+              fi
+            else
+              echo "PR #${number}: native auto-merge already armed"
+            fi
+            verified="$sha"
+            if ! checks_green "$verified"; then
+              echo "PR #${number}: ci and security are not both green on ${verified}"
+              return 0
+            fi
+            if ! load_pr "$number"; then
+              report_refusal "PR #${number}: could not re-read pull request before merge"
+              return 0
+            fi
+            if [[ "$sha" != "$verified" ]] || ! pr_eligible; then
+              echo "skip PR #${number}: head changed before merge"
+              return 0
+            fi
+            direct_merge "$number" "$verified" "$url"
+          }
+
+          case "$EVENT_NAME" in
+            pull_request)
+              MODE="event"
+              number="$(jq -r '.pull_request.number // ""' "$GITHUB_EVENT_PATH")" || exit 1
+              if [[ ! "$number" =~ ^[1-9][0-9]*$ ]]; then
+                echo "::error::refusing unexpected pull request number" >&2
+                exit 1
+              fi
+              if ! load_pr "$number"; then
+                echo "::error::could not read pull request #${number}" >&2
+                exit 1
+              fi
+              if ! pr_eligible; then
+                echo "skip PR #${number}: author=${login:-unknown} draft=${draft} state=${state} head=${head_repo:-unknown}"
+                exit 0
+              fi
+              arm_merge "$number" "https://github.com/${REPOSITORY}/pull/${number}"
+              ;;
+            schedule|workflow_dispatch)
+              MODE="sweep"
+              gh_api --paginate --slurp "repos/${REPOSITORY}/pulls?state=open&per_page=100"
+              if [[ "$GH_STATUS" -ne 0 ]]; then
+                echo "::error::could not list open pull requests" >&2
+                exit 1
+              fi
+              listed="$(jq -r '[.[][] | select(.state == "open") | .number] | unique | .[]' <<<"$GH_BODY")" || exit 1
+              if [[ -z "$listed" ]]; then
+                record "no open pull requests"
+                exit 0
+              fi
+              while IFS= read -r number; do
+                if [[ ! "$number" =~ ^[1-9][0-9]*$ ]]; then
+                  echo "::error::refusing unexpected pull request number" >&2
+                  exit 1
+                fi
+                sweep_one "$number"
+              done <<<"$listed"
+              ;;
+            *)
+              echo "::error::refusing event ${EVENT_NAME}" >&2
+              exit 1
+              ;;
+          esac
