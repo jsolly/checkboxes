@@ -74,8 +74,14 @@ Work from fresh main on an isolated branch. Review the actual final diff for bug
 secrets, security, tests and repository guidelines; use an independent reviewer
 for substantial or sensitive changes. Run the required complete local gate before
 pushing. Create a same-repository PR; use a draft while approval/work remains.
-Merge only when the required CI validates the exact current head. Never push to
-the default branch, weaken rulesets, bypass checks or use an admin merge. Optional
+Convert a pull request to draft, or run `gh pr merge --disable-auto`, to hold
+auto-merge. Non-draft pull requests opened by `solly-agent` or `jsolly` arm
+GitHub's native squash auto-merge. A half-hour sweep re-arms that and, once
+`ci` and `security` are green on the current head, squash-merges that commit.
+Pull requests from anyone else, including Dependabot and other bots, never
+auto-merge. Merge only when the required CI validates the exact current head.
+Never push to the default branch, weaken rulesets, bypass checks or use an
+admin merge. Optional
 personal review skills may help, but they are not prerequisites for this flow.
 
 Preserve existing code-only Deploy and main-only Production rules.
