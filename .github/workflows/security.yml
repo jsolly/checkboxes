@@ -82,3 +82,42 @@ jobs:
           enable-cache: false
       - name: Lint the static media template
         run: bash scripts/security-scanners.sh cfn-lint
+
+  # The branch ruleset requires a check named exactly "security". This job
+  # does not scan. It fails unless every scanner job succeeded.
+  security:
+    name: security
+    needs: [gitleaks, semgrep, osv-scanner, zizmor, cfn-lint]
+    if: always()
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 5
+    steps:
+      - name: Require every scanner to succeed
+        env:
+          GITLEAKS: ${{ needs.gitleaks.result }}
+          SEMGREP: ${{ needs.semgrep.result }}
+          OSV_SCANNER: ${{ needs['osv-scanner'].result }}
+          ZIZMOR: ${{ needs.zizmor.result }}
+          CFN_LINT: ${{ needs['cfn-lint'].result }}
+        run: |
+          set -euo pipefail
+          failed=0
+          for pair in \
+            "gitleaks:${GITLEAKS}" \
+            "semgrep:${SEMGREP}" \
+            "osv-scanner:${OSV_SCANNER}" \
+            "zizmor:${ZIZMOR}" \
+            "cfn-lint:${CFN_LINT}"
+          do
+            name="${pair%%:*}"
+            result="${pair#*:}"
+            printf '%s %s\n' "$name" "$result"
+            if [[ "$result" != success ]]; then
+              failed=1
+            fi
+          done
+          if [[ "$failed" -ne 0 ]]; then
+            echo "security: a scanner did not succeed"
+            exit 1
+          fi
+          echo "security: every scanner succeeded"

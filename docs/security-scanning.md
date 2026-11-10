@@ -3,8 +3,10 @@
 Pre-push and the Security workflow run the same OSV check:
 `scripts/security-scanners.sh osv`. It resolves the pinned osv-scanner 2.7.1
 binary and judges `package-lock.json`. Semgrep, gitleaks, zizmor and cfn-lint
-stay on their existing hooks and jobs. This page records the dependency
-exceptions that check is allowed to accept.
+stay on their existing hooks and jobs. The workflow's `security` job is the
+check the ruleset requires. It scans nothing of its own: it runs after those
+five jobs and fails unless every one succeeded. This page records the
+dependency exceptions that check is allowed to accept.
 
 ## How an exception works
 
