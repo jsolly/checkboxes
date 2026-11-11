@@ -137,7 +137,10 @@ jobs:
           enable-cache: false
       - run: npm ci
         if: steps.verified-tree.outputs.run_full != 'false'
-      - run: npx --no-install playwright install --with-deps chromium
+      # TEMPORARY: --with-deps removed. On 2026-11-11 apt on the arm runner could not reach
+      # ports.ubuntu.com. Restore `--with-deps` when the mirror resolves again:
+      # https://app.todoist.com/app/task/6hxj7q93qR2WxXW5
+      - run: npx --no-install playwright install chromium
         if: steps.verified-tree.outputs.run_full != 'false'
       - name: Run complete repository gate
         if: steps.verified-tree.outputs.run_full != 'false'
