@@ -439,5 +439,81 @@ cp "$BOOTSTRAP_PAYLOAD" "$2"
         self.assertFalse(self.downloads.exists())
 
 
+class PrePushReachability(unittest.TestCase):
+    """The real pre-push hook skips a scan only when curl cannot reach its server at all."""
+
+    def setUp(self):
+        scratch = tempfile.TemporaryDirectory()
+        self.addCleanup(scratch.cleanup)
+        self.scratch = Path(scratch.name).resolve()
+        self.root = self.scratch / 'repo'
+        self.bin = self.scratch / 'bin'
+        self.bin.mkdir()
+        for name in ('.git-hooks/pre-commit', 'gate/gate-lib.sh'):
+            target = self.root / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(SOURCE / name, target)
+        self.log = self.scratch / 'log'
+        (self.root / 'scripts').mkdir()
+        (self.root / 'scripts/security-scanners.sh').write_text(
+            'printf "scan %s\\n" "$1" >>"' + str(self.log) + '"\nexit "${FIXTURE_SCAN_RC:-0}"\n')
+        self.curl = self.bin / 'curl'
+        self.curl.write_text('#!/usr/bin/env bash\nprintf "probe %s\\n" "${!#}" >>"' + str(self.log)
+                             + '"\nexit "${FIXTURE_CURL_RC:-0}"\n')
+        self.curl.chmod(0o755)
+        self.env = {k: v for k, v in os.environ.items() if not k.startswith(('GIT_', 'PYTHON'))}
+        self.env.update(HOME=str(self.scratch), GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM='1')
+        subprocess.run(['git', 'init', '-q', '-b', 'main', str(self.root)], env=self.env, check=True)
+        # PATH is the fixture bin alone, so removing the curl stub leaves no curl at all.
+        for command in ('bash', 'git', 'env', 'dirname', 'basename'):
+            (self.bin / command).symlink_to(shutil.which(command, path=self.env['PATH']))
+        self.env['PATH'] = str(self.bin)
+
+    def push(self, curl_rc=0, scan_rc=0):
+        env = dict(self.env, FIXTURE_CURL_RC=str(curl_rc), FIXTURE_SCAN_RC=str(scan_rc))
+        refs = 'refs/heads/topic ' + 'a' * 40 + ' refs/heads/topic ' + '0' * 40 + '\n'
+        return subprocess.run(['bash', '.git-hooks/pre-commit', 'pre-push'], cwd=self.root, env=env,
+                              input=refs, text=True, capture_output=True)
+
+    def lines(self):
+        return self.log.read_text().splitlines() if self.log.exists() else []
+
+    def test_reachable_servers_run_both_scans(self):
+        result = self.push()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.lines(), ['probe https://semgrep.dev/', 'scan semgrep',
+                                        'probe https://api.osv.dev/', 'scan osv'])
+
+    def test_finding_aborts_the_push(self):
+        result = self.push(scan_rc=1)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('push aborted', result.stderr)
+        self.assertEqual(self.lines(), ['probe https://semgrep.dev/', 'scan semgrep'])
+
+    def test_each_no_connection_exit_skips_both_scans_with_a_warning(self):
+        for rc in (5, 6, 7, 28, 35, 56):
+            with self.subTest(curl_rc=rc):
+                result = self.push(curl_rc=rc, scan_rc=1)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn('semgrep (pre-push) skipped', result.stderr)
+                self.assertIn('osv-scanner (pre-push) skipped', result.stderr)
+        self.assertNotIn('scan semgrep', self.lines())
+        self.assertNotIn('scan osv', self.lines())
+
+    def test_other_probe_failure_aborts_without_scanning(self):
+        result = self.push(curl_rc=60)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('curl exit 60', result.stderr)
+        self.assertIn('push aborted', result.stderr)
+        self.assertEqual(self.lines(), ['probe https://semgrep.dev/'])
+
+    def test_missing_curl_aborts_without_scanning(self):
+        self.curl.unlink()
+        result = self.push()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('curl is not on PATH', result.stderr)
+        self.assertEqual(self.lines(), [])
+
+
 if __name__ == '__main__':
     unittest.main()

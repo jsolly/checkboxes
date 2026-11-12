@@ -15,7 +15,8 @@ ignore file, including `osv-scanner.toml`, is not read, so a branch cannot hide
 an advisory by suppressing the scanner. Every finding is printed. The command
 exits 0 only when each finding matches one reviewed disposition. Any other
 finding, a malformed report, or a scanner failure blocks the push and the
-Security job.
+Security job. Pre-push skips the check, with a warning, only when it cannot
+reach api.osv.dev at all; the Security job never skips it.
 
 A disposition is one advisory on one exact package version. It records the
 lockfile path, the registry URL, the integrity and a fingerprint of every

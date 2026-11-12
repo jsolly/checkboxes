@@ -23,7 +23,9 @@ bash scripts/setup-agent-environment.sh
 
 Setup installs repo-owned hooks outside the working tree, provisions the pinned
 tools and lockfile dependencies, and installs pinned Chromium when this repo uses
-Playwright. Run the repo's documented quality gate with its pinned tools:
+Playwright. Where `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` is set, as in Claude's cloud
+sessions, setup skips Chromium; the gate steps that launch it then fail locally
+and run in CI. Run the repo's documented quality gate with its pinned tools:
 
 ```bash
 mise exec -- npm run gate
@@ -37,7 +39,12 @@ that the gate ran. No setup command deploys the application or infrastructure.
 
 The dispatcher lives in this clone's Git common directory, shared only by its
 linked worktrees. It registers pre-commit and pre-push. Pre-push runs Semgrep
-and osv-scanner. Reviewed OSV exceptions are recorded in
+and osv-scanner. A scan whose server (semgrep.dev, api.osv.dev) cannot be
+reached at all, as in Claude's cloud sessions, is skipped with a warning; the
+Security workflow runs it once the branch has a pull request, so a `preview/`
+push without one goes unscanned. Any HTTP answer counts as
+reachable, and findings, scan errors and other probe failures still block the
+push. Reviewed OSV exceptions are recorded in
 [security scanning](security-scanning.md). The complete hook/library/setup
 bundle must match current reviewed `origin/main`, or a deliberately approved exact
 bundle digest. Missing files, symlinks, unreviewed modes and a foreign origin fail
