@@ -52,7 +52,7 @@ loader. Removing root `tsconfig.json` makes the app build fail on `$lib` imports
 Verify native TypeScript checking, `npm run check:ts`, both phases of
 `npm run build`, and the pinned component generator when changing these aliases.
 
-Package manifests/lockfiles, `.npmrc`, `.nvmrc`, `.mise.toml`, Git files, `.github/`,
+Package manifests/lockfiles, `.npmrc`, `.nvmrc`, `.mise.toml`, `mise.lock`, Git files, `.github/`,
 native agent registrations and `vercel.ts` keep their required locations.
 `vercel.ts` is handwritten strict TypeScript: root `tsconfig.json`, Biome and
 Knip (as an entry file) cover it like any other source.
