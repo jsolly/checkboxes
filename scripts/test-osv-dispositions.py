@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import sys
 from datetime import date
 from pathlib import Path
 import unittest
@@ -14,6 +15,8 @@ SOURCE = Path(__file__).resolve().parent / 'osv-dispositions.py'
 
 
 def load():
+    # Loading the checker from its path would otherwise write scripts/__pycache__.
+    sys.dont_write_bytecode = True
     spec = importlib.util.spec_from_file_location('osv_dispositions', SOURCE)
     if spec is None or spec.loader is None:
         raise RuntimeError('Cannot load osv-dispositions.py')
