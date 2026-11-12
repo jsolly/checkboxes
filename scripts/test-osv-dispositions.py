@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""The OSV disposition checker accepts only the reviewed deepmerge identity."""
+"""The OSV disposition checker accepts only the reviewed deepmerge identity,
+and the osv-scanner pin in mise.lock stays installable."""
 from __future__ import annotations
 
 import importlib.util
 import json
 import sys
+import tomllib
 from datetime import date
 from pathlib import Path
 import unittest
@@ -102,6 +104,27 @@ class Dispositions(unittest.TestCase):
         script = (ROOT / 'scripts/security-scanners.sh').read_text()
         self.assertIn('scripts/osv-dispositions.py', script)
         self.assertNotIn('osv-scanner.toml', script)
+
+
+class MiseLock(unittest.TestCase):
+    def test_osv_scanner_records_no_slsa_provenance(self):
+        lock = tomllib.loads((ROOT / 'mise.lock').read_text())
+        entries = lock['tools']['osv-scanner']
+        with_slsa = [
+            name
+            for entry in entries
+            for name, value in entry.items()
+            if name.startswith('platforms.')
+            and 'slsa' in value.get('provenance', {})
+        ]
+        self.assertEqual(
+            with_slsa, [],
+            'mise 2026.9.16 and later refuse to install osv-scanner from a lock that '
+            'records SLSA provenance while the Aqua registry entry names no signer; '
+            'delete the provenance.slsa subtables under tools.osv-scanner after '
+            '`mise lock`; on a version bump, recheck whether the registry now names a '
+            'signer and, if it does, remove this test instead.',
+        )
 
 
 if __name__ == '__main__':
