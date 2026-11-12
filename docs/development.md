@@ -9,7 +9,10 @@ fresh Linux setup provisions a pinned, checksum-verified public mise binary in
 `/usr/local/bin`, using noninteractive sudo only when needed. The repository's `.mise.toml`
 and `.nvmrc` own its tool pins; `mise.lock` records each tool's download URL and checksum per
 platform so installs need no GitHub API lookup. To bump a pin, edit `.mise.toml`, run `mise lock`
-and commit both files (`mise lock --bump` for the major-only node pin). Semgrep and cfn-lint are
+and commit both files (`mise lock --bump` for the major-only node pin). After `mise lock`, delete any
+`provenance.slsa` subtable from `mise.lock`: newer mise refuses to install from one whose registry
+entry names no signer (seen with mise 2026.9.16 and 2026.10.14); checksums and URLs still pin the
+download. Semgrep and cfn-lint are
 not mise tools: `scripts/security-scanners.sh` pins them and runs them through the pinned uv.
 
 On a reviewed fresh `origin/main` checkout run:

@@ -1,7 +1,9 @@
 # mise.lock pins each tool's download URL and checksum per platform, so installs need no GitHub
 # API release lookup (proxied cloud sessions refuse that API). To bump a pin, edit it here, run
 # `mise lock`, and commit both files. A major-only pin such as node stays at its locked patch until
-# `mise lock --bump`.
+# `mise lock --bump`. After `mise lock`, delete any `provenance.slsa` subtable: newer mise refuses to
+# install from one whose registry entry names no signer (seen with mise 2026.9.16 and 2026.10.14);
+# checksums and URLs still pin the download.
 # Semgrep and cfn-lint are not pinned here: scripts/security-scanners.sh owns their versions and
 # runs them through the pinned uv. Locked, mise installs a Python tool under a directory that the
 # scanners' lookup does not find.
