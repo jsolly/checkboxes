@@ -33,8 +33,10 @@ case "${1:-pre-commit}" in
       exit 0
     fi
     echo "▶ pre-push security (checkboxes)"
-    run_step "semgrep" bash scripts/security-scanners.sh semgrep
-    run_step "osv-scanner" bash scripts/security-scanners.sh osv
+    # A scan whose server cannot be reached is skipped with a warning; the Security
+    # workflow runs it on the pull request. Findings and scan errors still fail the push.
+    gate_pre_push_scan "semgrep" https://semgrep.dev/ semgrep
+    gate_pre_push_scan "osv-scanner" https://api.osv.dev/ osv
     echo "✓ pre-push security scan passed"
     exit 0
     ;;

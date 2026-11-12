@@ -45,7 +45,13 @@ mise install
 if [[ -f package-lock.json ]]; then
   mise exec -- npm ci
 fi
-if [[ -x node_modules/.bin/playwright ]]; then
+# PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD is Playwright's own opt-out, set by any value but empty, 0 or
+# false. Claude's cloud sessions set it and block the browser download host, so the gate's browser
+# steps cannot run there; CI runs them.
+skip_browser="${PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD:-}"
+if [[ -n "$skip_browser" && "$skip_browser" != 0 && "${skip_browser,,}" != false ]]; then
+  echo "⚠ PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=$skip_browser: Chromium not installed; the gate steps that launch it will fail here and run in CI." >&2
+elif [[ -x node_modules/.bin/playwright ]]; then
   mise exec -- node_modules/.bin/playwright install chromium
 fi
 bash scripts/repo-python.sh scripts/repo-hooks.py verify --root "$root"
