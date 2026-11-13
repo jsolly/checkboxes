@@ -317,7 +317,7 @@ run_step() { # run_step "label" cmd [args...]
 # status still exits 0, so any answer runs the scan. Only curl's no-connection exits skip it
 # with a warning: 5/6 proxy or host not resolved, 7 no connect, 28 no answer in time, 35 TLS
 # handshake, 56 connection dropped (a proxy that refuses the CONNECT, as in Claude's cloud
-# sessions). A skipped scan runs only in the Security workflow, which runs on pull requests.
+# sessions). A locally skipped scan still runs in CI's pull request security jobs.
 # A finding, a scan error, a missing curl or any other probe failure (such as a broken local
 # CA bundle) returns nonzero, so the caller's push aborts.
 gate_pre_push_scan() { # <label> <url> <scanner>
@@ -327,9 +327,9 @@ gate_pre_push_scan() { # <label> <url> <scanner>
   case "$rc" in
     0) run_step "$1" bash scripts/security-scanners.sh "$3" || return ;;
     5 | 6 | 7 | 28 | 35 | 56)
-      echo "⚠ $1 (pre-push) skipped: $2 is unreachable from this host (curl exit $rc). The Security workflow runs it once the branch has a pull request; a preview/ push without one is not scanned." >&2 ;;
+      echo "⚠ $1 (pre-push) skipped: $2 is unreachable from this host (curl exit $rc). The CI security jobs run it once the branch has a pull request; a preview/ push without one is not scanned." >&2 ;;
     *)
-      echo "✗ could not probe $2 for the $1 pre-push scan (curl exit $rc, not a refused connection) — fix this host's curl, or let the Security workflow run the scan" >&2
+      echo "✗ could not probe $2 for the $1 pre-push scan (curl exit $rc, not a refused connection) — fix this host's curl, or let the CI security jobs run the scan" >&2
       return 1 ;;
   esac
 }
