@@ -34,6 +34,22 @@ Replace an exception with the upstream patch when one exists.
 
 ## Patched dependencies
 
+`@astrojs/svelte` is now 9.1.2, fixing reflected slot-name XSS
+([GHSA-f4j9-crrj-867q](https://osv.dev/GHSA-f4j9-crrj-867q)). It was published
+on 28 October 2026 and meets the seven-day release age. Its dependency update
+resolves `@sveltejs/vite-plugin-svelte` 7.3.1, `svelte2tsx` 0.7.63 and a nested
+`magic-string` 1.4.5. The adapter's Astro, Svelte and TypeScript peer requirements
+are satisfied by this lockfile.
+
+The plugin upgrade changes the exact caller fingerprint for the existing
+deepmerge exception. The deepmerge call in `src/utils/options.js` still merges
+local build configuration with the same arguments and array replacement rule;
+the only change in that file between plugin 7.1.2 and 7.3.1 is warning wording.
+The proposed fingerprint binds the existing exception to plugin 7.3.1's exact
+version and integrity. The deepmerge version, tarball, path, advisory and
+10 December expiry are unchanged. This is still an accepted risk, not a fix for
+deepmerge, and remains part of John's held PR review.
+
 Compatible fixed releases are in the lockfile. npm's `min-release-age=7`
 rejected anything published after 2026-11-03 14:25 UTC. Direct dependencies
 were updated when their own release carried the fix. Transitive copies use a
@@ -71,7 +87,7 @@ on 11.0.4. `@vercel/nft` calls `glob()` with `mark`, `ignore`, `dot` and
 
 | Package | Advisory | Disposition |
 | --- | --- | --- |
-| deepmerge 4.3.1 | GHSA-gcqx-w48m-w2h4 | Accept prototype-poisoning of the returned object through 10 December 2026. No patched release exists. `@sveltejs/vite-plugin-svelte` 7.1.2 merges its own build defaults with the project Svelte and Vite configuration. Plugin 7.3.1, the newest release eligible under the cooldown, still depends on `^4.3.1`. |
+| deepmerge 4.3.1 | GHSA-gcqx-w48m-w2h4 | Accept prototype-poisoning of the returned object through 10 December 2026. No patched release exists. `@sveltejs/vite-plugin-svelte` 7.3.1 merges its own build defaults with the project Svelte and Vite configuration. Plugin 7.3.1 still depends on `^4.3.1`. |
 
 The advisory is
 [GHSA-gcqx-w48m-w2h4](https://osv.dev/GHSA-gcqx-w48m-w2h4)

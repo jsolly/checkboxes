@@ -33,8 +33,8 @@ case "${1:-pre-commit}" in
       exit 0
     fi
     echo "▶ pre-push security (checkboxes)"
-    # A scan whose server cannot be reached is skipped with a warning; the Security
-    # workflow runs it on the pull request. Findings and scan errors still fail the push.
+    # A scan whose server cannot be reached is skipped with a warning; CI's security
+    # jobs run it on the pull request. Findings and scan errors still fail the push.
     gate_pre_push_scan "semgrep" https://semgrep.dev/ semgrep
     gate_pre_push_scan "osv-scanner" https://api.osv.dev/ osv
     echo "✓ pre-push security scan passed"
