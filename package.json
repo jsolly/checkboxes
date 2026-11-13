@@ -21,7 +21,7 @@
 		"check:yaml": "uvx yamllint@1.38.0 -c config/quality/yamllint.yaml -s .",
 		"generate-stats": "tsx src/utils/generate-stats.ts",
 		"worktree:init": "bash scripts/worktree-init.sh && bash scripts/setup-agent-environment.sh",
-		"test": "tsx --test --test-reporter=dot \"tests/**/*.test.ts\" && npm run test:assets && bash scripts/repo-python.sh scripts/test-osv-dispositions.py",
+		"test": "tsx --test --test-reporter=dot \"tests/**/*.test.ts\" && npm run test:assets && bash scripts/repo-python.sh scripts/test-osv-dispositions.py && npm run test:hooks",
 		"lint-staged": "lint-staged --config config/quality/lint-staged.json",
 		"check:actions": "bash scripts/check-actions.sh",
 		"gate": "FLEET_DOC_FAST=0 bash .git-hooks/pre-commit",
@@ -29,7 +29,8 @@
 		"smoke:scenario-contract": "node --test scripts/production-smoke-scenario.test.mjs",
 		"check:a11y": "node scripts/check-accessibility.ts",
 		"assets": "node --use-env-proxy --import tsx scripts/assets/cli.ts",
-		"test:assets": "vitest run --config config/testing/vitest.assets.mjs"
+		"test:assets": "vitest run --config config/testing/vitest.assets.mjs",
+		"test:hooks": "tsc -p config/typescript/hooks.json && vitest run --config config/testing/vitest.hooks.ts"
 	},
 	"overrides": {
 		"path-to-regexp": ">=6.3.0",

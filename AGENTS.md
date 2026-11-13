@@ -110,7 +110,8 @@ authorize a dependency merge.
 
 This repo owns `gate/gate-lib.sh` and `scripts/repo-hooks.py`. Run reviewed
 `scripts/setup-agent-environment.sh` on main to install its outside-worktree
-pre-commit and pre-push dispatcher. Pre-push runs Semgrep and osv-scanner.
+pre-commit and pre-push dispatcher. Pre-push runs ranged gitleaks only.
+Semgrep and osv-scanner run in required PR CI and standalone scanner modes.
 `.cursor/hooks.json` blocks agent `git commit` and `git push` until the pinned
 gitleaks scan passes. Never set hooksPath to `.git-hooks`: a branch could then
 register executable hooks. See [development and release](docs/development.md).

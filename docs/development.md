@@ -38,13 +38,13 @@ that the gate ran. No setup command deploys the application or infrastructure.
 ## Hook trust
 
 The dispatcher lives in this clone's Git common directory, shared only by its
-linked worktrees. It registers pre-commit and pre-push. Pre-push runs Semgrep
-and osv-scanner. A scan whose server (semgrep.dev, api.osv.dev) cannot be
-reached at all, as in Claude's cloud sessions, is skipped with a warning; the
-CI runs it once the branch has a pull request, so a `preview/`
-push without one goes unscanned. Any HTTP answer counts as
-reachable, and findings, scan errors and other probe failures still block the
-push. Reviewed OSV exceptions are recorded in
+linked worktrees. It registers pre-commit and pre-push. Pre-push runs pinned
+gitleaks over each outgoing ref range. New branches require a fetched
+`origin/main`; deletions and empty ranges need no history scan. A missing
+scanner, unreadable range or finding blocks the push. Semgrep and osv-scanner
+run in required PR CI and can be run manually through
+`scripts/security-scanners.sh`. Pre-push needs neither scanner nor a network
+probe. Reviewed OSV exceptions are recorded in
 [security scanning](security-scanning.md). The complete hook/library/setup
 bundle must match current reviewed `origin/main`, or a deliberately approved exact
 bundle digest. Missing files, symlinks, unreviewed modes and a foreign origin fail

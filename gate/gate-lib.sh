@@ -69,7 +69,7 @@ gate_enter_committing_tree() { # <shim path>
 # The gate fires at COMMIT time, not push time: every worktree commit runs the
 # full quality gate, and GitHub Actions CI is the server-side
 # backstop for anything a `git commit -n` bypass or a skipped merge/rebase lets past.
-# Semgrep and osv-scanner run from .git-hooks/pre-push, not from this commit gate.
+# Semgrep and osv-scanner run in required PR security jobs and standalone scanner modes.
 # Secrets, markdown-lint-on-change, docs-only fast path, banner + failure trap are
 # keyed off `git diff --cached` (the staged index). DEFINITIONS ONLY — no side
 # effects on source.
@@ -310,28 +310,6 @@ run_step() { # run_step "label" cmd [args...]
   printf '%s\n' "$_out" >&2
   printf '✗ step failed: %s (exit %d)\n' "$label" "$_rc" >&2
   return "$_rc"
-}
-
-# gate_pre_push_scan <label> <url> <scanner>: pre-push only, never CI. Probe <url> with a
-# HEAD request, then run scripts/security-scanners.sh <scanner>. Without --fail an HTTP error
-# status still exits 0, so any answer runs the scan. Only curl's no-connection exits skip it
-# with a warning: 5/6 proxy or host not resolved, 7 no connect, 28 no answer in time, 35 TLS
-# handshake, 56 connection dropped (a proxy that refuses the CONNECT, as in Claude's cloud
-# sessions). A locally skipped scan still runs in CI's pull request security jobs.
-# A finding, a scan error, a missing curl or any other probe failure (such as a broken local
-# CA bundle) returns nonzero, so the caller's push aborts.
-gate_pre_push_scan() { # <label> <url> <scanner>
-  local rc=0
-  command -v curl >/dev/null 2>&1 || { echo "✗ curl is not on PATH — the $1 pre-push scan needs it to reach $2" >&2; return 1; }
-  curl --head --silent --output /dev/null --connect-timeout 5 --max-time 15 "$2" || rc=$?
-  case "$rc" in
-    0) run_step "$1" bash scripts/security-scanners.sh "$3" || return ;;
-    5 | 6 | 7 | 28 | 35 | 56)
-      echo "⚠ $1 (pre-push) skipped: $2 is unreachable from this host (curl exit $rc). The CI security jobs run it once the branch has a pull request; a preview/ push without one is not scanned." >&2 ;;
-    *)
-      echo "✗ could not probe $2 for the $1 pre-push scan (curl exit $rc, not a refused connection) — fix this host's curl, or let the CI security jobs run the scan" >&2
-      return 1 ;;
-  esac
 }
 
 # === Bash floor on entrypoints ===================================================

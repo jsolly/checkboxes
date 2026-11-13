@@ -19,6 +19,9 @@ with its component; test configuration may live under `tests/`.
   membership, exclusions and the `$lib` aliases for the native consumers below.
   The native policy basename also participates in Vite's compiler cache
   invalidation; verify a physical option edit and its restoration in Astro.
+- `testing/vitest.hooks.ts` selects the real pre-push boundary test. `npm run
+  test:hooks` explicitly selects it and type-checks that test and config through
+  `typescript/hooks.json`, which inherits the shared strict compiler policy.
 - `quality/biome.settings.jsonc` owns Biome rules, globs and overrides. Package
   commands, the committing-tree gate and lint-staged select it explicitly. Its
   VCS ignore discovery and file patterns keep their repository scope.
