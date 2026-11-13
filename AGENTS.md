@@ -14,6 +14,9 @@ Production verification follows Vercel READY and the public checkbox behavior sm
 
 Local gate before push: `npm run gate`.
 
+The required `ci` job waits for every pull request security scanner. A failed,
+cancelled or skipped security scanner fails `ci` before dependency installation.
+
 ## Vercel Previews
 
 **Vercel Previews only for `preview/` branches.** Production Git deploys stay on `main`. Vercel's Git integration builds a Preview for a pushed branch named `preview/**` (`vercel.ts` `git.deploymentEnabled`); every other branch builds nothing. The branch's stable Vercel URL tracks its latest push. Agents create or push a `preview/` branch only when John asks, through `/preview-link`.

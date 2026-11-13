@@ -1,12 +1,15 @@
 # Repository security checks
 
-Pre-push and the Security workflow run the same OSV check:
+Pre-push and CI run the same OSV check:
 `scripts/security-scanners.sh osv`. It resolves the pinned osv-scanner 2.7.1
 binary and judges `package-lock.json`. Semgrep, gitleaks, zizmor and cfn-lint
-stay on their existing hooks and jobs. The workflow's `security` job is the
-check the ruleset requires. It scans nothing of its own: it runs after those
-five jobs and fails unless every one succeeded. This page records the
-dependency exceptions that check is allowed to accept.
+stay on their existing hooks and jobs. CI runs these scanners on pull requests.
+The required `ci` job waits for their
+`security` aggregate and fails before checkout or dependency installation unless
+every scanner succeeded. Failed, cancelled and skipped scans cannot satisfy `ci`.
+Pushes to main and manual CI runs keep their existing gate without repeating the
+pull request scans. This page records the dependency exceptions that check is
+allowed to accept.
 
 ## How an exception works
 
@@ -15,8 +18,8 @@ ignore file, including `osv-scanner.toml`, is not read, so a branch cannot hide
 an advisory by suppressing the scanner. Every finding is printed. The command
 exits 0 only when each finding matches one reviewed disposition. Any other
 finding, a malformed report, or a scanner failure blocks the push and the
-Security job. Pre-push skips the check, with a warning, only when it cannot
-reach api.osv.dev at all; the Security job never skips it.
+CI scanner job. Pre-push skips the check, with a warning, only when it cannot
+reach api.osv.dev at all; the CI scanner job never skips it.
 
 A disposition is one advisory on one exact package version. It records the
 lockfile path, the registry URL, the integrity and a fingerprint of every

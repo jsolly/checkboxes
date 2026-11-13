@@ -29,22 +29,28 @@ jobs:
   # `ow-ci`; any other label defers. Deferred jobs use name `ci-deferred` so a
   # skipped required `ci` check cannot look green.
   ci:
+    needs: [security]
     name: >-
       ${{ (github.event_name != 'pull_request' ||
       github.event.action != 'labeled' ||
       github.event.label.name == 'ow-ci') && 'ci' || 'ci-deferred' }}
     if: >-
-      github.event_name != 'pull_request' ||
+      always() && (github.event_name != 'pull_request' ||
       github.event.action != 'labeled' ||
-      github.event.label.name == 'ow-ci'
+      github.event.label.name == 'ow-ci')
     runs-on: ubuntu-24.04-arm
     steps:
+      - name: Require pull request security scans
+        if: github.event_name == 'pull_request'
+        env:
+          SECURITY: ${{ needs.security.result }}
+        run: test "$SECURITY" = success
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
           persist-credentials: false
-      # Nothing but the checkout runs before the scan: an earlier step could rewrite the git config,
-      # PATH, or environment the scan reads history with.
+      # Only the security result guard and checkout run before the scan. Keep dependency
+      # scripts after it: they could rewrite the git config, PATH or scan environment.
       - name: Secrets scan (range)
         shell: bash
         env:
@@ -165,3 +171,142 @@ jobs:
           path: ${{ runner.temp }}/ci-tree-${{ github.job }}.txt
           if-no-files-found: error
           retention-days: 7
+
+  gitleaks:
+    permissions:
+      contents: read
+    if: >-
+      github.event_name == 'pull_request' &&
+      (github.event.action != 'labeled' || github.event.label.name == 'ow-ci')
+    name: gitleaks
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scan commits added to the base branch
+        run: bash scripts/security-scanners.sh gitleaks-range
+
+  semgrep:
+    permissions:
+      contents: read
+    if: >-
+      github.event_name == 'pull_request' &&
+      (github.event.action != 'labeled' || github.event.label.name == 'ow-ci')
+    name: semgrep
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          version: "0.12.22"
+          enable-cache: false
+      - name: Semgrep p/default
+        run: bash scripts/security-scanners.sh semgrep
+
+  osv-scanner:
+    permissions:
+      contents: read
+    if: >-
+      github.event_name == 'pull_request' &&
+      (github.event.action != 'labeled' || github.event.label.name == 'ow-ci')
+    name: osv-scanner
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Scan package-lock.json
+        run: bash scripts/security-scanners.sh osv
+
+  zizmor:
+    permissions:
+      contents: read
+    if: >-
+      github.event_name == 'pull_request' &&
+      (github.event.action != 'labeled' || github.event.label.name == 'ow-ci')
+    name: zizmor
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Offline GitHub Actions audit
+        run: bash scripts/security-scanners.sh zizmor
+
+  cfn-lint:
+    permissions:
+      contents: read
+    if: >-
+      github.event_name == 'pull_request' &&
+      (github.event.action != 'labeled' || github.event.label.name == 'ow-ci')
+    name: cfn-lint
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          version: "0.12.22"
+          enable-cache: false
+      - name: Lint the static media template
+        run: bash scripts/security-scanners.sh cfn-lint
+
+  # Keep the security check used by auto-merge. The required ci job waits for it.
+  # Fail even when a scanner was skipped, cancelled or failed.
+  security:
+    permissions:
+      contents: read
+    name: security
+    needs: [gitleaks, semgrep, osv-scanner, zizmor, cfn-lint]
+    if: >-
+      always() && github.event_name == 'pull_request' &&
+      (github.event.action != 'labeled' || github.event.label.name == 'ow-ci')
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 5
+    steps:
+      - name: Require every scanner to succeed
+        env:
+          GITLEAKS: ${{ needs.gitleaks.result }}
+          SEMGREP: ${{ needs.semgrep.result }}
+          OSV_SCANNER: ${{ needs['osv-scanner'].result }}
+          ZIZMOR: ${{ needs.zizmor.result }}
+          CFN_LINT: ${{ needs['cfn-lint'].result }}
+        run: |
+          set -euo pipefail
+          failed=0
+          for pair in \
+            "gitleaks:${GITLEAKS}" \
+            "semgrep:${SEMGREP}" \
+            "osv-scanner:${OSV_SCANNER}" \
+            "zizmor:${ZIZMOR}" \
+            "cfn-lint:${CFN_LINT}"
+          do
+            name="${pair%%:*}"
+            result="${pair#*:}"
+            printf '%s %s\n' "$name" "$result"
+            if [[ "$result" != success ]]; then
+              failed=1
+            fi
+          done
+          if [[ "$failed" -ne 0 ]]; then
+            echo "security: a scanner did not succeed"
+            exit 1
+          fi
+          echo "security: every scanner succeeded"

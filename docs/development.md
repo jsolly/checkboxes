@@ -41,7 +41,7 @@ The dispatcher lives in this clone's Git common directory, shared only by its
 linked worktrees. It registers pre-commit and pre-push. Pre-push runs Semgrep
 and osv-scanner. A scan whose server (semgrep.dev, api.osv.dev) cannot be
 reached at all, as in Claude's cloud sessions, is skipped with a warning; the
-Security workflow runs it once the branch has a pull request, so a `preview/`
+CI runs it once the branch has a pull request, so a `preview/`
 push without one goes unscanned. Any HTTP answer counts as
 reachable, and findings, scan errors and other probe failures still block the
 push. Reviewed OSV exceptions are recorded in
