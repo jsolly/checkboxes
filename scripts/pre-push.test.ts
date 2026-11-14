@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
 	copyFileSync,
 	mkdirSync,
@@ -166,6 +167,38 @@ exit "\${SECRET_EXIT:-0}"
 		assert.equal(malformedResult.status, 1, malformedResult.stderr);
 		assert.match(malformedResult.stderr, /not a commit id/u);
 		assert.throws(() => readFileSync(runs));
+		// Exercise root history with log.showRoot=false using the actual pinned scanner.
+		const scanner = spawnSync("bash", ["-c", "command -v gitleaks"], {
+			encoding: "utf8",
+		});
+		assert.equal(scanner.status, 0, scanner.stderr);
+		assert.ok(isAbsolute(scanner.stdout.trim()));
+		copyFileSync(scanner.stdout.trim(), join(bin, "gitleaks"));
+		const token = [
+			"ghp",
+			createHash("sha256")
+				.update("root history fixture")
+				.digest("hex")
+				.slice(0, 36),
+		].join("_");
+		writeFileSync(join(root, "root-secret.txt"), token);
+		git("add", "root-secret.txt");
+		git("commit", "-qm", "leaking tree");
+		const leakingTree = git("rev-parse", "HEAD^{tree}");
+		const orphan = git("commit-tree", leakingTree, "-m", "root secret");
+		const removed = git(
+			"commit-tree",
+			git("rev-parse", `${tip}^{tree}`),
+			"-p",
+			orphan,
+			"-m",
+			"removed",
+		);
+		git("config", "log.showRoot", "false");
+		const blockedRoot = push(ref(removed, zero));
+		assert.notEqual(blockedRoot.status, 0, blockedRoot.stderr);
+		assert.match(blockedRoot.stdout + blockedRoot.stderr, /leaks found/u);
+		assert.ok(!(blockedRoot.stdout + blockedRoot.stderr).includes(token));
 		git("update-ref", "-d", "refs/remotes/origin/main");
 		assert.notEqual(push(ref(tip, zero)).status, 0);
 	} finally {
