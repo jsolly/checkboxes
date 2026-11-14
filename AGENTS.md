@@ -14,6 +14,9 @@ Production verification follows Vercel READY and the public checkbox behavior sm
 
 Local gate before push: `npm run gate`.
 
+The required `ci` job waits for every pull request security scanner. A failed,
+cancelled or skipped security scanner fails `ci` before dependency installation.
+
 ## Vercel Previews
 
 **Vercel Previews only for `preview/` branches.** Production Git deploys stay on `main`. Vercel's Git integration builds a Preview for a pushed branch named `preview/**` (`vercel.ts` `git.deploymentEnabled`); every other branch builds nothing. The branch's stable Vercel URL tracks its latest push. Agents create or push a `preview/` branch only when John asks, through `/preview-link`.
@@ -107,7 +110,8 @@ authorize a dependency merge.
 
 This repo owns `gate/gate-lib.sh` and `scripts/repo-hooks.py`. Run reviewed
 `scripts/setup-agent-environment.sh` on main to install its outside-worktree
-pre-commit and pre-push dispatcher. Pre-push runs Semgrep and osv-scanner.
+pre-commit and pre-push dispatcher. Pre-push runs ranged gitleaks only.
+Semgrep and osv-scanner run in required PR CI and standalone scanner modes.
 `.cursor/hooks.json` blocks agent `git commit` and `git push` until the pinned
 gitleaks scan passes. Never set hooksPath to `.git-hooks`: a branch could then
 register executable hooks. See [development and release](docs/development.md).
