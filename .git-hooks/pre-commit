@@ -48,7 +48,7 @@ case "${1:-pre-commit}" in
       fi
       echo "• gitleaks ($range)"
       "$gl" git --no-banner --no-color --redact --verbose \
-        --log-opts="--text --diff-merges=remerge --no-color --no-textconv ${range}"
+        --log-opts="--root --text --diff-merges=remerge --no-color --no-textconv ${range}"
     done
     echo "✓ pre-push secrets scan passed"
     exit 0
