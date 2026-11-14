@@ -88,7 +88,7 @@
 		"svelte": "^5.57.3",
 		"tailwind-merge": "3.6.0",
 		"tailwindcss": "^4.3.2",
-		"vue": "^3.5.43"
+		"vue": "^3.5.45"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.15",
