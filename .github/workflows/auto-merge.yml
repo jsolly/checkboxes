@@ -2,7 +2,7 @@ name: Auto-merge
 
 # Arm GitHub's native squash auto-merge for non-draft pull requests opened by
 # solly-agent, jsolly, cursor[bot], or app/cursor whose head branch is in this
-# repository. A half-hour sweep re-arms that, and squash-merges with
+# repository. A daily sweep re-arms that, and squash-merges with
 # --match-head-commit once the
 # ci and security check-runs are green. The solly-agent token fires push
 # workflows, so this file does not dispatch them. It never checks out code.
@@ -10,7 +10,7 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "0 9,17,22 * * *"
   workflow_dispatch:
 
 # gh uses AUTO_MERGE_TOKEN. The workflow token gets no permissions.

@@ -92,7 +92,7 @@ pushing. Create a same-repository PR; use a draft while approval/work remains.
 Convert a pull request to draft, or run `gh pr merge --disable-auto`, to hold
 auto-merge. Non-draft pull requests opened by `solly-agent`, `jsolly`,
 `cursor[bot]`, or `app/cursor` arm GitHub's native squash auto-merge. A
-half-hour sweep uses that same author list, re-arms auto-merge, and, once
+daily sweep at 09:00, 17:00 and 22:00 UTC uses that same author list, re-arms auto-merge, and, once
 `ci` and `security` are green on the current head, squash-merges that commit.
 Pull requests from anyone else, including Dependabot, never auto-merge. Merge
 only when the required CI validates the exact current head.
