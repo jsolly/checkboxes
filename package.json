@@ -66,7 +66,7 @@
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.10",
-		"@astrojs/react": "^7.0.0",
+		"@astrojs/react": "^7.1.7",
 		"@astrojs/sitemap": "^3.7.4",
 		"@astrojs/svelte": "^9.1.2",
 		"@astrojs/vercel": "^11.0.20",
