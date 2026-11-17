@@ -356,7 +356,7 @@ class PublicMiseBootstrap(unittest.TestCase):
         self.script(self.bin / 'uname', '#!/usr/bin/env bash\nif [[ "$1" == -s ]]; then echo "${FIXTURE_SYSTEM:-Linux}"; else echo "${FIXTURE_ARCH:-x86_64}"; fi\n')
         self.script(self.bin / 'curl', '''#!/usr/bin/env bash
 printf '%s\\n' "$*" >> "$BOOTSTRAP_DOWNLOADS"
-[[ "${FIXTURE_DOWNLOAD_FAIL:-0}" != 1 ]] || exit 7
+[[ "${FIXTURE_DOWNLOAD_FAIL:-0}" == 0 ]] || exit "$FIXTURE_DOWNLOAD_FAIL"
 while [[ "$1" != -o ]]; do shift; done
 cp "$BOOTSTRAP_PAYLOAD" "$2"
 ''')
@@ -408,6 +408,16 @@ cp "$BOOTSTRAP_PAYLOAD" "$2"
     def test_failed_download_does_not_install(self):
         result = self.provision(extra={'FIXTURE_DOWNLOAD_FAIL': '1'})
         self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(self.executions.exists())
+        self.assertFalse((self.bin / 'mise').exists())
+
+    def test_download_timeout_is_bounded_and_never_installs(self):
+        result = self.provision(extra={'FIXTURE_DOWNLOAD_FAIL': '28'})
+        self.assertEqual(result.returncode, 28, result.stderr)
+        args = self.downloads.read_text().split()
+        for flag in ('--connect-timeout', '--max-time', '--retry-max-time'):
+            self.assertIn(flag, args)
+            self.assertGreater(float(args[args.index(flag) + 1]), 0)
         self.assertFalse(self.executions.exists())
         self.assertFalse((self.bin / 'mise').exists())
 

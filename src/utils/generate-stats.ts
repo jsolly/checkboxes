@@ -43,11 +43,16 @@ function getExistingVibeComplexity(
 	existingStats: Partial<StatsFile> | undefined,
 	id: FrameworkId,
 ): number {
-	const frameworkStats = existingStats?.frameworks?.[id] as
-		| (Partial<FrameworkStats> & { complexityScore?: number })
-		| undefined;
-
-	return frameworkStats?.vibeComplexity ?? frameworkStats?.complexityScore ?? 0;
+	const score = existingStats?.frameworks?.[id]?.vibeComplexity;
+	if (
+		typeof score !== "number" ||
+		!Number.isFinite(score) ||
+		score < 0 ||
+		score > 100
+	) {
+		throw new Error(`Missing or invalid saved vibe complexity for ${id}`);
+	}
+	return score;
 }
 
 async function measureBaselineBundle(
@@ -162,23 +167,19 @@ async function generateStats(): Promise<void> {
 	}
 
 	if (!shouldUpdateVibeComplexity) {
-		try {
-			const existingStats = JSON.parse(
-				await fs.readFile(
-					path.join(process.cwd(), STATS_CONFIG.STATS_FILE_PATH),
-					"utf-8",
-				),
-			) as StatsFile;
+		const existingStats = JSON.parse(
+			await fs.readFile(
+				path.join(process.cwd(), STATS_CONFIG.STATS_FILE_PATH),
+				"utf-8",
+			),
+		) as StatsFile;
 
-			for (const id of Object.keys(stats) as FrameworkId[]) {
-				stats[id].vibeComplexity = Math.round(
-					getExistingVibeComplexity(existingStats, id),
-				);
-			}
-			console.log("ℹ️ Using existing vibe complexity scores");
-		} catch {
-			console.warn("⚠️ Could not load existing vibe complexity scores");
+		for (const id of Object.keys(stats) as FrameworkId[]) {
+			stats[id].vibeComplexity = Math.round(
+				getExistingVibeComplexity(existingStats, id),
+			);
 		}
+		console.log("ℹ️ Using existing vibe complexity scores");
 	}
 
 	if (shouldUpdateVibeComplexity) {
@@ -190,34 +191,31 @@ async function generateStats(): Promise<void> {
 
 		for (let i = 0; i < STATS_CONFIG.VIBE_COMPLEXITY_ITERATIONS; i++) {
 			console.log(`📊 Evaluating vibe complexity - Run ${i + 1}...`);
-			try {
-				const { scores } = await evaluateVibeComplexity(implementationCode);
-
-				for (const [id, score] of Object.entries(scores)) {
-					const bucket = vibeMeasurements[id as FrameworkId];
-					if (bucket) {
-						bucket.push(score);
-					}
-				}
-			} catch (error) {
-				const message = error instanceof Error ? error.message : String(error);
-				if (message.includes("429") || message.includes("RESOURCE_EXHAUSTED")) {
-					console.warn(
-						"⚠️ Gemini API rate limit hit — using scores collected so far",
+			const { scores } = await evaluateVibeComplexity(implementationCode);
+			for (const id of Object.keys(implementationCode) as FrameworkId[]) {
+				const score = scores[id];
+				if (
+					typeof score !== "number" ||
+					!Number.isFinite(score) ||
+					score < 0 ||
+					score > 100
+				) {
+					throw new Error(
+						`Missing or invalid generated vibe complexity for ${id}`,
 					);
-					break;
 				}
-				throw error;
+				vibeMeasurements[id]?.push(score);
 			}
 		}
 
 		for (const id of Object.keys(implementationCode) as FrameworkId[]) {
 			const measurements = vibeMeasurements[id];
-			if (measurements && measurements.length > 0) {
-				const median = Math.round(calculateMedian(measurements));
-				stats[id].vibeComplexity = median;
-				console.log(`    ${id} median vibe complexity: ${median}`);
+			if (!measurements || measurements.length === 0) {
+				throw new Error(`No vibe complexity measurements for ${id}`);
 			}
+			const median = Math.round(calculateMedian(measurements));
+			stats[id].vibeComplexity = median;
+			console.log(`    ${id} median vibe complexity: ${median}`);
 		}
 	}
 
