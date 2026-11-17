@@ -11,3 +11,18 @@ const release = import.meta.env["PUBLIC_WEBSITE_RELEASE"] ?? "";
  <UpdateNotice slot="notice" {release} client:load />
  <slot />
 </Layout>
+
+<script>
+ import { injectSpeedInsights } from "@vercel/speed-insights";
+
+ if (import.meta.env.PROD && window.location.hostname === "www.checkboxes.xyz" && navigator.onLine) {
+  injectSpeedInsights({
+   beforeSend(event) {
+    const url = new URL(event.url);
+    url.search = "";
+    url.hash = "";
+    return { ...event, url: url.href };
+   },
+  });
+ }
+</script>
