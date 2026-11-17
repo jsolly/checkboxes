@@ -21,7 +21,7 @@ install_public_mise() (
   [[ ! -e "$destination" && ! -L "$destination" ]] || { echo 'A mise destination already exists outside PATH; inspect it before setup.' >&2; exit 1; }
   scratch="$(mktemp -d)"
   trap 'rm -rf "$scratch"' EXIT
-  curl --fail --silent --show-error --location --retry 3 \
+  curl --fail --silent --show-error --location --retry 3 --connect-timeout 10 --max-time 120 --retry-max-time 360 \
     "https://github.com/jdx/mise/releases/download/v${local_version}/${asset}" -o "$scratch/mise"
   bash "$root/scripts/repo-python.sh" -c \
     'import hashlib, pathlib, sys; actual = hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest(); sys.exit(0 if actual == sys.argv[2] else "Downloaded mise checksum does not match the repository pin")' \
