@@ -69,7 +69,7 @@ gate_enter_committing_tree() { # <shim path>
 # The gate fires at COMMIT time, not push time: every worktree commit runs the
 # full quality gate, and GitHub Actions CI is the server-side
 # backstop for anything a `git commit -n` bypass or a skipped merge/rebase lets past.
-# Semgrep and osv-scanner run from .git-hooks/pre-push, not from this commit gate.
+# Semgrep and osv-scanner run in required PR security jobs and standalone scanner modes.
 # Secrets, markdown-lint-on-change, docs-only fast path, banner + failure trap are
 # keyed off `git diff --cached` (the staged index). DEFINITIONS ONLY — no side
 # effects on source.

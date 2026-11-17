@@ -32,7 +32,7 @@ DEPENDENCY_DISPOSITIONS = {
         ],
         'integrity': 'sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==',
         'resolved': 'https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz',
-        'consumers': '463ffbb62062f8f290be749ad1026553b482c0b946f8e8f6c84284cd967519b6',
+        'consumers': 'f92403060bcbc4ada674a24784624493d4e96d4cbfd14ae917dc69338265e287',
         'advisories': {
             'GHSA-gcqx-w48m-w2h4': '2026-12-10',
         },

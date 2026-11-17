@@ -19,6 +19,9 @@ with its component; test configuration may live under `tests/`.
   membership, exclusions and the `$lib` aliases for the native consumers below.
   The native policy basename also participates in Vite's compiler cache
   invalidation; verify a physical option edit and its restoration in Astro.
+- `testing/vitest.hooks.ts` selects the real pre-push boundary test. `npm run
+  test:hooks` explicitly selects it and type-checks that test and config through
+  `typescript/hooks.json`, which inherits the shared strict compiler policy.
 - `quality/biome.settings.jsonc` owns Biome rules, globs and overrides. Package
   commands, the committing-tree gate and lint-staged select it explicitly. Its
   VCS ignore discovery and file patterns keep their repository scope.
@@ -52,7 +55,7 @@ loader. Removing root `tsconfig.json` makes the app build fail on `$lib` imports
 Verify native TypeScript checking, `npm run check:ts`, both phases of
 `npm run build`, and the pinned component generator when changing these aliases.
 
-Package manifests/lockfiles, `.npmrc`, `.nvmrc`, `.mise.toml`, Git files, `.github/`,
+Package manifests/lockfiles, `.npmrc`, `.nvmrc`, `.mise.toml`, `mise.lock`, Git files, `.github/`,
 native agent registrations and `vercel.ts` keep their required locations.
 `vercel.ts` is handwritten strict TypeScript: root `tsconfig.json`, Biome and
 Knip (as an entry file) cover it like any other source.

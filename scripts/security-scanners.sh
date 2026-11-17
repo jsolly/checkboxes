@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ((BASH_VERSINFO[0] >= 5)) || { echo "✗ $0 requires Bash >= 5, not $BASH_VERSION. Fix: brew install bash; open a fresh shell and rerun repository setup." >&2; exit 1; }
-# Pinned scanners for the pre-commit gate, the pre-push hook, and Security CI.
+# Pinned scanners for commit quality gates, standalone use and security CI.
 # A binary already on PATH or installed by mise is used when its version matches.
 # Otherwise the official release is downloaded and checked against the SHA-256
 # below. Semgrep and cfn-lint are PyPI packages run through the pinned uv.

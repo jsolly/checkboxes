@@ -7,7 +7,15 @@ required. Templates used during migration are examples, not an enforced upstream
 Prerequisites: Git, Bash >= 5 and Python >= 3.11. Install mise on non-Linux hosts;
 fresh Linux setup provisions a pinned, checksum-verified public mise binary in
 `/usr/local/bin`, using noninteractive sudo only when needed. The repository's `.mise.toml`
-and `.nvmrc` own its tool pins. On a reviewed fresh `origin/main` checkout run:
+and `.nvmrc` own its tool pins; `mise.lock` records each tool's download URL and checksum per
+platform so installs need no GitHub API lookup. To bump a pin, edit `.mise.toml`, run `mise lock`
+and commit both files (`mise lock --bump` for the major-only node pin). After `mise lock` and before committing, delete osv-scanner's `provenance.slsa` subtables from
+`mise.lock`: mise 2026.9.16 and later refuse to install it while its Aqua registry entry names no
+signer, and `scripts/test-osv-dispositions.py` fails the gate if they remain. Recheck the registry on
+each osv-scanner bump. Checksums and URLs still pin the download. Semgrep and cfn-lint are
+not mise tools: `scripts/security-scanners.sh` pins them and runs them through the pinned uv.
+
+On a reviewed fresh `origin/main` checkout run:
 
 ```bash
 bash scripts/setup-agent-environment.sh
@@ -15,7 +23,9 @@ bash scripts/setup-agent-environment.sh
 
 Setup installs repo-owned hooks outside the working tree, provisions the pinned
 tools and lockfile dependencies, and installs pinned Chromium when this repo uses
-Playwright. Run the repo's documented quality gate with its pinned tools:
+Playwright. Where `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` is set, as in Claude's cloud
+sessions, setup skips Chromium; the gate steps that launch it then fail locally
+and run in CI. Run the repo's documented quality gate with its pinned tools:
 
 ```bash
 mise exec -- npm run gate
@@ -28,8 +38,13 @@ that the gate ran. No setup command deploys the application or infrastructure.
 ## Hook trust
 
 The dispatcher lives in this clone's Git common directory, shared only by its
-linked worktrees. It registers pre-commit and pre-push. Pre-push runs Semgrep
-and osv-scanner. Reviewed OSV exceptions are recorded in
+linked worktrees. It registers pre-commit and pre-push. Pre-push runs pinned
+gitleaks over each outgoing ref range. New branches require a fetched
+`origin/main`; deletions and empty ranges need no history scan. A missing
+scanner, unreadable range or finding blocks the push. Semgrep and osv-scanner
+run in required PR CI and can be run manually through
+`scripts/security-scanners.sh`. Pre-push needs neither scanner nor a network
+probe. Reviewed OSV exceptions are recorded in
 [security scanning](security-scanning.md). The complete hook/library/setup
 bundle must match current reviewed `origin/main`, or a deliberately approved exact
 bundle digest. Missing files, symlinks, unreviewed modes and a foreign origin fail
@@ -77,7 +92,7 @@ pushing. Create a same-repository PR; use a draft while approval/work remains.
 Convert a pull request to draft, or run `gh pr merge --disable-auto`, to hold
 auto-merge. Non-draft pull requests opened by `solly-agent`, `jsolly`,
 `cursor[bot]`, or `app/cursor` arm GitHub's native squash auto-merge. A
-half-hour sweep uses that same author list, re-arms auto-merge, and, once
+daily sweep at 09:00, 17:00 and 22:00 UTC uses that same author list, re-arms auto-merge, and, once
 `ci` and `security` are green on the current head, squash-merges that commit.
 Pull requests from anyone else, including Dependabot, never auto-merge. Merge
 only when the required CI validates the exact current head.

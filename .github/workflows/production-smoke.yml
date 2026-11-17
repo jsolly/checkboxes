@@ -55,7 +55,10 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npx --no-install playwright install --with-deps chromium
+      # TEMPORARY: --with-deps removed. On 2026-11-11 apt on the arm runner could not reach
+      # ports.ubuntu.com. Restore `--with-deps` when the mirror resolves again:
+      # https://app.todoist.com/app/task/6hxj7q93qR2WxXW5
+      - run: npx --no-install playwright install chromium
       - run: npm run smoke:scenario-contract
       - run: node scripts/production-smoke.mjs
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
