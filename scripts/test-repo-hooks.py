@@ -439,5 +439,55 @@ cp "$BOOTSTRAP_PAYLOAD" "$2"
         self.assertFalse(self.downloads.exists())
 
 
+
+class PlaywrightBrowserSkip(unittest.TestCase):
+    """Setup skips the Chromium download exactly where Playwright reads its own opt-out as set."""
+
+    def setUp(self):
+        scratch = tempfile.TemporaryDirectory()
+        self.addCleanup(scratch.cleanup)
+        self.root = Path(scratch.name).resolve()
+        self.bin = self.root / 'bin'
+        self.bin.mkdir()
+        (self.bin / 'bash').symlink_to(shutil.which('bash'))
+        self.calls = self.root / 'mise-calls'
+        stub = self.bin / 'mise'
+        stub.write_text('#!/usr/bin/env bash\nprintf "%s\\n" "$*" >> "$MISE_CALLS"\n')
+        stub.chmod(0o755)
+        playwright = self.root / 'node_modules/.bin/playwright'
+        playwright.parent.mkdir(parents=True)
+        playwright.write_text('#!/usr/bin/env bash\nexit 0\n')
+        playwright.chmod(0o755)
+        text = (SOURCE / 'scripts/setup-agent-environment.sh').read_text()
+        start = text.index('skip_browser=')
+        self.block = text[start:text.index('\nfi\n', start) + 4]
+        self.assertIn('playwright install chromium', self.block)
+
+    def run_block(self, value=None):
+        env = {'PATH': str(self.bin), 'HOME': str(self.root), 'MISE_CALLS': str(self.calls)}
+        if value is not None:
+            env['PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD'] = value
+        result = subprocess.run([str(self.bin / 'bash'), '-c', 'set -euo pipefail\n' + self.block],
+                                cwd=self.root, env=env, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = self.calls.read_text().splitlines() if self.calls.exists() else []
+        self.calls.unlink(missing_ok=True)
+        return calls, result.stderr
+
+    def test_unset_or_off_values_install_chromium(self):
+        for value in (None, '', '0', 'false'):
+            with self.subTest(value=value):
+                calls, stderr = self.run_block(value)
+                self.assertEqual(calls, ['exec -- node_modules/.bin/playwright install chromium'])
+                self.assertEqual(stderr, '')
+
+    def test_set_values_skip_chromium_and_warn(self):
+        for value in ('1', 'true', 'FALSE'):
+            with self.subTest(value=value):
+                calls, stderr = self.run_block(value)
+                self.assertEqual(calls, [])
+                self.assertIn(f'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD={value}: Chromium not installed', stderr)
+
+
 if __name__ == '__main__':
     unittest.main()
