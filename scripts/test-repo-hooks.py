@@ -441,7 +441,7 @@ cp "$BOOTSTRAP_PAYLOAD" "$2"
 
 
 class PlaywrightBrowserSkip(unittest.TestCase):
-    """Setup skips the Chromium download only where Playwright's own opt-out is set."""
+    """Setup skips the Chromium download exactly where Playwright reads its own opt-out as set."""
 
     def setUp(self):
         scratch = tempfile.TemporaryDirectory()
@@ -475,14 +475,14 @@ class PlaywrightBrowserSkip(unittest.TestCase):
         return calls, result.stderr
 
     def test_unset_or_off_values_install_chromium(self):
-        for value in (None, '', '0', 'false', 'FALSE'):
+        for value in (None, '', '0', 'false'):
             with self.subTest(value=value):
                 calls, stderr = self.run_block(value)
                 self.assertEqual(calls, ['exec -- node_modules/.bin/playwright install chromium'])
                 self.assertEqual(stderr, '')
 
     def test_set_values_skip_chromium_and_warn(self):
-        for value in ('1', 'true'):
+        for value in ('1', 'true', 'FALSE'):
             with self.subTest(value=value):
                 calls, stderr = self.run_block(value)
                 self.assertEqual(calls, [])
