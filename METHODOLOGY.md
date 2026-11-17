@@ -186,6 +186,12 @@ Each framework entry in `src/data/framework-stats.json` stores a full `bundleMea
 
 ## Normalization
 
+The public gallery and this methodology page use Vercel Speed Insights to collect
+real visitor page performance measurements. Page URLs have their query strings and
+fragments removed before collection. The isolated `/test/*` pages do not load it.
+These visitor measurements are separate from the framework benchmark numbers
+described here and do not change their inputs or scores.
+
 Code Complexity is already normalized to 0–100 by the five-axis formula. No separate display score is needed.
 
 Z-scores for bundle size, Code Complexity, and Vibe Complexity are computed across all frameworks in the dataset so badge colors reflect relative standing, with higher z-scores treated as worse for all three metrics.
