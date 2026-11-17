@@ -86,9 +86,9 @@
 		"shiki": "^4.4.3",
 		"sortablejs": "^1.15.6",
 		"svelte": "^5.57.3",
-		"tailwind-merge": "3.6.0",
+		"tailwind-merge": "3.7.0",
 		"tailwindcss": "^4.3.2",
-		"vue": "^3.5.43"
+		"vue": "^3.5.45"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.15",
@@ -102,7 +102,7 @@
 		"knip": "^6.38.0",
 		"lint-staged": "^17.6.0",
 		"markdownlint-cli2": "^0.24.0",
-		"playwright": "1.63.0",
+		"playwright": "1.65.0",
 		"tailwind-variants": "^3.3.1",
 		"tsx": "^4.23.15",
 		"typescript": "^6.0.3",
