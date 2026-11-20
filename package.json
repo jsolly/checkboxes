@@ -29,6 +29,7 @@
 		"smoke:scenario-contract": "node --test scripts/production-smoke-scenario.test.mjs",
 		"check:a11y": "node scripts/check-accessibility.ts",
 		"assets": "node --use-env-proxy --import tsx scripts/assets/cli.ts",
+		"test:browser": "tsx --test --test-reporter=dot \"tests/e2e/*.e2e.ts\"",
 		"test:assets": "vitest run --config config/testing/vitest.assets.mjs",
 		"test:hooks": "tsc -p config/typescript/hooks.json && vitest run --config config/testing/vitest.hooks.ts",
 		"test:stats": "vitest run --config config/testing/vitest.stats.ts"

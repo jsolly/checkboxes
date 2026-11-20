@@ -64,6 +64,27 @@ gate_begin_commit "checkboxes"    # staged gitleaks; md-lint; doc-only fast path
 run_step "bash floor" gate_check_bash_floor   # every Bash entrypoint refuses Bash < 5
 gate_require_node                 # enforce the pinned Node (.nvmrc), not whatever's on PATH
 
+# Claude Duet cloud sessions ship no test browser: they set PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD
+# and block Playwright's download host (harness-improvements Todoist task 6j3qXFvGP5QhCRP5
+# tracks support). There, outside CI, the browser steps below skip with a warning. Anywhere
+# else, CI included, a Chromium that cannot launch fails the gate. The opt-out reads as set
+# exactly as Playwright and scripts/setup-agent-environment.sh read it.
+gate_browser=1
+browser_opt_out="${PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD:-}"
+if ! browser_error="$(node --input-type=module -e 'try { const { chromium } = await import("playwright"); await (await chromium.launch()).close(); } catch (error) { console.error(String(error?.message ?? error).split("\n")[0]); process.exit(1); }' 2>&1)"; then
+  if [[ -z "${CI:-}" && -n "$browser_opt_out" && "$browser_opt_out" != 0 && "$browser_opt_out" != false ]]; then
+    gate_browser=0
+    echo "⚠ PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=$browser_opt_out and Chromium cannot launch (Claude Duet cloud sessions have no test browser): browser steps skip; CI runs them." >&2
+  else
+    echo "✗ Playwright Chromium cannot launch: ${browser_error%%$'\n'*}" >&2
+    echo "  Fix: npx --no-install playwright install chromium" >&2
+    false # fires the gate ERR trap, which prints the abort line and exits
+  fi
+fi
+browser_step() { # browser_step "label" cmd [args...]: run_step unless the browser steps skip here
+  if ((gate_browser)); then run_step "$@"; else echo "⚠ skipped: $1 (no test browser here; CI runs it)" >&2; fi
+}
+
 # --- Quality gate (run_step: silent on green, full output + abort on red) ---
 run_step "biome ci"     npx --no-install biome ci --config-path=config/quality/biome.settings.jsonc . --error-on-warnings
 run_step "yaml lint"   npm run check:yaml
@@ -71,12 +92,14 @@ run_step "cfn-lint" bash scripts/security-scanners.sh cfn-lint
 run_step "actionlint"             npm run check:actions
 run_step "zizmor" bash scripts/security-scanners.sh zizmor
 run_step "markdown lint" npm run check:md
-run_step "smoke scenario" npm run smoke:scenario-contract
+browser_step "smoke scenario" npm run smoke:scenario-contract
 run_step "tests" npm test
+browser_step "browser tests" npm run test:browser
 run_step "astro check (types)" npm run check:ts
 run_step "knip"        npm run check:knip
 run_step "build"       npm run build
 
 run_step "repository hook trust" bash scripts/repo-python.sh scripts/test-repo-hooks.py
 
+((gate_browser)) || echo "⚠ the browser steps above were skipped; this gate pass does not cover them. CI runs them." >&2
 echo "✓ pre-commit gate passed — commit will land; Vercel deploys via GitHub integration after merge to main."

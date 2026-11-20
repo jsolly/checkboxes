@@ -499,5 +499,84 @@ class PlaywrightBrowserSkip(unittest.TestCase):
                 self.assertIn(f'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD={value}: Chromium not installed', stderr)
 
 
+BROWSER_SCRIPTS = ('smoke:scenario-contract', 'test:browser', )
+
+
+class GateBrowserSkip(unittest.TestCase):
+    """The commit gate skips browser steps only for Playwright's opt-out outside CI."""
+
+    def setUp(self):
+        scratch = tempfile.TemporaryDirectory()
+        self.addCleanup(scratch.cleanup)
+        self.root = Path(scratch.name).resolve()
+        self.bin = self.root / 'bin'
+        self.bin.mkdir()
+        (self.bin / 'bash').symlink_to(shutil.which('bash'))
+        text = (SOURCE / '.git-hooks/pre-commit').read_text()
+        start = text.index('gate_browser=1')
+        self.block = text[start:text.index('\n}\n', start) + 3]
+        self.assertIn('chromium.launch()', self.block)
+
+    def run_gate(self, launches, opt_out=None, ci=None):
+        node = self.bin / 'node'
+        node.write_text('#!/usr/bin/env bash\n' + ('exit 0\n' if launches else
+                        'echo "browserType.launch: Executable does not exist" >&2\nexit 1\n'))
+        node.chmod(0o755)
+        env = {'PATH': str(self.bin), 'HOME': str(self.root)}
+        if opt_out is not None:
+            env['PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD'] = opt_out
+        if ci is not None:
+            env['CI'] = ci
+        script = ('set -euo pipefail\nrun_step() { echo "ran: $1"; }\n' + self.block
+                  + 'browser_step "smoke" true\nrun_step "tests" true\n')
+        return subprocess.run([str(self.bin / 'bash'), '-c', script], cwd=self.root, env=env,
+                              text=True, capture_output=True)
+
+    def test_launchable_browser_runs_steps(self):
+        for opt_out, ci in ((None, None), ('1', None), ('1', 'true')):
+            with self.subTest(opt_out=opt_out, ci=ci):
+                result = self.run_gate(True, opt_out, ci)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stdout, 'ran: smoke\nran: tests\n')
+                self.assertEqual(result.stderr, '')
+
+    def test_opt_out_outside_ci_skips_browser_steps_with_warning(self):
+        for value in ('1', 'true', 'FALSE'):
+            with self.subTest(value=value):
+                result = self.run_gate(False, value)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stdout, 'ran: tests\n')
+                self.assertIn(f'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD={value} and Chromium cannot launch', result.stderr)
+                self.assertIn('skipped: smoke', result.stderr)
+
+    def test_missing_browser_fails_in_ci_or_without_opt_out(self):
+        for opt_out, ci in (('1', 'true'), (None, None), ('', None), ('0', None), ('false', None)):
+            with self.subTest(opt_out=opt_out, ci=ci):
+                result = self.run_gate(False, opt_out, ci)
+                self.assertEqual(result.returncode, 1)
+                self.assertEqual(result.stdout, '')
+                self.assertIn('Chromium cannot launch: browserType.launch: Executable does not exist\n',
+                              result.stderr)
+
+    def test_real_probe_prints_the_error_message_not_a_node_frame(self):
+        (self.bin / 'node').symlink_to(shutil.which('node'))
+        env = {'PATH': str(self.bin), 'HOME': str(self.root), 'CI': 'true'}
+        script = 'set -euo pipefail\nrun_step() { echo "ran: $1"; }\n' + self.block
+        result = subprocess.run([str(self.bin / 'bash'), '-c', script], cwd=self.root, env=env,
+                                text=True, capture_output=True)
+        self.assertEqual(result.returncode, 1)
+        line = next(l for l in result.stderr.splitlines() if 'Chromium cannot launch:' in l)
+        self.assertIn("'playwright'", line)
+        self.assertNotIn('node:internal', result.stderr)
+
+    def test_gate_wires_browser_steps_and_warns_after_skips(self):
+        text = (SOURCE / '.git-hooks/pre-commit').read_text()
+        for script in BROWSER_SCRIPTS:
+            lines = [l for l in text.splitlines() if f'npm run {script}' in l]
+            self.assertEqual(len(lines), 1, script)
+            self.assertTrue(lines[0].lstrip().startswith('browser_step '), lines[0])
+        self.assertIn('((gate_browser)) || echo', text[text.index('browser_step() {'):])
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -17,7 +17,8 @@ Each test should answer: **"what happened for a real user or system event?"**
 - `tests/lib/` - business logic and provider integration helpers (`src/lib/**`).
 - `tests/pages/` - route rendering and page-level behavior.
 - `tests/smoke/` - Playwright smoke tests for route and console sanity.
-- `tests/e2e/` - end-to-end user journeys (serial, production-like).
+- `tests/e2e/` - end-to-end user journeys (serial, production-like). Named `*.e2e.ts` and run by
+  `npm run test:browser`, so `npm test` needs no browser.
 - `tests/helpers/` - shared factories/builders and test environment utilities.
 
 ## Naming conventions
