@@ -48,7 +48,7 @@ Protection](https://vercel.com/docs/skew-protection).
 Tabs opened before this feature ships cannot show a notice retroactively. After
 their next ordinary navigation, they can detect future deployments.
 
-`tests/e2e/website-updates.test.ts` builds independent releases and serves them
+`tests/e2e/website-updates.e2e.ts` (`npm run test:browser`) builds independent releases and serves them
 through one local origin. It verifies the first poll returning B for an A
 document, independent tab choice, active checkbox state, cancellation,
 dismissal/reopening with keyboard focus, explicit keyboard reload,
@@ -59,8 +59,8 @@ assets across publication of B; live host retention is a separate production
 acceptance check. Expected injected network console errors are limited to
 offline and HTTP 503; any other console/page/network error fails. Set
 `UPDATE_EVIDENCE_DIR` to an existing absolute directory to capture
-desktop/mobile light/dark screenshots. The test runs in the normal `npm test`
-gate with the pinned Chromium installation.
+desktop/mobile light/dark screenshots. The gate runs it through `npm run
+test:browser` with the pinned Chromium installation.
 
 ## Styles and live retention acceptance
 

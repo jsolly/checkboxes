@@ -24,8 +24,9 @@ bash scripts/setup-agent-environment.sh
 Setup installs repo-owned hooks outside the working tree, provisions the pinned
 tools and lockfile dependencies, and installs pinned Chromium when this repo uses
 Playwright. Where `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` is set, as in Claude's cloud
-sessions, setup skips Chromium; the gate steps that launch it then fail locally
-and run in CI. Run the repo's documented quality gate with its pinned tools:
+sessions, setup skips Chromium; the gate then skips the steps that launch it,
+with a warning, and CI runs them. Anywhere else, CI included, a Chromium that
+cannot launch fails the gate. Run the repo's documented quality gate with its pinned tools:
 
 ```bash
 mise exec -- npm run gate
