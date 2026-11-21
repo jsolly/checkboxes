@@ -90,16 +90,40 @@ Work from fresh main on an isolated branch. Review the actual final diff for bug
 secrets, security, tests and repository guidelines; use an independent reviewer
 for substantial or sensitive changes. Run the required complete local gate before
 pushing. Create a same-repository PR; use a draft while approval/work remains.
-Convert a pull request to draft, or run `gh pr merge --disable-auto`, to hold
-auto-merge. Non-draft pull requests opened by `solly-agent`, `jsolly`,
-`cursor[bot]`, or `app/cursor` arm GitHub's native squash auto-merge. A
-daily sweep at 09:00, 17:00 and 22:00 UTC uses that same author list, re-arms auto-merge, and, once
-`ci` and `security` are green on the current head, squash-merges that commit.
-Pull requests from anyone else, including Dependabot, never auto-merge. Merge
-only when the required CI validates the exact current head.
+Keep a pull request in draft to hold it. Non-draft, same-repository pull
+requests into `main` from `solly-agent`, `jsolly`, `cursor[bot]`, or `app/cursor`
+are eligible for native squash auto-merge. The default-branch Auto-merge
+workflow runs at 09:00, 17:00 and 22:00 UTC, or by a manual dispatch on
+`main`. It verifies the exact PR CI run attempt and both `ci` and `security`
+jobs for the same PR, head and target branch, then requests native auto-merge
+with that head. Green PRs, including drafts just marked ready, wait for the
+next sweep unless a maintainer dispatches the workflow on `main`. If a partial
+CI rerun does not report both required jobs, rerun all CI jobs. Other authors,
+including Dependabot, are not eligible. Disabling native auto-merge alone does
+not prevent a later sweep; use draft to keep a PR on hold.
 Never push to the default branch, weaken rulesets, bypass checks or use an
 admin merge. Optional
 personal review skills may help, but they are not prerequisites for this flow.
+
+### Auto-merge credential cutover
+
+An administrator must create the `auto-merge` GitHub Actions environment and
+allow deployments only from the branch `main` (no tag or PR-ref rules).
+Pause the outgoing workflow, review and if needed disarm PRs it already armed,
+revoke its credential, and remove the repository `AUTO_MERGE_TOKEN` and any
+inherited copy granting access here. Merge the replacement through the usual
+protected PR checks. Once the environment policy is in place, store a newly
+issued, repository-scoped automation credential as the environment secret
+`MAIN_AUTO_MERGE_TOKEN`, not as a repository or organization secret. It needs
+Actions read and the permissions to read PRs and request normal squash
+auto-merge without any ruleset bypass. Keep the required `CI / ci` and
+`security` rules in force, then re-enable the Auto-merge workflow.
+
+The workflow does not run PR code, use PR artifacts, or authorize merges from
+matching job names in unrelated workflows. This does not replace reviewing
+changes to CI definitions or gate scripts before merging. If cutover fails, pause
+Auto-merge and merge reviewed PRs through the normal protected GitHub UI while
+correcting the environment. Do not restore an unrestricted repository merge secret.
 
 Preserve existing code-only Deploy and main-only Production rules.
 Never push a `preview/` branch merely to validate this migration. Verify the

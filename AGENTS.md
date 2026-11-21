@@ -4,7 +4,7 @@
 
 Ship profile: `vercel-static`
 
-**Integration: branch → reviewed PR → merge on green `CI / ci`.** Non-draft pull requests opened by `solly-agent`, `jsolly`, `cursor[bot]`, or `app/cursor` arm native squash auto-merge. Convert a pull request to draft, or run `gh pr merge --disable-auto`, to hold it. Pull requests from anyone else, including Dependabot, never auto-merge. Follow [local release instructions](docs/development.md). Agents never push to `main`, change rulesets, or admin-merge.
+**Integration: branch → reviewed PR → merge on green `CI / ci`.** Non-draft pull requests opened by `solly-agent`, `jsolly`, `cursor[bot]`, or `app/cursor` are eligible for native squash auto-merge at the next scheduled or manual main-branch sweep after CI and security are verified for the current head. Keep a pull request in draft to hold it. The Auto-merge workflow does not act on pull requests from anyone else, including Dependabot. Follow [local release instructions](docs/development.md). Agents never push to `main`, change rulesets, or admin-merge.
 
 Production URL: <https://www.checkboxes.xyz>
 
