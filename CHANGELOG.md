@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-22
+
+- Removed npm overrides for `tar-fs`, `lodash` and `rollup`. The dependency tree no longer contains these packages.
+
 ## 2026-11-20
 
 - The commit gate skips its Chromium steps with a warning only where `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` is set outside CI and Chromium cannot launch, as in Claude Duet cloud sessions. Anywhere else, CI included, a Chromium that cannot launch fails the gate with its launch error. Hook trust tests cover the run, skip and fail cases. The website update browser test moves to `tests/e2e/website-updates.e2e.ts`, run by `npm run test:browser`, so `npm test` launches no browser.
