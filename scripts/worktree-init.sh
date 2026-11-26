@@ -6,21 +6,23 @@
 # Copy, never symlink — a symlinked .env.local resolves outside the worktree root and
 # trips Vite's server.fs.allow. cp -p preserves the 0600 mode on .env.local.
 #
-# Non-fatal by design: a missing primary, missing manifest, or zero glob matches must
-# not block the reviewed repository setup that follows in worktree:init. Always exits 0, except the Bash < 5
-# refusal on its first line.
+# No manifest or zero glob matches are valid. If Git or an allowlisted copy
+# fails, stop before dependency setup instead of leaving a partial worktree.
 ((BASH_VERSINFO[0] >= 5)) || { echo "✗ $0 requires Bash >= 5, not $BASH_VERSION. Fix: brew install bash; open a fresh shell and rerun repository setup." >&2; exit 1; }
-set -uo pipefail
+set -euo pipefail
 
-dest="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+dest="$(git rev-parse --show-toplevel)"
 manifest="$dest/.worktreeinclude"
 [ -f "$manifest" ] || exit 0
 
 # The first `worktree` entry in --porcelain output is the primary checkout. Strip the
 # fixed `worktree ` prefix rather than field-splitting — the path is verbatim and may
 # contain spaces, which `awk '{print $2}'` would truncate.
-primary="$(git worktree list --porcelain 2>/dev/null | sed -n 's/^worktree //p' | head -n1)"
-[ -n "$primary" ] || exit 0
+primary="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
+if [ -z "$primary" ]; then
+  echo "worktree-init: Git did not list a primary checkout" >&2
+  exit 1
+fi
 [ "$primary" = "$dest" ] && exit 0  # running in the primary itself; nothing to copy
 
 while IFS= read -r line || [ -n "$line" ]; do
@@ -37,9 +39,10 @@ while IFS= read -r line || [ -n "$line" ]; do
   for src in "$primary"/$line; do                     # glob-expand against the primary
     [ -e "$src" ] || continue                         # tolerate zero matches
     rel="${src#"$primary"/}"
-    mkdir -p "$dest/$(dirname "$rel")"
-    cp -p "$src" "$dest/$rel" && echo "worktree-init: copied $rel" >&2
+    if ! mkdir -p "$dest/$(dirname "$rel")" || ! cp -p "$src" "$dest/$rel"; then
+      echo "worktree-init: could not copy $rel" >&2
+      exit 1
+    fi
+    echo "worktree-init: copied $rel" >&2
   done
 done < "$manifest"
-
-exit 0
