@@ -93,10 +93,14 @@ pushing. Create a same-repository PR; use a draft while approval/work remains.
 The owning agent follows the PR through CI, merge and the repository's release
 checks using its existing authenticated GitHub session. Keep held PRs in draft
 and preserve their existing auto-merge state. A ready, same-repository self PR
-into `main` can use native squash auto-merge when the base branch's active rules
-require the relevant checks with no bypass available to the merging identity.
-Verify those rules before arming; if that evidence is unavailable, wait for green
-CI and use a squash merge pinned to the verified head SHA instead.
+into `main` can use native squash auto-merge. Before arming or merging, verify
+with the merging connection that the base branch actively requires GitHub
+Actions `ci` and `security` (integration ID 15368), the repository allows
+squash and auto-merge, and every applicable active ruleset reports
+`current_user_can_bypass: never`. If this evidence is missing or unreadable,
+leave the PR open and report the blocker. If the connection cannot arm
+auto-merge for the exact head, wait for green checks and use a squash merge
+pinned to that head instead.
 
 Before a direct merge, read the actual GitHub Actions workflow runs and jobs for
 the current PR and head. Require the latest relevant CI attempt's `ci` and
