@@ -90,13 +90,32 @@ Work from fresh main on an isolated branch. Review the actual final diff for bug
 secrets, security, tests and repository guidelines; use an independent reviewer
 for substantial or sensitive changes. Run the required complete local gate before
 pushing. Create a same-repository PR; use a draft while approval/work remains.
-Convert a pull request to draft, or run `gh pr merge --disable-auto`, to hold
-auto-merge. Non-draft pull requests opened by `solly-agent`, `jsolly`,
-`cursor[bot]`, or `app/cursor` arm GitHub's native squash auto-merge. A
-daily sweep at 09:00, 17:00 and 22:00 UTC uses that same author list, re-arms auto-merge, and, once
-`ci` and `security` are green on the current head, squash-merges that commit.
-Pull requests from anyone else, including Dependabot, never auto-merge. Merge
-only when the required CI validates the exact current head.
+The owning agent follows the PR through CI, merge and the repository's release
+checks using its existing authenticated GitHub session. Keep held PRs in draft
+and preserve their existing auto-merge state. A ready, same-repository self PR
+into `main` can use native squash auto-merge. Before arming or merging, verify
+with the merging connection that the base branch actively requires GitHub
+Actions `ci` and `security` (integration ID 15368), the repository allows
+squash and auto-merge, and every applicable active ruleset reports
+`current_user_can_bypass: never`. If this evidence is missing or unreadable,
+leave the PR open and report the blocker. If the connection cannot arm
+auto-merge for the exact head, wait for green checks and use a squash merge
+pinned to that head instead.
+
+Before a direct merge, read the actual GitHub Actions workflow runs and jobs for
+the current PR and head. Require the latest relevant CI attempt's `ci` and
+`security` jobs to succeed; matching check names or a success from another SHA
+are insufficient. Missing, failed, cancelled, skipped or incomplete jobs hold
+the merge. Re-read the PR's draft state, head and target branch before merging;
+if the head or target changed, repeat the checks. A head-pinned merge must reject
+a newer head. The owning agent follows any armed native auto-merge to completion
+and verifies the resulting release. If execution is interrupted, report the PR's
+draft/auto-merge state and remaining checks so another agent can resume.
+
+No Actions workflow arms, re-arms or merges PRs. Keep repository Allow auto-merge
+enabled, but store no PAT or GitHub App private key for merging in Actions.
+Dependabot and third-party PRs require their separately authorized maintenance
+flow; the self-PR integration path does not grant that authority.
 Never push to the default branch, weaken rulesets, bypass checks or use an
 admin merge. Optional
 personal review skills may help, but they are not prerequisites for this flow.

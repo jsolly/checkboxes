@@ -268,7 +268,7 @@ jobs:
       - name: Lint the static media template
         run: bash scripts/security-scanners.sh cfn-lint
 
-  # Keep the security check used by auto-merge. The required ci job waits for it.
+  # The required ci job waits for this aggregate security check.
   # Fail even when a scanner was skipped, cancelled or failed.
   security:
     permissions:
